@@ -67,16 +67,7 @@ public class AccountsApiController implements AccountsApi {
     }
 
     public ResponseEntity<BankAccount> createAccount(@Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody BankAccount body) {
-        BankAccount account = new BankAccount();
-        account.setUserId(bankAccountService.GenerateID());
-        account.setIban(bankAccountService.GenerateIban());
-        account.setBalance(BigDecimal.valueOf(0));
-        account.setAbsoluteLimit(body.getAbsoluteLimit());
-        account.setCreationDate(new SimpleDateFormat("dd-MM-yyyy").format(new Date()));
-        account.setAccountType(body.getAccountType());
-
-        bankAccountService.SetBankAccount(account);
-        return new ResponseEntity<BankAccount>(account, HttpStatus.OK);
+        return bankAccountService.SetBankAccount(body);
     }
 
     public ResponseEntity<Void> deleteAccount(@Parameter(in = ParameterIn.PATH, description = "The IBAN", required=true, schema=@Schema()) @PathVariable("iban") String iban) {
@@ -116,17 +107,7 @@ public class AccountsApiController implements AccountsApi {
     public ResponseEntity<List<BankAccount>> getAccounts(@Min(0)@Parameter(in = ParameterIn.QUERY, description = "number of records to skip for pagination" ,schema=@Schema(allowableValues={  }
 )) @Valid @RequestParam(value = "skip", required = false) Integer skip,@Min(0) @Max(50) @Parameter(in = ParameterIn.QUERY, description = "maximum number of records to return" ,schema=@Schema(allowableValues={  }, maximum="50"
 )) @Valid @RequestParam(value = "limit", required = false) Integer limit) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
-            try {
-                return new ResponseEntity<List<BankAccount>>(objectMapper.readValue("[ {\n  \"balance\" : 23.45,\n  \"absolute limit\" : 1,\n  \"iban\" : \"NLxxINHO0xxxxxxxxx\",\n  \"accountType\" : \"Current\",\n  \"creationDate\" : \"01-05-2022:12:00:00\",\n  \"userId\" : 1\n}, {\n  \"balance\" : 23.45,\n  \"absolute limit\" : 1,\n  \"iban\" : \"NLxxINHO0xxxxxxxxx\",\n  \"accountType\" : \"Current\",\n  \"creationDate\" : \"01-05-2022:12:00:00\",\n  \"userId\" : 1\n} ]", List.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<List<BankAccount>>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
-
-        return new ResponseEntity<List<BankAccount>>(HttpStatus.NOT_IMPLEMENTED);
+        return bankAccountService.GetAllBankAccounts();
     }
 
     public ResponseEntity<BankAccount> updateAccount(@Parameter(in = ParameterIn.PATH, description = "The IBAN", required=true, schema=@Schema()) @PathVariable("iban") String iban,@Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody BankAccount body) {

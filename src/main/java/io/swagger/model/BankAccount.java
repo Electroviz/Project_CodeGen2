@@ -91,6 +91,10 @@ public class BankAccount   {
     return userId;
   }
 
+  public Integer getId() {
+    return id;
+  }
+
   public void setUserId(Integer userId) {
     this.userId = userId;
   }
