@@ -3,6 +3,7 @@ package io.swagger.api;
 import io.swagger.model.BankAccount;
 import io.swagger.model.TransactionInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.service.BankAccountService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -30,8 +31,12 @@ import javax.validation.constraints.*;
 import javax.validation.Valid;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-05-12T15:22:53.754Z[GMT]")
 @RestController
@@ -42,6 +47,8 @@ public class AccountsApiController implements AccountsApi {
     private final ObjectMapper objectMapper;
 
     private final HttpServletRequest request;
+
+    BankAccountService bankAccountService = new BankAccountService();
 
     @org.springframework.beans.factory.annotation.Autowired
     public AccountsApiController(ObjectMapper objectMapper, HttpServletRequest request) {
@@ -60,22 +67,22 @@ public class AccountsApiController implements AccountsApi {
     }
 
     public ResponseEntity<BankAccount> createAccount(@Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody BankAccount body) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
-            try {
-                return new ResponseEntity<BankAccount>(objectMapper.readValue("{\n  \"balance\" : 23.45,\n  \"absolute limit\" : 1,\n  \"iban\" : \"NLxxINHO0xxxxxxxxx\",\n  \"accountType\" : \"Current\",\n  \"creationDate\" : \"01-05-2022:12:00:00\",\n  \"userId\" : 1\n}", BankAccount.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<BankAccount>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
+        BankAccount account = new BankAccount();
+        account.setUserId(bankAccountService.GenerateID());
+        account.setIban(bankAccountService.GenerateIban());
+        account.setBalance(BigDecimal.valueOf(0));
+        account.setAbsoluteLimit(body.getAbsoluteLimit());
+        account.setCreationDate(new SimpleDateFormat("dd-MM-yyyy").format(new Date()));
+        account.setAccountType(body.getAccountType());
 
-        return new ResponseEntity<BankAccount>(HttpStatus.NOT_IMPLEMENTED);
+        bankAccountService.SetBankAccount(account);
+        return new ResponseEntity<BankAccount>(account, HttpStatus.OK);
     }
 
     public ResponseEntity<Void> deleteAccount(@Parameter(in = ParameterIn.PATH, description = "The IBAN", required=true, schema=@Schema()) @PathVariable("iban") String iban) {
         String accept = request.getHeader("Accept");
-        return new ResponseEntity<Void>(HttpStatus.NOT_IMPLEMENTED);
+        bankAccountService.DeleteBankAccount(iban);
+        return new ResponseEntity<Void>(HttpStatus.OK);
     }
 
     public ResponseEntity<BankAccount> getAccountByIBAN(@Parameter(in = ParameterIn.PATH, description = "The IBAN", required=true, schema=@Schema()) @PathVariable("iban") String iban) {
@@ -135,5 +142,4 @@ public class AccountsApiController implements AccountsApi {
 
         return new ResponseEntity<BankAccount>(HttpStatus.NOT_IMPLEMENTED);
     }
-
 }
