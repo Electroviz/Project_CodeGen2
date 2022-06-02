@@ -71,7 +71,6 @@ public class AccountsApiController implements AccountsApi {
     }
 
     public ResponseEntity<Void> deleteAccount(@Parameter(in = ParameterIn.PATH, description = "The IBAN", required=true, schema=@Schema()) @PathVariable("iban") String iban) {
-        String accept = request.getHeader("Accept");
         bankAccountService.DeleteBankAccount(iban);
         return new ResponseEntity<Void>(HttpStatus.OK);
     }
