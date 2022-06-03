@@ -70,7 +70,7 @@ public class AccountsApiController implements AccountsApi {
         BankAccount account = new BankAccount();
         account.setUserId(bankAccountService.GenerateID());
         account.setIban(bankAccountService.GenerateIban());
-        account.setBalance(BigDecimal.valueOf(0));
+        account.setBalance(Double.valueOf(0));
         account.setAbsoluteLimit(body.getAbsoluteLimit());
         account.setCreationDate(new SimpleDateFormat("dd-MM-yyyy").format(new Date()));
         account.setAccountType(body.getAccountType());
