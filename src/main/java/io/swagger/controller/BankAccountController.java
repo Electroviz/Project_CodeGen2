@@ -6,10 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.print.attribute.standard.Media;
 
 @RestController
 public class BankAccountController {
@@ -36,5 +35,10 @@ public class BankAccountController {
         } else {
             return new ResponseEntity(response, HttpStatus.CREATED);
         }
+    }
+
+    @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE,value="/get/{IBAN}")
+    public ResponseEntity getBankAccountInfoByIbanController(@PathVariable("IBAN") String IBAN) {
+        
     }
 }
