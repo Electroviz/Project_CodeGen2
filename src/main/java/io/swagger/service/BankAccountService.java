@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -18,6 +19,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class BankAccountService {
     @Autowired
     private BankAccountRepository bankAccountRepository;
+    //melle
     public ResponseEntity GetAllBankAccounts() {
         List<BankAccount> allBankAccounts = bankAccountRepository.findAll();
 
@@ -29,6 +31,22 @@ public class BankAccountService {
         }
     }
 
+    //Melle
+    public ResponseEntity GetBankAccountByIban(String iban) {
+        iban = iban.replaceAll("[{}]",""); //make sure that the {variable} quotes are not taking into consideration
+        //if(iban != null) return new ResponseEntity<String>(String.valueOf(bankAccountRepository.findAll().stream().count()),HttpStatus.FOUND);
+        BankAccount correctBankAccount = null;
+        for (BankAccount ba : this.bankAccountRepository.findAll()) {
+            if (Objects.equals(ba.getIban(), iban)) {
+                return new ResponseEntity<BankAccount>(ba,HttpStatus.FOUND);
+            }
+        }
+
+        return ResponseEntity.status(400).body(correctBankAccount);
+
+    }
+
+    //melle
     public void CreateDummyDataBankAccount() {
         BankAccount newBankAccount = new BankAccount();
         newBankAccount.setIban(this.generateRandomIban());
@@ -40,6 +58,7 @@ public class BankAccountService {
         bankAccountRepository.save(newBankAccount);
     }
 
+    //melle
     public ResponseEntity CreateNewBankAccount() {
         BankAccount newBankAccount = new BankAccount();
         newBankAccount.SetBalance(0.0);
@@ -56,6 +75,7 @@ public class BankAccountService {
         bankAccountRepository.save(bankAccount);
     }
 
+    //melle
     private String generateRandomIban() {
         boolean succes = true;
         String newIban = "";

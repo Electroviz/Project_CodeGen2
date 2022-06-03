@@ -16,13 +16,14 @@ public class BankAccountController {
     @Autowired
     private BankAccountService bankAccountService;
 
-    //voorbeeld van een request
+    //melle
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE,value = "/allBankAccounts")
     public ResponseEntity getAccountByIBANController(){
 
         return bankAccountService.GetAllBankAccounts();
     }
 
+    //melle
     @RequestMapping(value = "/createBankAccount", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity registerNewBankAccountController(@RequestBody BankAccount account){
         ResponseEntity<String> response = bankAccountService.CreateNewBankAccount();
@@ -34,11 +35,11 @@ public class BankAccountController {
         }
     }
 
+    //melle
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE,value="/getBankAccount/{IBAN}")
     public ResponseEntity getBankAccountInfoByIbanController(@PathVariable("IBAN") String IBAN) {
 
-        BankAccount testAccount = new BankAccount();
-        testAccount.setIban(IBAN);
-        return new ResponseEntity<BankAccount>(testAccount, HttpStatus.OK);
+
+        return bankAccountService.GetBankAccountByIban(IBAN);
     }
 }
