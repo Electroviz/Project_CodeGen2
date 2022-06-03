@@ -3,6 +3,7 @@ package io.swagger;
 import io.swagger.configuration.LocalDateConverter;
 import io.swagger.configuration.LocalDateTimeConverter;
 
+import io.swagger.model.BankAccount;
 import io.swagger.service.BankAccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -17,6 +18,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 @SpringBootApplication
 @EnableOpenApi
 @ComponentScan(basePackages = { "io.swagger", "io.swagger.api" , "io.swagger.configuration"})
@@ -29,8 +32,23 @@ public class Swagger2SpringBoot implements CommandLineRunner {
             throw new ExitException();
         }
 
+        //melle
+        //create the banks own account
+        BankAccount ourMainBankAccount = new BankAccount();
+        ourMainBankAccount.setIban("NL01INHO0000000001");
+        ourMainBankAccount.setBalance(1000000000.0); //miljard
+        ourMainBankAccount.setAbsoluteLimit(-1000000000.0); //minus 1 miljard in het rood
+        ourMainBankAccount.setAccountType(BankAccount.AccountTypeEnum.CURRENT); //not a savings account
+        ourMainBankAccount.setUserId(-1);
+
+        bankAccountService.SaveBankAccount(ourMainBankAccount);
+
+        //melle
+        //create 10 fake bank accounts without user associations
         for(int i = 0; i < 10; i++)
             bankAccountService.CreateDummyDataBankAccount();
+
+
     }
 
     public static void main(String[] args) throws Exception {
