@@ -37,4 +37,14 @@ public class BankAccountController {
             return new ResponseEntity(response, HttpStatus.CREATED);
         }
     }
+
+    @RequestMapping(method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_VALUE,value = "/all")
+    public ResponseEntity getAccountByName(){
+        if (bankAccountService.GetAllBankAccounts().getStatusCode().isError()){
+            return ResponseEntity.status(400).body("Bad Request");
+        }
+        else {
+            return ResponseEntity.status(201).body(bankAccountService.GetAllBankAccounts());
+        }
+    }
 }

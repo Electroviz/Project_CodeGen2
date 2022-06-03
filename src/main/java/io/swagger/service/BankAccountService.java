@@ -58,6 +58,22 @@ public class BankAccountService {
 
     }
 
+    public ResponseEntity getAccountByName(String fullname){
+        BankAccount accountToReturn = null;
+        List<BankAccount> allBankAccounts;
+        allBankAccounts = bankAccountRepository.findAll();
+        Integer userCompareId = null;
+
+        //1. pak alle users
+        //2. check per user of de gegeven naam overeen komt met user.fullname
+        //3. zoja pak het user object en de userId
+        //4. check nu of de userId overeenkomt met een userid in een van de bankaccounts
+        //5. zoja return de iban's van die accounts.
+
+
+        //userCompareId = accountCheck.getUserId();
+    }
+
     public void SaveBankAccount(BankAccount bankAccount) {
         bankAccountRepository.save(bankAccount);
     }
@@ -102,10 +118,9 @@ public class BankAccountService {
         newBankAccount.SetBalance(0.0);
         newBankAccount.absoluteLimit(0.0); //-	Balance cannot become lower than a certain number defined per account, referred to as absolute limit
         newBankAccount.SetAccountStatus(BankAccount.AccountStatusEnum.ACTIVE);
-        newBankAccount.setCreationDate(new Date());
+        newBankAccount.setCreationDate(new SimpleDateFormat("dd-MM-yyyy").format(new Date()));
         newBankAccount.setIban(generateRandomIban());
 
-        //bankAccountRepository.save(account);
 
         if(account.getAccountType() != BankAccount.AccountTypeEnum.CURRENT && account.getAccountType() != BankAccount.AccountTypeEnum.SAVINGS) {
             return ResponseEntity.status(400).body(account);
@@ -123,14 +138,19 @@ public class BankAccountService {
     public void DeleteBankAccount(String iban){
         List<BankAccount> allBankAccounts;
         allBankAccounts = bankAccountRepository.findAll();
+        boolean canDel = false;
         int deleteId = 0;
         for (BankAccount bankAccount : allBankAccounts) {
             if(bankAccount.getIban() == iban){
                 deleteId = bankAccount.getId();
+                canDel = true;
                 break;
             }
         }
-        bankAccountRepository.deleteById(deleteId);
+        if (canDel)
+        {
+            bankAccountRepository.deleteById(deleteId);
+        }
     }
 
 }

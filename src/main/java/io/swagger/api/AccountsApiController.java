@@ -91,17 +91,7 @@ public class AccountsApiController implements AccountsApi {
     }
 
     public ResponseEntity<List<String>> getAccountByName(@Parameter(in = ParameterIn.PATH, description = "full name of a user", required=true, schema=@Schema()) @PathVariable("fullName") String fullName) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
-            try {
-                return new ResponseEntity<List<String>>(objectMapper.readValue("[ \"\", \"\" ]", List.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<List<String>>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
-
-        return new ResponseEntity<List<String>>(HttpStatus.NOT_IMPLEMENTED);
+        return bankAccountService.getAccountByName(fullName);
     }
 
     public ResponseEntity<List<BankAccount>> getAccounts(@Min(0)@Parameter(in = ParameterIn.QUERY, description = "number of records to skip for pagination" ,schema=@Schema(allowableValues={  }
