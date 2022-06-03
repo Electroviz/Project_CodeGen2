@@ -18,34 +18,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class BankAccountService {
     @Autowired
     private BankAccountRepository bankAccountRepository;
-
-    //eventueel user service hier ook in auto wiren
-//    public BankAccountService() {
-//        //created dummy data
-//        BankAccount newBankAccount = new BankAccount();
-//        newBankAccount.setIban(generateRandomIban());
-//        newBankAccount.setBalance(1000.0);
-//
-//        bankAccountRepository.save(newBankAccount);
-//
-//    }
     public ResponseEntity GetAllBankAccounts() {
-        //test account:
-//        BankAccount newBankAccount = new BankAccount();
-//        newBankAccount.setUserId(1);
-//        newBankAccount.setAccountType(BankAccount.AccountTypeEnum.CURRENT);
-//        newBankAccount.setBalance(0.0);
-//        newBankAccount.setAbsoluteLimit(0.0);
-//        newBankAccount.setCreationDate("12-02-2022");
-//        newBankAccount.setIban("184kjdjanf");
-
-//        bankAccountRepository.save(newBankAccount);
-
-//        List<BankAccount> allBankAccounts;
-//        allBankAccounts = bankAccountRepository.findAll();
-        for(int i = 0; i < 5; i++)
-            this.CreateDummyDataBankAccount();
-
         List<BankAccount> allBankAccounts = bankAccountRepository.findAll();
 
         if(bankAccountRepository.count() == 0) {
@@ -54,11 +27,9 @@ public class BankAccountService {
         else {
             return new ResponseEntity<List<BankAccount>>(allBankAccounts,HttpStatus.ACCEPTED);
         }
-
-
     }
 
-    private void CreateDummyDataBankAccount() {
+    public void CreateDummyDataBankAccount() {
         BankAccount newBankAccount = new BankAccount();
         newBankAccount.setIban(this.generateRandomIban());
         newBankAccount.setBalance(ThreadLocalRandom.current().nextDouble(300, 1800));

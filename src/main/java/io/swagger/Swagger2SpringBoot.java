@@ -3,6 +3,8 @@ package io.swagger;
 import io.swagger.configuration.LocalDateConverter;
 import io.swagger.configuration.LocalDateTimeConverter;
 
+import io.swagger.service.BankAccountService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.ExitCodeGenerator;
 import org.springframework.boot.SpringApplication;
@@ -19,12 +21,16 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 @EnableOpenApi
 @ComponentScan(basePackages = { "io.swagger", "io.swagger.api" , "io.swagger.configuration"})
 public class Swagger2SpringBoot implements CommandLineRunner {
-
+    @Autowired
+    BankAccountService bankAccountService;
     @Override
     public void run(String... arg0) throws Exception {
         if (arg0.length > 0 && arg0[0].equals("exitcode")) {
             throw new ExitException();
         }
+
+        for(int i = 0; i < 10; i++)
+            bankAccountService.CreateDummyDataBankAccount();
     }
 
     public static void main(String[] args) throws Exception {
