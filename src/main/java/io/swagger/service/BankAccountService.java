@@ -3,6 +3,7 @@ package io.swagger.service;
 import io.swagger.model.BankAccount;
 import io.swagger.repository.BankAccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -11,6 +12,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Service
 public class BankAccountService {
@@ -18,36 +20,56 @@ public class BankAccountService {
     private BankAccountRepository bankAccountRepository;
 
     //eventueel user service hier ook in auto wiren
-
+//    public BankAccountService() {
+//        //created dummy data
+//        BankAccount newBankAccount = new BankAccount();
+//        newBankAccount.setIban(generateRandomIban());
+//        newBankAccount.setBalance(1000.0);
+//
+//        bankAccountRepository.save(newBankAccount);
+//
+//    }
     public ResponseEntity GetAllBankAccounts() {
         //test account:
-        BankAccount newBankAccount = new BankAccount();
-        newBankAccount.setUserId(1);
-        newBankAccount.setAccountType(BankAccount.AccountTypeEnum.CURRENT);
-        newBankAccount.setBalance(0.0);
-        newBankAccount.setAbsoluteLimit(0.0);
-        newBankAccount.setCreationDate("12-02-2022");
-        newBankAccount.setIban("184kjdjanf");
+//        BankAccount newBankAccount = new BankAccount();
+//        newBankAccount.setUserId(1);
+//        newBankAccount.setAccountType(BankAccount.AccountTypeEnum.CURRENT);
+//        newBankAccount.setBalance(0.0);
+//        newBankAccount.setAbsoluteLimit(0.0);
+//        newBankAccount.setCreationDate("12-02-2022");
+//        newBankAccount.setIban("184kjdjanf");
 
-        bankAccountRepository.save(newBankAccount);
+//        bankAccountRepository.save(newBankAccount);
 
-        List<BankAccount> allBankAccounts;
-        allBankAccounts = bankAccountRepository.findAll();
+//        List<BankAccount> allBankAccounts;
+//        allBankAccounts = bankAccountRepository.findAll();
+        for(int i = 0; i < 5; i++)
+            this.CreateDummyDataBankAccount();
 
-
+        List<BankAccount> allBankAccounts = bankAccountRepository.findAll();
 
         if(bankAccountRepository.count() == 0) {
             return ResponseEntity.status(400).body(allBankAccounts);
         }
         else {
-            return ResponseEntity.status(201).body(allBankAccounts);
+            return new ResponseEntity<List<BankAccount>>(allBankAccounts,HttpStatus.ACCEPTED);
         }
+
 
     }
 
+    private void CreateDummyDataBankAccount() {
+        BankAccount newBankAccount = new BankAccount();
+        newBankAccount.setIban(this.generateRandomIban());
+        newBankAccount.setBalance(ThreadLocalRandom.current().nextDouble(300, 1800));
+        newBankAccount.setAbsoluteLimit(0.0);
+        newBankAccount.accountType(BankAccount.AccountTypeEnum.CURRENT);
+        newBankAccount.userId(ThreadLocalRandom.current().nextInt(0, 100000));
+
+        bankAccountRepository.save(newBankAccount);
+    }
+
     public ResponseEntity CreateNewBankAccount() {
-
-
         BankAccount newBankAccount = new BankAccount();
         newBankAccount.SetBalance(0.0);
         newBankAccount.absoluteLimit(0.0); //-	Balance cannot become lower than a certain number defined per account, referred to as absolute limit

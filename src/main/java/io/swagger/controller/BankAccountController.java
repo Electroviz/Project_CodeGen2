@@ -17,19 +17,16 @@ public class BankAccountController {
     private BankAccountService bankAccountService;
 
     //voorbeeld van een request
-    @RequestMapping(method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_VALUE,value = "/all")
+    @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE,value = "/allBankAccounts")
     public ResponseEntity getAccountByIBANController(){
-        if (bankAccountService.GetAllBankAccounts().getStatusCode().isError()){
-            return ResponseEntity.status(400).body("Bad Request");
-        }
-        else {
-            return ResponseEntity.status(201).body(bankAccountService.GetAllBankAccounts());
-        }
+
+        return bankAccountService.GetAllBankAccounts();
     }
 
     @RequestMapping(value = "/createBankAccount", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity registerNewBankAccountController(@RequestBody BankAccount account){
         ResponseEntity<String> response = bankAccountService.CreateNewBankAccount();
+
         if (response.getStatusCode().isError()) {
             return new ResponseEntity(response.getStatusCode(), HttpStatus.BAD_REQUEST);
         } else {
@@ -37,8 +34,11 @@ public class BankAccountController {
         }
     }
 
-    @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE,value="/get/{IBAN}")
+    @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE,value="/getBankAccount/{IBAN}")
     public ResponseEntity getBankAccountInfoByIbanController(@PathVariable("IBAN") String IBAN) {
-        
+
+        BankAccount testAccount = new BankAccount();
+        testAccount.setIban(IBAN);
+        return new ResponseEntity<BankAccount>(testAccount, HttpStatus.OK);
     }
 }
