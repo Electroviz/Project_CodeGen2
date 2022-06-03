@@ -137,6 +137,11 @@ public class BankAccount   {
     return this;
   }
 
+  public boolean CanWithdrawMoney(Double amount) {
+    if(this.balance < amount) return false;
+    else return true;
+  }
+
   public void SetBalance(Double balanceAmount) {
       this.balance = balanceAmount;
   }

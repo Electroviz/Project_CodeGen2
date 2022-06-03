@@ -17,6 +17,18 @@ public class BankAccountController {
     private BankAccountService bankAccountService;
 
     //melle
+    @RequestMapping(method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE, value= "/putBankAccountType/{type}/{IBAN}")
+    public ResponseEntity putBankAccountTypeByIBAN(@PathVariable("type") String type, @PathVariable("IBAN") String IBAN) {
+        type = type.replaceAll("[{}]",""); //make sure that the {variable} quotes are not taking into consideration
+        BankAccount.AccountTypeEnum bankAccountType = BankAccount.AccountTypeEnum.valueOf(type);
+        BankAccount bankAccountByIban = bankAccountService.GetBankAccountByIban(IBAN);
+        if(bankAccountByIban == null) return ResponseEntity.status(400).body("unknown IBAN");
+        else {
+            return bankAccountService.PutBankAccountType(bankAccountType,bankAccountService.GetBankAccountByIban(IBAN));
+        }
+    }
+
+    //melle
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE,value = "/allBankAccounts")
     public ResponseEntity getAccountByIBANController(){
 
@@ -38,8 +50,13 @@ public class BankAccountController {
     //melle
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE,value="/getBankAccount/{IBAN}")
     public ResponseEntity getBankAccountInfoByIbanController(@PathVariable("IBAN") String IBAN) {
+        BankAccount ba = bankAccountService.GetBankAccountByIban(IBAN);
 
-
-        return bankAccountService.GetBankAccountByIban(IBAN);
+        if(ba != null) {
+            return new ResponseEntity<BankAccount>(ba,HttpStatus.FOUND);
+        }
+        else {
+            return ResponseEntity.status(400).body(ba);
+        }
     }
 }
