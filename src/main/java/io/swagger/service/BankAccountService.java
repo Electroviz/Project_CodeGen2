@@ -21,7 +21,17 @@ public class BankAccountService {
     //eventueel user service hier ook in auto wiren
 
     public ResponseEntity GetAllBankAccounts() {
-        //employee check toevoegen
+        //test account:
+        BankAccount newBankAccount = new BankAccount();
+        newBankAccount.setUserId(1);
+        newBankAccount.setAccountType(BankAccount.AccountTypeEnum.CURRENT);
+        newBankAccount.setBalance(0.0);
+        newBankAccount.setAbsoluteLimit(0.0);
+        newBankAccount.setCreationDate("12-02-2022");
+        newBankAccount.setIban("184kjdjanf");
+
+        bankAccountRepository.save(newBankAccount);
+
         List<BankAccount> allBankAccounts;
         allBankAccounts = bankAccountRepository.findAll();
 
@@ -42,6 +52,68 @@ public class BankAccountService {
         account.setAbsoluteLimit(body.getAbsoluteLimit());
         account.setCreationDate(new SimpleDateFormat("dd-MM-yyyy").format(new Date()));
         account.setAccountType(body.getAccountType());
+    }
+    public ResponseEntity CreateNewBankAccount() {
+
+
+        BankAccount newBankAccount = new BankAccount();
+        newBankAccount.SetBalance(0.0);
+        newBankAccount.absoluteLimit(0.0); //-	Balance cannot become lower than a certain number defined per account, referred to as absolute limit
+        newBankAccount.SetAccountStatus(BankAccount.AccountStatusEnum.ACTIVE);
+        newBankAccount.setIban(generateRandomIban());
+
+        //!!create a check for if the user being connected to this bank account does not already have a current and savings account!!
+        return ResponseEntity.status(400).body(newBankAccount);
+
+    }
+
+    public void SaveBankAccount(BankAccount bankAccount) {
+        bankAccountRepository.save(bankAccount);
+    }
+
+    private String generateRandomIban() {
+        boolean succes = true;
+        String newIban = "";
+        List<BankAccount> allBankAccounts = bankAccountRepository.findAll();
+        do {
+            succes = true;
+            newIban = this.IbanStringGenerator();
+            for (int i = 0; i < allBankAccounts.size(); i++) {
+                BankAccount bankAccount = allBankAccounts.get(i);
+                String ibanToCheck = bankAccount.GetIBAN();
+                if (newIban == ibanToCheck) {
+                    succes = false;
+                }
+            }
+        } while(succes == false);
+
+
+
+
+
+        return newIban;
+    }
+
+    private String IbanStringGenerator() {
+        Random random = new Random();
+        String IBAN = "NL";
+        int index = random.nextInt(10);
+        IBAN += Integer.toString(index);
+        index = random.nextInt(10);
+        IBAN += Integer.toString(index);
+        IBAN += "INHO0";
+        for (int i = 0; i < 10; i++) {
+            int n = random.nextInt(10);
+            IBAN += Integer.toString(n);
+        }
+
+        return IBAN;
+    }
+
+    public ResponseEntity SetBankAccount(BankAccount account) {
+
+
+        //bankAccountRepository.save(account);
 
         if(account.getAccountType() != BankAccount.AccountTypeEnum.CURRENT && account.getAccountType() != BankAccount.AccountTypeEnum.SAVINGS) {
             return ResponseEntity.status(400).body(account);
