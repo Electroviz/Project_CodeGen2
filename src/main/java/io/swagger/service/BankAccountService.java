@@ -44,15 +44,6 @@ public class BankAccountService {
 
     }
 
-    public ResponseEntity SetBankAccount(BankAccount body) {
-        BankAccount account = new BankAccount();
-        account.setUserId(GenerateID());
-        account.setIban(GenerateIban());
-        account.setBalance(BigDecimal.valueOf(0));
-        account.setAbsoluteLimit(body.getAbsoluteLimit());
-        account.setCreationDate(new SimpleDateFormat("dd-MM-yyyy").format(new Date()));
-        account.setAccountType(body.getAccountType());
-    }
     public ResponseEntity CreateNewBankAccount() {
 
 
@@ -87,10 +78,6 @@ public class BankAccountService {
             }
         } while(succes == false);
 
-
-
-
-
         return newIban;
     }
 
@@ -111,7 +98,12 @@ public class BankAccountService {
     }
 
     public ResponseEntity SetBankAccount(BankAccount account) {
-
+        BankAccount newBankAccount = new BankAccount();
+        newBankAccount.SetBalance(0.0);
+        newBankAccount.absoluteLimit(0.0); //-	Balance cannot become lower than a certain number defined per account, referred to as absolute limit
+        newBankAccount.SetAccountStatus(BankAccount.AccountStatusEnum.ACTIVE);
+        newBankAccount.setCreationDate(new Date());
+        newBankAccount.setIban(generateRandomIban());
 
         //bankAccountRepository.save(account);
 
@@ -141,34 +133,4 @@ public class BankAccountService {
         bankAccountRepository.deleteById(deleteId);
     }
 
-
-    public String GenerateIban(){
-        //Bestaat de iban check toevoegen
-        Random rand = new Random();
-        String iban = "NL";
-        for (int i = 0; i < 2; i++)
-        {
-            int n = rand.nextInt(10) + 0;
-            iban += Integer.toString(n);
-        }
-        iban += "INHO0";
-        for (int i = 0; i < 9; i++)
-        {
-            int n = rand.nextInt(10) + 0;
-            iban += Integer.toString(n);
-        }
-        return iban;
-    }
-
-    public Integer GenerateID(){
-        //Bestaat de id check toevoegen
-        Random rand = new Random();
-        String id = "";
-        for (int i = 0; i < 8; i++)
-        {
-            int n = rand.nextInt(10) + 0;
-            id += Integer.toString(n);
-        }
-        return Integer.parseInt(id);
-    }
 }
