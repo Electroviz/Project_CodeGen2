@@ -48,6 +48,9 @@ public class BankAccountService {
     public ResponseEntity CreateNewBankAccount() {
         BankAccount newBankAccount = new BankAccount();
         newBankAccount.SetBalance(0.0);
+        newBankAccount.absoluteLimit(0.0); //-	Balance cannot become lower than a certain number defined per account, referred to as absolute limit
+
+
 
 
     }

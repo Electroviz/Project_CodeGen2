@@ -70,7 +70,7 @@ public class BankAccount   {
   private AccountTypeEnum accountType = null;
 
   @JsonProperty("absolute limit")
-  private BigDecimal absoluteLimit = null;
+  private Double absoluteLimit = null;
 
   @JsonProperty("creationDate")
   private String creationDate = null;
@@ -153,7 +153,7 @@ public class BankAccount   {
     this.accountType = accountType;
   }
 
-  public BankAccount absoluteLimit(BigDecimal absoluteLimit) {
+  public BankAccount absoluteLimit(Double absoluteLimit) {
     this.absoluteLimit = absoluteLimit;
     return this;
   }
@@ -166,11 +166,11 @@ public class BankAccount   {
       @NotNull
 
     @Valid
-    public BigDecimal getAbsoluteLimit() {
+    public Double getAbsoluteLimit() {
     return absoluteLimit;
   }
 
-  public void setAbsoluteLimit(BigDecimal absoluteLimit) {
+  public void setAbsoluteLimit(Double absoluteLimit) {
     this.absoluteLimit = absoluteLimit;
   }
 
