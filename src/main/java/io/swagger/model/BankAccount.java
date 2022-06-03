@@ -66,6 +66,36 @@ public class BankAccount   {
       return null;
     }
   }
+
+  public enum AccountStatusEnum {
+    ACTIVE("Active"),
+
+    INACTIVE("Inactive"),
+
+    CLOSED("Closed");
+
+    private String value;
+
+    AccountStatusEnum(String value) {
+      this.value = value;
+    }
+
+    @Override
+    @JsonValue
+    public String toString() {
+      return String.valueOf(value);
+    }
+
+    @JsonCreator
+    public static AccountStatusEnum fromValue(String text) {
+      for (AccountStatusEnum b : AccountStatusEnum.values()) {
+        if (String.valueOf(b.value).equals(text)) {
+          return b;
+        }
+      }
+      return null;
+    }
+  }
   @JsonProperty("accountType")
   private AccountTypeEnum accountType = null;
 
@@ -74,6 +104,13 @@ public class BankAccount   {
 
   @JsonProperty("creationDate")
   private String creationDate = null;
+
+  @JsonProperty("status")
+  private AccountStatusEnum accountStatus = null;
+
+  public void SetAccountStatus(AccountStatusEnum status) {
+    this.accountStatus = status;
+  }
 
   public BankAccount userId(Integer userId) {
     this.userId = userId;
@@ -156,6 +193,10 @@ public class BankAccount   {
   public BankAccount absoluteLimit(Double absoluteLimit) {
     this.absoluteLimit = absoluteLimit;
     return this;
+  }
+
+  public String GetIBAN() {
+    return this.iban;
   }
 
   /**
