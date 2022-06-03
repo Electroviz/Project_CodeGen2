@@ -45,6 +45,13 @@ public class BankAccountService {
 
     }
 
+    public ResponseEntity CreateNewBankAccount() {
+        BankAccount newBankAccount = new BankAccount();
+        newBankAccount.SetBalance(0.0);
+
+
+    }
+
     public ResponseEntity SetBankAccount(BankAccount account) {
 
 

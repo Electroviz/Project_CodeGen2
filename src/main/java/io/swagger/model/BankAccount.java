@@ -34,7 +34,7 @@ public class BankAccount   {
   private String iban = null;
 
   @JsonProperty("balance")
-  private BigDecimal balance = null;
+  private Double balance = null;
 
   /**
    * Gets or Sets accountType
@@ -100,6 +100,10 @@ public class BankAccount   {
     return this;
   }
 
+  public void SetBalance(Double balanceAmount) {
+      this.balance = balanceAmount;
+  }
+
   /**
    * Get iban
    * @return iban
@@ -114,11 +118,6 @@ public class BankAccount   {
     this.iban = iban;
   }
 
-  public BankAccount balance(BigDecimal balance) {
-    this.balance = balance;
-    return this;
-  }
-
   /**
    * Get balance
    * @return balance
@@ -126,11 +125,11 @@ public class BankAccount   {
   @Schema(example = "23.45", description = "")
   
     @Valid
-    public BigDecimal getBalance() {
+    public Double getBalance() {
     return balance;
   }
 
-  public void setBalance(BigDecimal balance) {
+  public void setBalance(Double balance) {
     this.balance = balance;
   }
 
