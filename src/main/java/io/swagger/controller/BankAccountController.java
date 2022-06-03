@@ -29,7 +29,7 @@ public class BankAccountController {
     }
 
     @RequestMapping(value = "/createBankAccount", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity registerUserController(@RequestBody BankAccount account){
+    public ResponseEntity registerNewBankAccountController(@RequestBody BankAccount account){
         ResponseEntity<String> response = bankAccountService.CreateNewBankAccount();
         if (response.getStatusCode().isError()) {
             return new ResponseEntity(response.getStatusCode(), HttpStatus.BAD_REQUEST);

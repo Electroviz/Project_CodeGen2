@@ -1,5 +1,6 @@
 package io.swagger.api;
 
+import io.swagger.controller.BankAccountController;
 import io.swagger.model.BankAccount;
 import io.swagger.model.TransactionInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;

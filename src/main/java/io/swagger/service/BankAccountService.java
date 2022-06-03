@@ -46,13 +46,15 @@ public class BankAccountService {
     }
 
     public ResponseEntity CreateNewBankAccount() {
+
+
         BankAccount newBankAccount = new BankAccount();
         newBankAccount.SetBalance(0.0);
         newBankAccount.absoluteLimit(0.0); //-	Balance cannot become lower than a certain number defined per account, referred to as absolute limit
         newBankAccount.SetAccountStatus(BankAccount.AccountStatusEnum.ACTIVE);
         newBankAccount.setIban(generateRandomIban());
 
-        //set a check for if the user being connected to this bank account does not already have a current and savings account
+        //!!create a check for if the user being connected to this bank account does not already have a current and savings account!!
         return ResponseEntity.status(400).body(newBankAccount);
 
     }
@@ -64,7 +66,7 @@ public class BankAccountService {
     private String generateRandomIban() {
         boolean succes = true;
         String newIban = "";
-        List<BankAccount> allBankAccounts = (List<BankAccount>) GetAllBankAccounts();
+        List<BankAccount> allBankAccounts = bankAccountRepository.findAll();
         do {
             succes = true;
             newIban = this.IbanStringGenerator();
