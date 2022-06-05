@@ -226,9 +226,8 @@ public class User   {
    * @return userRole
    **/
   @Schema(required = true, description = "")
-      @NotNull
 
-    public UserRoleEnum getUserRole() {
+  public UserRoleEnum getUserRole() {
     return userRole;
   }
 
