@@ -1,11 +1,10 @@
 package io.swagger.service;
 
 import io.swagger.api.ApiException;
-import io.swagger.controller.TransactionController;
 import io.swagger.model.BankAccount;
 import io.swagger.model.Transaction;
 import io.swagger.model.User;
-import io.swagger.repository.TransactionRespository;
+import io.swagger.repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,9 +13,12 @@ import java.util.Objects;
 @Service
 public class TransactionService {
     @Autowired
-    private TransactionRespository transactionRespository;
+    private TransactionRepository transactionRepository;
     @Autowired
     private BankAccountService bankAccountService;
+    @Autowired
+    private UserService userService;
+
 
 
     public void createTransaction(User currentUser, Transaction transaction) throws ApiException {
@@ -44,7 +46,8 @@ public class TransactionService {
         }
 
         //Get the from user (the sender)
-        //Someone needs to implement userservice???
+       User fromUser = userService.findById(fromBankAccount.getUserId()).orElseThrow(() -> ApiException.badRequest("No such from user"));
+
 
 
 
