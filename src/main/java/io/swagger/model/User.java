@@ -7,6 +7,10 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
 import org.springframework.validation.annotation.Validated;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 
@@ -16,10 +20,13 @@ import javax.validation.constraints.*;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-05-12T15:22:53.754Z[GMT]")
 
-
+@Entity
 public class User   {
+
+  @Id
+  @GeneratedValue
   @JsonProperty("id")
-  private Long id = null;
+  private Integer id = null;
 
   @JsonProperty("username")
   private String username = null;
@@ -78,7 +85,7 @@ public class User   {
   @JsonProperty("day limit")
   private BigDecimal dayLimit = null;
 
-  public User id(Long id) {
+  public User id(Integer id) {
     this.id = id;
     return this;
   }
@@ -89,11 +96,11 @@ public class User   {
    **/
   @Schema(description = "")
   
-    public Long getId() {
+    public Integer getId() {
     return id;
   }
 
-  public void setId(Long id) {
+  public void setId(Integer id) {
     this.id = id;
   }
 

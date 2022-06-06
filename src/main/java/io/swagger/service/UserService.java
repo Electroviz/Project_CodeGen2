@@ -15,8 +15,9 @@ public class UserService {
 
     
     public Optional<User> findById(Long userId) {
-        Optional<UserEntity> entity = userRepository.findById(userId);
-        return entity.map(this::toUserModel);
+        Optional<User> entity = userRepository.findById(userId);
+//        return entity.map(this::toUserModel);
+        return null;
     }
 
     private User toUserModel(UserEntity userEntity) {
