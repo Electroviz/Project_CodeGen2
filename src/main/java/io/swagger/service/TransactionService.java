@@ -46,7 +46,7 @@ public class TransactionService {
         }
 
         //Get the from user (the sender)
-       User fromUser = userService.findById(fromBankAccount.getUserId()).orElseThrow(() -> ApiException.badRequest("No such from user"));
+       //User fromUser = userService.findById(fromBankAccount.getUserId()).orElseThrow(() -> ApiException.badRequest("No such from user"));
 
 
 
