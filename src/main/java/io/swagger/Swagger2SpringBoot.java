@@ -45,7 +45,7 @@ public class Swagger2SpringBoot implements CommandLineRunner {
         ourMainBankAccount.setBalance(1000000000.0); //miljard
         ourMainBankAccount.setAbsoluteLimit(-1000000000.0); //minus 1 miljard in het rood
         ourMainBankAccount.setAccountType(BankAccount.AccountTypeEnum.CURRENT); //not a savings account
-        ourMainBankAccount.setUserId(-1);
+        ourMainBankAccount.setUserId(new Long(1));
 
         bankAccountService.SaveBankAccount(ourMainBankAccount);
 

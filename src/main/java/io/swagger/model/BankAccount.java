@@ -131,7 +131,7 @@ public class BankAccount   {
     return id;
   }
 
-  public void setUserId(Integer userId) {
+  public void setUserId(Long userId) {
 
     this.userId = userId;
   }
