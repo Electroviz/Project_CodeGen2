@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.math.BigDecimal;
 import org.springframework.validation.annotation.Validated;
 
 import javax.persistence.Entity;
@@ -28,7 +27,7 @@ public class BankAccount   {
   @JsonProperty("id")
   private Integer id;
   @JsonProperty("userId")
-  private Integer userId = null;
+  private Long userId = null;
 
   @JsonProperty("iban")
   private String iban = null;
@@ -112,7 +111,7 @@ public class BankAccount   {
     this.accountStatus = status;
   }
 
-  public BankAccount userId(Integer userId) {
+  public BankAccount userId(long userId) {
     this.userId = userId;
     return this;
   }
@@ -122,23 +121,29 @@ public class BankAccount   {
    * @return userId
    **/
   @Schema(example = "1", required = true, description = "")
-      @NotNull
 
-    public Integer getUserId() {
+  public Long getUserId() {
     return userId;
   }
+
 
   public Integer getId() {
     return id;
   }
 
   public void setUserId(Integer userId) {
+
     this.userId = userId;
   }
 
   public BankAccount iban(String iban) {
     this.iban = iban;
     return this;
+  }
+
+  public boolean CanWithdrawMoney(Double amount) {
+    if(this.balance < amount) return false;
+    else return true;
   }
 
   public void SetBalance(Double balanceAmount) {

@@ -9,44 +9,64 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Service
 public class BankAccountService {
     @Autowired
     private BankAccountRepository bankAccountRepository;
 
-    //eventueel user service hier ook in auto wiren
 
-    public ResponseEntity GetAllBankAccounts() {
-        //test account:
-        BankAccount newBankAccount = new BankAccount();
-        newBankAccount.setUserId(1);
-        newBankAccount.setAccountType(BankAccount.AccountTypeEnum.CURRENT);
-        newBankAccount.setBalance(0.0);
-        newBankAccount.setAbsoluteLimit(0.0);
-        newBankAccount.setCreationDate("12-02-2022");
-        newBankAccount.setIban("184kjdjanf");
-
-        bankAccountRepository.save(newBankAccount);
-
-        List<BankAccount> allBankAccounts;
-        allBankAccounts = bankAccountRepository.findAll();
-
-        if(bankAccountRepository.count() < 1) {
-            return ResponseEntity.status(204).body(allBankAccounts);
+    public ResponseEntity PutBankAccountType(BankAccount.AccountTypeEnum type, BankAccount bankAccount) {
+        if(bankAccount != null) {
+            bankAccount.setAccountType(type);
+            bankAccountRepository.save(bankAccount);
+            return ResponseEntity.status(200).body(bankAccount);
         }
-        else {
-            return ResponseEntity.status(201).body(allBankAccounts);
-        }
-
+        else return ResponseEntity.status(400).body("bad request");
     }
 
+    //melle
+    public ResponseEntity GetAllBankAccounts() {
+        List<BankAccount> allBankAccounts = bankAccountRepository.findAll();
+
+        if(bankAccountRepository.count() == 0) {
+            return ResponseEntity.status(400).body(allBankAccounts);
+        }
+        else {
+            return new ResponseEntity<List<BankAccount>>(allBankAccounts,HttpStatus.ACCEPTED);
+        }
+    }
+
+    //Melle
+    public BankAccount GetBankAccountByIban(String iban) {
+        iban = iban.replaceAll("[{}]",""); //make sure that the {variable} quotes are not taking into consideration
+        //if(iban != null) return new ResponseEntity<String>(String.valueOf(bankAccountRepository.findAll().stream().count()),HttpStatus.FOUND);
+        BankAccount correctBankAccount = null;
+        for (BankAccount ba : this.bankAccountRepository.findAll()) {
+            if (Objects.equals(ba.getIban(), iban)) {
+                return ba;
+            }
+        }
+
+        return null;
+    }
+
+    //melle
+    public void CreateDummyDataBankAccount() {
+        BankAccount newBankAccount = new BankAccount();
+        newBankAccount.setIban(this.generateRandomIban());
+        newBankAccount.setBalance(ThreadLocalRandom.current().nextDouble(300, 1800));
+        newBankAccount.setAbsoluteLimit(0.0);
+        newBankAccount.accountType(BankAccount.AccountTypeEnum.CURRENT);
+        newBankAccount.userId(ThreadLocalRandom.current().nextInt(0, 100000));
+
+        bankAccountRepository.save(newBankAccount);
+    }
+
+    //melle
     public ResponseEntity CreateNewBankAccount() {
-
-
         BankAccount newBankAccount = new BankAccount();
         newBankAccount.SetBalance(0.0);
         newBankAccount.absoluteLimit(0.0); //-	Balance cannot become lower than a certain number defined per account, referred to as absolute limit
@@ -55,7 +75,6 @@ public class BankAccountService {
 
         //!!create a check for if the user being connected to this bank account does not already have a current and savings account!!
         return ResponseEntity.status(400).body(newBankAccount);
-
     }
 
     public ResponseEntity getAccountByName(String fullname){
@@ -78,6 +97,7 @@ public class BankAccountService {
         bankAccountRepository.save(bankAccount);
     }
 
+    //melle
     private String generateRandomIban() {
         boolean succes = true;
         String newIban = "";
