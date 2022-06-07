@@ -6,8 +6,12 @@ import io.swagger.model.Transaction;
 import io.swagger.model.User;
 import io.swagger.repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -20,6 +24,39 @@ public class TransactionService {
     private UserService userService;
 
 
+//    This is a test transaction !!!!
+    private double balance1;
+    private String name;
+
+    public String bankktest(String name){
+        this.name = name;
+        return name;
+    }
+    public double getBalanceTest(){
+        return balance1;
+    }
+    public void deposittest(double amount){
+        balance1 += amount;
+        System.out.println(name + " has $" + balance1);
+    }
+    public void withdraw(double amount){
+        if (amount < balance1){
+            balance1 -= amount;
+            System.out.println(name + " has $" + balance1);
+        }
+        else {
+            System.out.println("withdraw by " + name + " fails");
+        }
+
+    }
+    public ResponseEntity StartTransactionTest(){
+        String user1 = bankktest("hans");
+        //deposittest(500);
+        String user2 = bankktest("Willem");
+        deposittest(900);
+        return null;
+    }
+//    End of the test transaction !!!!
 
     public void createTransaction(User currentUser, Transaction transaction) throws ApiException {
 
@@ -48,23 +85,68 @@ public class TransactionService {
         //Get the from user (the sender)
        User fromUser = userService.findById(fromBankAccount.getUserId()).orElseThrow(() -> ApiException.badRequest("No such from user"));
 
+        // check the transaction limit for the from user
+        if (transaction.getAmount().doubleValue() > fromUser.getTransactionLimit().doubleValue()) {
+            throw ApiException.badRequest("The transaction amount exceeds the transaction limit");
+        }
 
+        // get the from/to bank accounts
+        // compute the from account balance
+        BigDecimal fromAccountBalance = BigDecimal.valueOf(fromBankAccount.getBalance()).subtract(transaction.getAmount());
 
+        // ensure the new balance is not less than the absolute limit
+        if (fromAccountBalance.doubleValue() < fromBankAccount.getAbsoluteLimit().doubleValue()) {
+            throw ApiException.badRequest("Transaction failed. Balance in the from account will be less than the absolute limit");
+        }
 
+        // ensure the total value of transactions for this person as of today does not exceed the
+        // daily limit
+        BigDecimal totalDayTransactions = getTotalDayTransactions(fromUser);
 
-        //Things to implement!!!!
-        //Get the from user (the sender)
-        //Check transaction limit of the user
-        //Get the sender and receiver bank iban
-        //Check the new balance is not less than the absolut limit
-        //The amount of the transaction should not exceed the day limit
-        //Compute the total day transactions if this transaction were to go through
+        // compute the total day transactions if this transaction were to go through
+        BigDecimal newDayTotal = totalDayTransactions.add(transaction.getAmount());
+        if (newDayTotal.longValue() > fromUser.getDayLimit().longValue()) {
+            throw ApiException.badRequest("Transaction failed. This transaction will exceed your day limit.");
+        }
 
         //Update the senders bank account
         //UPdate the receivers bank account
         //Save the transaction
+        // ----  start the  transaction ----
 
-
+        //Implemt in bankaccountservice
+        //Updateuser functie
     }
 
+    public BigDecimal getTotalDayTransactions(User user) {
+        BigDecimal total = BigDecimal.valueOf(0);
+
+        // get all the transactions
+        List<Transaction> allTransactions = transactionRepository.findAll();
+        for (Transaction transaction : allTransactions) {
+            // check if the current transaction belongs to the given user.
+            if (!Objects.equals(transaction.getUserIDPerforming(), user.getId())) {
+                continue;
+            }
+            // check if the current transaction belongs to current date
+            org.threeten.bp.LocalDate transactionDate = transaction.getTimestamp().toLocalDateTime().toLocalDate();
+            LocalDate today = LocalDate.now();
+            if (!transactionDate.equals(today)) {
+                continue;
+            }
+
+            // this transaction is of today and was initiated by this user, add the amount to
+            // the current totals
+            total = total.add(transaction.getAmount());
+        }
+
+        return total;
+    }
+
+
+    public int createTransaction2() {
+        int tom = 5;
+
+        return  tom;
+    }
 }
