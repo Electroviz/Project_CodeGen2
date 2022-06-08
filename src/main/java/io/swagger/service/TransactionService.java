@@ -6,6 +6,7 @@ import io.swagger.model.Transaction;
 import io.swagger.model.User;
 import io.swagger.repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
@@ -19,6 +20,58 @@ public class TransactionService {
     @Autowired
     private UserService userService;
 
+    private double balance;
+    private String name;
+
+    public ResponseEntity testTransactionTest(){
+        String naam1 = "Hans";
+        BankAccounTest(naam1);
+        DepositTest(500);
+        withdrawTest(100);
+
+        String naam2 = "Jan";
+        BankAccounTest(naam2);
+        DepositTest(200);
+        withdrawTest(100);
+
+        return null;
+    }
+
+    public void BankAccounTest(String name){
+        this.name = name;
+        //balance = 0.0;
+    }
+    public double GetBalanceTest(){
+        return balance;
+    }
+    public String GetNameTest(){
+        return name;
+    }
+    public void DepositTest(double amount){
+        balance += amount;
+        System.out.println(name + " has $ " + balance + " after deposit");
+    }
+    public void withdrawTest(double amount){
+        if (amount <= balance){
+            balance -= amount;
+            System.out.println(name + " has $ " + balance + "After withdraw!");
+        }
+        else{
+            System.out.println("Withdraw by "+ name + " Fails!!");
+        }
+    }
+    public void TransferTest(double amount1){
+        if (this.balance < amount1){
+            System.out.println("Transfer fails");
+        }
+        else{
+            this.balance -= amount1;
+            //acc.balance += amount1;
+            System.out.println("Account of " + this.name + " becomes $ " + this.balance);
+            //System.out.println("Account of " + acc.name + " becomes $ " + this.balance);
+        }
+
+    }
 
 
     public void createTransaction(User currentUser, Transaction transaction) throws ApiException {
