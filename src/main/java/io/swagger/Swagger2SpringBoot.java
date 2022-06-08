@@ -2,9 +2,7 @@ package io.swagger;
 
 import io.swagger.configuration.LocalDateConverter;
 import io.swagger.configuration.LocalDateTimeConverter;
-
 import io.swagger.model.BankAccount;
-import io.swagger.model.User;
 import io.swagger.service.BankAccountService;
 import io.swagger.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,15 +11,10 @@ import org.springframework.boot.ExitCodeGenerator;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
-
-import springfox.documentation.oas.annotations.EnableOpenApi;
-
 import org.springframework.context.annotation.Configuration;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
-
-import java.math.BigDecimal;
-import java.util.concurrent.ThreadLocalRandom;
+import springfox.documentation.oas.annotations.EnableOpenApi;
 
 @SpringBootApplication
 @EnableOpenApi

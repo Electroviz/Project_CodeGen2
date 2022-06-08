@@ -3,7 +3,9 @@ package io.swagger.service;
 import io.swagger.api.ApiException;
 import io.swagger.model.BankAccount;
 import io.swagger.model.Transaction;
-import io.swagger.model.User;
+
+import io.swagger.model.UserDTO;
+import io.swagger.model.entity.User;
 import io.swagger.repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -63,7 +65,7 @@ public class TransactionService {
     }
 //    End of the test transaction !!!!
 
-    public void createTransaction(User currentUser, Transaction transaction) throws ApiException {
+    public void createTransaction(UserDTO currentUser, Transaction transaction) throws ApiException {
 
         //Check if amount is valid
         if (transaction.getAmount().doubleValue() <=0)
@@ -88,12 +90,12 @@ public class TransactionService {
         }
 
         //Get the from user (the sender)
-       User fromUser = userService.findById(fromBankAccount.getUserId()).orElseThrow(() -> ApiException.badRequest("No such from user"));
+       //User fromUser = userService.findbyid(fromBankAccount.getUserId()).orElseThrow(() -> ApiException.badRequest("No such from user"));
 
         // check the transaction limit for the from user
-        if (transaction.getAmount().doubleValue() > fromUser.getTransactionLimit().doubleValue()) {
-            throw ApiException.badRequest("The transaction amount exceeds the transaction limit");
-        }
+//        if (transaction.getAmount().doubleValue() > fromUser.getTransactionLimit().doubleValue()) {
+//            throw ApiException.badRequest("The transaction amount exceeds the transaction limit");
+//        }
 
         // get the from/to bank accounts
         // compute the from account balance
@@ -104,15 +106,15 @@ public class TransactionService {
             throw ApiException.badRequest("Transaction failed. Balance in the from account will be less than the absolute limit");
         }
 
-        // ensure the total value of transactions for this person as of today does not exceed the
-        // daily limit
-        BigDecimal totalDayTransactions = getTotalDayTransactions(fromUser);
-
-        // compute the total day transactions if this transaction were to go through
-        BigDecimal newDayTotal = totalDayTransactions.add(transaction.getAmount());
-        if (newDayTotal.longValue() > fromUser.getDayLimit().longValue()) {
-            throw ApiException.badRequest("Transaction failed. This transaction will exceed your day limit.");
-        }
+//        // ensure the total value of transactions for this person as of today does not exceed the
+//        // daily limit
+//        BigDecimal totalDayTransactions = getTotalDayTransactions(fromUser);
+//
+//        // compute the total day transactions if this transaction were to go through
+//        BigDecimal newDayTotal = totalDayTransactions.add(transaction.getAmount());
+//        if (newDayTotal.longValue() > fromUser.getDayLimit().longValue()) {
+//            throw ApiException.badRequest("Transaction failed. This transaction will exceed your day limit.");
+//        }
 
         //Update the senders bank account
         //UPdate the receivers bank account
