@@ -75,7 +75,7 @@ public class BankAccountService {
         newBankAccount.SetAccountStatus(BankAccount.AccountStatusEnum.ACTIVE);
         newBankAccount.setIban(generateRandomIban());
 
-        
+
         //!!create a check for if the user being connected to this bank account does not already have a current and savings account!!
         return ResponseEntity.status(400).body(newBankAccount);
     }
