@@ -1,5 +1,6 @@
 package io.swagger.service;
 
+<<<<<<< HEAD
 import io.swagger.model.entity.User;
 import io.swagger.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,4 +26,13 @@ public class UserService {
     public List<User> getAll(){
         return userList;
     }
+=======
+import org.springframework.stereotype.Service;
+import io.swagger.model.User;
+
+@Service
+public class UserService {
+
+
+>>>>>>> parent of b79f652 (Merge branch 'Melle' into Nick)
 }

@@ -7,8 +7,11 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
 import org.springframework.validation.annotation.Validated;
+<<<<<<< HEAD:src/main/java/io/swagger/model/UserDTO.java
 
 import javax.persistence.Table;
+=======
+>>>>>>> parent of b79f652 (Merge branch 'Melle' into Nick):src/main/java/io/swagger/model/User.java
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 
@@ -18,7 +21,12 @@ import javax.validation.constraints.*;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-06-07T15:56:57.563Z[GMT]")
 
+<<<<<<< HEAD:src/main/java/io/swagger/model/UserDTO.java
 public class UserDTO   {
+=======
+
+public class User   {
+>>>>>>> parent of b79f652 (Merge branch 'Melle' into Nick):src/main/java/io/swagger/model/User.java
   @JsonProperty("id")
   private Long id = null;
 
@@ -79,7 +87,11 @@ public class UserDTO   {
   @JsonProperty("dayLimit")
   private BigDecimal dayLimit = null;
 
+<<<<<<< HEAD:src/main/java/io/swagger/model/UserDTO.java
   public UserDTO id(Long id) {
+=======
+  public User id(Long id) {
+>>>>>>> parent of b79f652 (Merge branch 'Melle' into Nick):src/main/java/io/swagger/model/User.java
     this.id = id;
     return this;
   }
@@ -89,8 +101,13 @@ public class UserDTO   {
    * @return id
    **/
   @Schema(description = "")
+<<<<<<< HEAD:src/main/java/io/swagger/model/UserDTO.java
 
   public Long getId() {
+=======
+  
+    public Long getId() {
+>>>>>>> parent of b79f652 (Merge branch 'Melle' into Nick):src/main/java/io/swagger/model/User.java
     return id;
   }
 
@@ -227,9 +244,13 @@ public class UserDTO   {
    * @return userRole
    **/
   @Schema(required = true, description = "")
+<<<<<<< HEAD:src/main/java/io/swagger/model/UserDTO.java
   @NotNull
+=======
+      @NotNull
+>>>>>>> parent of b79f652 (Merge branch 'Melle' into Nick):src/main/java/io/swagger/model/User.java
 
-  public UserRoleEnum getUserRole() {
+    public UserRoleEnum getUserRole() {
     return userRole;
   }
 
