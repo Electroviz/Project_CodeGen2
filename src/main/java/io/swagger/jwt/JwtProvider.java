@@ -20,6 +20,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class JwtProvider {
+    //Nicky
     @Value("${security.jwt.token.secret-key:secret-key}")
     private String secretToken;
 

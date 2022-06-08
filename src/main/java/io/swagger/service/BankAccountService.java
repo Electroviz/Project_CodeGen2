@@ -1,7 +1,9 @@
 package io.swagger.service;
 
 import io.swagger.model.BankAccount;
+import io.swagger.model.User;
 import io.swagger.repository.BankAccountRepository;
+import io.swagger.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +18,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class BankAccountService {
     @Autowired
     private BankAccountRepository bankAccountRepository;
-
+    private UserRepository userRepository;
 
     public ResponseEntity PutBankAccountType(BankAccount.AccountTypeEnum type, BankAccount bankAccount) {
         if(bankAccount != null) {
@@ -65,7 +67,7 @@ public class BankAccountService {
         bankAccountRepository.save(newBankAccount);
     }
 
-    //melle
+    //melle/Nicky
     public ResponseEntity CreateNewBankAccount() {
         BankAccount newBankAccount = new BankAccount();
         newBankAccount.SetBalance(0.0);
@@ -73,31 +75,43 @@ public class BankAccountService {
         newBankAccount.SetAccountStatus(BankAccount.AccountStatusEnum.ACTIVE);
         newBankAccount.setIban(generateRandomIban());
 
+        
         //!!create a check for if the user being connected to this bank account does not already have a current and savings account!!
         return ResponseEntity.status(400).body(newBankAccount);
     }
 
+    //Nicky
     public ResponseEntity getAccountByName(String fullname){
-        BankAccount accountToReturn = null;
-        List<BankAccount> allBankAccounts;
-        allBankAccounts = bankAccountRepository.findAll();
-        Integer userCompareId = null;
+        List<String> returnIbans = null;
+        List<BankAccount> allBankAccounts = bankAccountRepository.findAll();
+        List<User> allUsers = userRepository.findAll();
+        Long userCompareId = null;
 
-        //1. pak alle users
-        //2. check per user of de gegeven naam overeen komt met user.fullname
-        //3. zoja pak het user object en de userId
-        //4. check nu of de userId overeenkomt met een userid in een van de bankaccounts
-        //5. zoja return de iban's van die accounts.
+        for (User user : allUsers)
+        {
+            if(user.getFullname() == fullname)
+            {
+                userCompareId = Long.valueOf(user.getId());
+                break;
+            }
+        }
 
+        for (BankAccount account : allBankAccounts)
+        {
+            if(account.getUserId() == userCompareId)
+            {
+                returnIbans.add(account.getIban());
+            }
+        }
 
-        //userCompareId = accountCheck.getUserId();
+        return new ResponseEntity<List<String>>(returnIbans,HttpStatus.ACCEPTED);
     }
 
     public void SaveBankAccount(BankAccount bankAccount) {
         bankAccountRepository.save(bankAccount);
     }
 
-    //melle
+    //melle/Nicky
     private String generateRandomIban() {
         boolean succes = true;
         String newIban = "";
@@ -155,6 +169,7 @@ public class BankAccountService {
         }
     }
 
+    //Nicky
     public void DeleteBankAccount(String iban){
         List<BankAccount> allBankAccounts;
         allBankAccounts = bankAccountRepository.findAll();
