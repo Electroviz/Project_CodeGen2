@@ -23,6 +23,6 @@ public class UserService {
     }
 
     public List<User> getAll(){
-        return userList;
+        return userRepository.findAll();
     }
 }
