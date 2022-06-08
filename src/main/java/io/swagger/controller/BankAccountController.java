@@ -1,6 +1,5 @@
 package io.swagger.controller;
 
-import io.swagger.service.BankAccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
