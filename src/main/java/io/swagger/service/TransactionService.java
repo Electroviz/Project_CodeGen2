@@ -3,7 +3,7 @@ package io.swagger.service;
 import io.swagger.api.ApiException;
 import io.swagger.model.BankAccount;
 import io.swagger.model.Transaction;
-import io.swagger.model.User;
+import io.swagger.model.entity.User;
 import io.swagger.repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -46,7 +46,7 @@ public class TransactionService {
         }
 
         //Get the from user (the sender)
-       User fromUser = userService.findById(fromBankAccount.getUserId()).orElseThrow(() -> ApiException.badRequest("No such from user"));
+       //User fromUser = userService.findById(fromBankAccount.getUserId()).orElseThrow(() -> ApiException.badRequest("No such from user"));
 
 
 

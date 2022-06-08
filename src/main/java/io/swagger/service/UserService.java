@@ -1,43 +1,38 @@
 package io.swagger.service;
 
-import io.swagger.entity.UserEntity;
-import io.swagger.model.User;
+<<<<<<< HEAD
+import io.swagger.model.entity.User;
 import io.swagger.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
 public class UserService {
+
     @Autowired
     private UserRepository userRepository;
 
-    
-    public Optional<User> findById(Long userId) {
-        Optional<User> entity = userRepository.findById(userId);
-//        return entity.map(this::toUserModel);
-        return entity;
+    private List<User> userList = new ArrayList<>();
+
+    public User addUser(User user){
+        user = userRepository.save(user);
+        return user;
     }
 
-    public void SaveUser(User u) {
-        this.userRepository.save(u);
+    public List<User> getAll(){
+        return userList;
     }
+=======
+import org.springframework.stereotype.Service;
+import io.swagger.model.User;
 
-    private User toUserModel(UserEntity userEntity) {
-//        User user = new User();
-//        user.setId(userEntity.getId());
-//        user.setUsername(userEntity.getUsername());
-//        user.setFullname(userEntity.getFullname());
-//        user.setEmail(userEntity.getEmail());
-//        user.setPassword(userEntity.getPassword());
-//        user.setPhone(userEntity.getPhone());
-//        user.setDateOfBirth(userEntity.getDateOfBirth());
-//        user.setUserRole(User.UserRoleEnum.fromValue(userEntity.getUserRole()));
-//        user.setTransactionLimit(userEntity.getTransactionLimit());
-//        user.setDayLimit(userEntity.getDayLimit());
-//        return user;
-        return null;
-    }
+@Service
+public class UserService {
 
+
+>>>>>>> parent of b79f652 (Merge branch 'Melle' into Nick)
 }

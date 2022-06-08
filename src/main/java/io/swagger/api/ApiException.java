@@ -7,21 +7,4 @@ public class ApiException extends Exception {
         super(msg);
         this.code = code;
     }
-
-    @Override
-    public String getMessage() {
-        return super.getMessage();
-    }
-
-    public static ApiException unauthorized() {
-        return new ApiException(401, "Unauthorized");
-    }
-
-    public static ApiException notFound() {
-        return new ApiException(404, "Not found");
-    }
-
-    public static ApiException badRequest(String message) {
-        return new ApiException(400, message);
-    }
 }

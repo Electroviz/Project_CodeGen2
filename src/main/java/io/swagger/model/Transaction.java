@@ -11,6 +11,7 @@ import org.springframework.validation.annotation.Validated;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Table;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 
@@ -20,15 +21,17 @@ import javax.validation.constraints.*;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-05-12T15:22:53.754Z[GMT]")
 
-@Entity
-public class Transaction   {
 
+<<<<<<< HEAD
   @Id
   @GeneratedValue
   @JsonProperty("id")
-  private Integer id;
+  private Long id;
+=======
+public class Transaction   {
+>>>>>>> parent of b79f652 (Merge branch 'Melle' into Nick)
   @JsonProperty("transactionID")
-  private Integer transactionID = null;
+  private Long transactionID = null;
 
   @JsonProperty("from")
   private String from = null;
@@ -48,7 +51,7 @@ public class Transaction   {
   @JsonProperty("description")
   private String description = null;
 
-  public Transaction transactionID(Integer transactionID) {
+  public Transaction transactionID(Long transactionID) {
     this.transactionID = transactionID;
     return this;
   }
@@ -59,11 +62,11 @@ public class Transaction   {
    **/
   @Schema(example = "123", description = "")
   
-    public Integer getTransactionID() {
+    public Long getTransactionID() {
     return transactionID;
   }
 
-  public void setTransactionID(Integer transactionID) {
+  public void setTransactionID(Long transactionID) {
     this.transactionID = transactionID;
   }
 
