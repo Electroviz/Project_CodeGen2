@@ -73,10 +73,10 @@ public class UserDTO   {
   @JsonProperty("userRole")
   private UserRoleEnum userRole = null;
 
-  @JsonProperty("transaction limit")
+  @JsonProperty("transactionLimit")
   private BigDecimal transactionLimit = null;
 
-  @JsonProperty("day limit")
+  @JsonProperty("dayLimit")
   private BigDecimal dayLimit = null;
 
   public UserDTO id(Long id) {
