@@ -4,7 +4,6 @@ import io.swagger.configuration.LocalDateConverter;
 import io.swagger.configuration.LocalDateTimeConverter;
 
 import io.swagger.model.BankAccount;
-import io.swagger.model.User;
 import io.swagger.service.BankAccountService;
 import io.swagger.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
