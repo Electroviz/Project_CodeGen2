@@ -37,6 +37,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-05-12T15:22:53.754Z[GMT]")
 @RestController
@@ -77,17 +78,18 @@ public class UserApiController implements UserApi {
     public ResponseEntity<List<UserDTO>> getAllUsers(@Min(0)@Parameter(in = ParameterIn.QUERY, description = "number of records to skip for pagination" ,schema=@Schema(allowableValues={  }
 )) @Valid @RequestParam(value = "skip", required = false) Integer skip,@Min(0) @Max(50) @Parameter(in = ParameterIn.QUERY, description = "maximum number of records to return" ,schema=@Schema(allowableValues={  }, maximum="50"
 )) @Valid @RequestParam(value = "limit", required = false) Integer limit) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
-            try {
-                return new ResponseEntity<List<UserDTO>>(objectMapper.readValue("[ {\n  \"password\" : \"fhdnd_Hdkf\",\n  \"phone\" : \"612345345\",\n  \"transaction limit\" : 500,\n  \"dateOfBirth\" : \"17-09-1990\",\n  \"day limit\" : 1000,\n  \"id\" : 0,\n  \"fullname\" : \"Kees Post\",\n  \"userRole\" : \"Employee\",\n  \"email\" : \"PieterBG@gmail.com\",\n  \"username\" : \"Kees1978\"\n}, {\n  \"password\" : \"fhdnd_Hdkf\",\n  \"phone\" : \"612345345\",\n  \"transaction limit\" : 500,\n  \"dateOfBirth\" : \"17-09-1990\",\n  \"day limit\" : 1000,\n  \"id\" : 0,\n  \"fullname\" : \"Kees Post\",\n  \"userRole\" : \"Employee\",\n  \"email\" : \"PieterBG@gmail.com\",\n  \"username\" : \"Kees1978\"\n} ]", List.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<List<UserDTO>>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
 
-        return new ResponseEntity<List<UserDTO>>(HttpStatus.NOT_IMPLEMENTED);
+
+        List<User> users = userService.getAll();
+
+        ModelMapper modelMapper = new ModelMapper();
+
+        List<UserDTO> dtos = users
+                .stream()
+                .map(user -> modelMapper.map(user, UserDTO.class))
+                .collect(Collectors.toList());
+
+        return new ResponseEntity<List<UserDTO>>(dtos, HttpStatus.OK);
     }
 
     public ResponseEntity<String> loginUser(@Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody Login body) {

@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 public class UserController {
@@ -20,7 +21,16 @@ public class UserController {
     @RequestMapping(value = "/users", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity getAll(){
 
-        return ResponseEntity.status(200).body(userService.getAll());
+        List<User> users = userService.getAll();
+
+        ModelMapper modelMapper = new ModelMapper();
+
+        List<UserDTO> dtos = users
+                .stream()
+                .map(user -> modelMapper.map(user, UserDTO.class))
+                .collect(Collectors.toList());
+
+        return ResponseEntity.status(200).body(dtos);
     }
 
     @RequestMapping(value = "/registeruser", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
