@@ -8,9 +8,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
 import org.springframework.validation.annotation.Validated;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
@@ -21,12 +18,7 @@ import javax.validation.constraints.*;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-06-07T15:56:57.563Z[GMT]")
 
-@Entity
-@Table(name = "users")
-public class User   {
-
-  @Id
-  @GeneratedValue
+public class UserDTO   {
   @JsonProperty("id")
   private Long id = null;
 
@@ -87,7 +79,7 @@ public class User   {
   @JsonProperty("day limit")
   private BigDecimal dayLimit = null;
 
-  public User id(Long id) {
+  public UserDTO id(Long id) {
     this.id = id;
     return this;
   }
@@ -106,7 +98,7 @@ public class User   {
     this.id = id;
   }
 
-  public User username(String username) {
+  public UserDTO username(String username) {
     this.username = username;
     return this;
   }
@@ -126,7 +118,7 @@ public class User   {
     this.username = username;
   }
 
-  public User fullname(String fullname) {
+  public UserDTO fullname(String fullname) {
     this.fullname = fullname;
     return this;
   }
@@ -145,7 +137,7 @@ public class User   {
     this.fullname = fullname;
   }
 
-  public User email(String email) {
+  public UserDTO email(String email) {
     this.email = email;
     return this;
   }
@@ -165,7 +157,7 @@ public class User   {
     this.email = email;
   }
 
-  public User password(String password) {
+  public UserDTO password(String password) {
     this.password = password;
     return this;
   }
@@ -185,7 +177,7 @@ public class User   {
     this.password = password;
   }
 
-  public User phone(String phone) {
+  public UserDTO phone(String phone) {
     this.phone = phone;
     return this;
   }
@@ -205,7 +197,7 @@ public class User   {
     this.phone = phone;
   }
 
-  public User dateOfBirth(String dateOfBirth) {
+  public UserDTO dateOfBirth(String dateOfBirth) {
     this.dateOfBirth = dateOfBirth;
     return this;
   }
@@ -225,7 +217,7 @@ public class User   {
     this.dateOfBirth = dateOfBirth;
   }
 
-  public User userRole(UserRoleEnum userRole) {
+  public UserDTO userRole(UserRoleEnum userRole) {
     this.userRole = userRole;
     return this;
   }
@@ -245,7 +237,7 @@ public class User   {
     this.userRole = userRole;
   }
 
-  public User transactionLimit(BigDecimal transactionLimit) {
+  public UserDTO transactionLimit(BigDecimal transactionLimit) {
     this.transactionLimit = transactionLimit;
     return this;
   }
@@ -266,7 +258,7 @@ public class User   {
     this.transactionLimit = transactionLimit;
   }
 
-  public User dayLimit(BigDecimal dayLimit) {
+  public UserDTO dayLimit(BigDecimal dayLimit) {
     this.dayLimit = dayLimit;
     return this;
   }
@@ -296,7 +288,7 @@ public class User   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    User user = (User) o;
+    UserDTO user = (UserDTO) o;
     return Objects.equals(this.id, user.id) &&
             Objects.equals(this.username, user.username) &&
             Objects.equals(this.fullname, user.fullname) &&

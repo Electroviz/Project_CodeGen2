@@ -1,7 +1,9 @@
 package io.swagger.controller;
 
-import io.swagger.model.User;
+import io.swagger.model.UserDTO;
+import io.swagger.model.entity.User;
 import io.swagger.service.UserService;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -21,11 +23,17 @@ public class UserController {
         return ResponseEntity.status(200).body(userService.getAll());
     }
 
-    @RequestMapping(value = "/usertest", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity add(@RequestBody User user){
+    @RequestMapping(value = "/createuser", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity add(@RequestBody UserDTO userDTO){
 
-        User result = userService.addUser(user);
-        return ResponseEntity.status(201).body(result);
+        ModelMapper modelMapper = new ModelMapper();
+        User user = modelMapper.map(userDTO, User.class);
+
+        user = userService.addUser(user);
+
+        UserDTO response = modelMapper.map(user, UserDTO.class);
+
+        return ResponseEntity.status(201).body(response);
     }
 
 
