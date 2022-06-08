@@ -1,5 +1,6 @@
 package io.swagger.service;
 
+import io.swagger.api.ApiException;
 import io.swagger.model.BankAccount;
 import io.swagger.repository.BankAccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,9 +8,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
+import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Service
@@ -165,5 +166,22 @@ public class BankAccountService {
             id += Integer.toString(n);
         }
         return Integer.parseInt(id);
+    }
+
+    public BankAccount getByIban(String iban) throws ApiException {
+        return bankAccountRepository.findById(Integer.valueOf(iban)).map(this::toModel)
+                .orElseThrow(() -> ApiException.badRequest("No such account"));
+    }
+
+
+    BankAccount toModel(BankAccount entity) {
+        BankAccount account = new BankAccount();
+        account.setUserId(entity.getUserId());
+        account.setIban(entity.getIban());
+        account.setBalance(entity.getBalance());
+        account.setAbsoluteLimit(entity.getAbsoluteLimit());
+        account.setCreationDate(entity.getCreationDate());
+        account.setAccountType(entity.getAccountType());
+        return account;
     }
 }

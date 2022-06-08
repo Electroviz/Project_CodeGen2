@@ -8,11 +8,16 @@ import io.swagger.repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.threeten.bp.LocalDateTime;
+import org.threeten.bp.OffsetDateTime;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 public class TransactionService {
@@ -37,12 +42,12 @@ public class TransactionService {
     }
     public void deposittest(double amount){
         balance1 += amount;
-        System.out.println(name + " has $" + balance1);
+        System.out.println(name + " has $" + balance1 + " After deposit");
     }
     public void withdraw(double amount){
         if (amount < balance1){
             balance1 -= amount;
-            System.out.println(name + " has $" + balance1);
+            System.out.println(name + "  has $" + balance1 + " After withdraw");
         }
         else {
             System.out.println("withdraw by " + name + " fails");
@@ -51,9 +56,9 @@ public class TransactionService {
     }
     public ResponseEntity StartTransactionTest(){
         String user1 = bankktest("hans");
-        //deposittest(500);
-        String user2 = bankktest("Willem");
-        deposittest(900);
+        deposittest(500);
+        withdraw(200);
+
         return null;
     }
 //    End of the test transaction !!!!
@@ -114,6 +119,9 @@ public class TransactionService {
         //Save the transaction
         // ----  start the  transaction ----
 
+        // update the "to" bank balance
+
+
         //Implemt in bankaccountservice
         //Updateuser functie
     }
@@ -143,10 +151,75 @@ public class TransactionService {
         return total;
     }
 
+    public List<Transaction> getTransactionHistoryByIban(User currentUser, String iban, int skip, int limit) throws ApiException {
+        BankAccount account = bankAccountService.getByIban(iban);
 
-    public int createTransaction2() {
-        int tom = 5;
+        // get user transactions
+        List<Transaction> userTransactions = filterByUser(currentUser);
 
-        return  tom;
+        // filter the transactions by iban
+        List<Transaction> filteredTransactions = new ArrayList<>();
+        for (Transaction userTransaction : userTransactions) {
+            if(userTransaction.getFrom().equals(iban) || userTransaction.getTo().equals(iban) ){
+                filteredTransactions.add(userTransaction);
+            }
+        }
+
+        // paginate the transaction list
+        return paginateTransactions(filteredTransactions, skip, limit);
     }
+
+    public List<Transaction> filterByUser(User currentUser) {
+        // collect the transaction entities
+        List<Transaction> entities = transactionRepository.findAll();
+
+        // filter the transactions that whose 'from' or 'to' belongs to the current user
+        List<Transaction> filteredEntities = new ArrayList<>();
+        for (Transaction entity : entities) {
+            try {
+                // get the 'from' bank account of this transaction
+                BankAccount bankAccount = bankAccountService.getByIban(entity.getFrom());
+                // verify if the 'from' bank account belongs to the current user
+                if (Objects.equals(bankAccount.getUserId(), currentUser.getId())) {
+                    filteredEntities.add(entity);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        // convert the filtered transaction entities to models
+        return filteredEntities.stream().map(this::toModel).collect(Collectors.toList());
+    }
+    public Transaction toModel(Transaction entity) {
+        Transaction model = new Transaction();
+        model.setAmount(entity.getAmount());
+        model.setTo(entity.getTo());
+        model.setFrom(entity.getFrom());
+        model.setUserIDPerforming(Math.toIntExact(entity.getUserIDPerforming()));
+        model.setDescription(entity.getDescription());
+        model.setTransactionID(Math.toIntExact(entity.getTransactionID()));
+
+        // convert the time from java.sql.Timestamp to swagger's own
+        LocalDateTime dateTime = entity.getTimestamp().toLocalDateTime();
+        model.setTimestamp(OffsetDateTime.parse(dateTime.toString()));
+        return model;
+    }
+    private List<Transaction> paginateTransactions(List<Transaction> transactions, int skip, int limit) {
+        try {
+            // slice the users based on the skip/limit parameters
+
+            // calculate the beginning & end index
+            int start = skip;
+            int end = skip + limit;
+            // ensure the end index is less than or equal to the maximum number of entities.
+            end = Math.min(end, transactions.size());
+
+            // get the data within the skip/limit params
+            return transactions.subList(start, end);
+        } catch (Exception e) {
+            System.err.println(e);
+            return Collections.emptyList();
+        }
+    }
+
 }
