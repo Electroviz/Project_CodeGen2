@@ -56,9 +56,9 @@ public class JwtProvider {
 
     }
 
-    public String GetUserName(String jwtToken){
-        UserService userService = thisUserService.loadUser(GetUserName(jwtToken))
-    }
+    //public String GetUserName(String jwtToken){
+        //UserService userService = thisUserService.loadUser(GetUserName(jwtToken));
+    //}
 
     public void ResolveToken(){
 

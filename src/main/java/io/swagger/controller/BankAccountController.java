@@ -39,7 +39,6 @@ public class BankAccountController {
 
     //melle/Nicky
     @RequestMapping(value = "/createBankAccount", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity registerNewBankAccountController(@RequestBody BankAccount account){
         ResponseEntity<String> response = bankAccountService.CreateNewBankAccount();
 
@@ -66,6 +65,32 @@ public class BankAccountController {
     //Nicky
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE,value="/getBankAccount/{FULLNAME}")
     public ResponseEntity getBankAccountInfoByName(@PathVariable("fullName") String fullName) {
+        List<String> ibansToReturn = bankAccountService.getAccountByName(fullName);
+
+        if(ibansToReturn != null) {
+            return new ResponseEntity<List>(ibansToReturn,HttpStatus.FOUND);
+        }
+        else {
+            return ResponseEntity.status(400).body(ibansToReturn);
+        }
+    }
+
+    //Nicky
+    @RequestMapping(method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE,value="/getBankAccount/{IBAN}/Deposit")
+    public ResponseEntity accountDeposit(@PathVariable("fullName") String fullName) {
+        List<String> ibansToReturn = bankAccountService.getAccountByName(fullName);
+
+        if(ibansToReturn != null) {
+            return new ResponseEntity<List>(ibansToReturn,HttpStatus.FOUND);
+        }
+        else {
+            return ResponseEntity.status(400).body(ibansToReturn);
+        }
+    }
+
+    //Nicky
+    @RequestMapping(method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE,value="/getBankAccount/{IBAN}/Withdraw")
+    public ResponseEntity accountWithdraw(@PathVariable("fullName") String fullName) {
         List<String> ibansToReturn = bankAccountService.getAccountByName(fullName);
 
         if(ibansToReturn != null) {
