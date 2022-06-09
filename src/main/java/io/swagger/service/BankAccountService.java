@@ -1,6 +1,7 @@
 package io.swagger.service;
 
 import io.swagger.model.BankAccount;
+import io.swagger.model.TransactionInfo;
 import io.swagger.model.User;
 import io.swagger.repository.BankAccountRepository;
 import io.swagger.repository.UserRepository;
@@ -186,6 +187,26 @@ public class BankAccountService {
         {
             bankAccountRepository.deleteById(deleteId);
         }
+    }
+
+    public TransactionInfo AccountDeposit(String iban, Double amount){
+        List<BankAccount> allBankAccounts;
+        allBankAccounts = bankAccountRepository.findAll();
+        TransactionInfo transactionInfo = new TransactionInfo();
+        BankAccount depositAccount = null;
+
+        for (BankAccount account : allBankAccounts) {
+            if(iban == account.getIban()){
+                account.setBalance(account.getBalance() + amount);
+                transactionInfo.setAmount(BigDecimal.valueOf(amount));
+                transactionInfo.setTimestamp(new SimpleDateFormat("dd-MM-yyyy").format(new Date()));
+                break;
+            }
+        }
+        //ingelogde userid
+        //transactionInfo.setUserIDPerforming();
+
+        return transactionInfo;
     }
 
 }

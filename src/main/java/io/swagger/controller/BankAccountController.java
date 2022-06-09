@@ -1,6 +1,7 @@
 package io.swagger.controller;
 
 import io.swagger.model.BankAccount;
+import io.swagger.model.TransactionInfo;
 import io.swagger.service.BankAccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -10,6 +11,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.print.attribute.standard.Media;
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -77,8 +79,8 @@ public class BankAccountController {
 
     //Nicky
     @RequestMapping(method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE,value="/getBankAccount/{IBAN}/Deposit")
-    public ResponseEntity accountDeposit(@PathVariable("fullName") String fullName) {
-        List<String> ibansToReturn = bankAccountService.getAccountByName(fullName);
+    public ResponseEntity accountDeposit(@PathVariable("IBAN") String IBAN, @RequestBody Double amount) {
+        TransactionInfo transactionInfo = bankAccountService.AccountDeposit(IBAN, amount);
 
         if(ibansToReturn != null) {
             return new ResponseEntity<List>(ibansToReturn,HttpStatus.FOUND);
@@ -90,7 +92,7 @@ public class BankAccountController {
 
     //Nicky
     @RequestMapping(method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE,value="/getBankAccount/{IBAN}/Withdraw")
-    public ResponseEntity accountWithdraw(@PathVariable("fullName") String fullName) {
+    public ResponseEntity accountWithdraw(@PathVariable("amount") float amount) {
         List<String> ibansToReturn = bankAccountService.getAccountByName(fullName);
 
         if(ibansToReturn != null) {
