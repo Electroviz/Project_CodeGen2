@@ -63,6 +63,7 @@ public class JwtProvider {
     public void ResolveToken(){
 
     }
+
     public boolean ValidateToken(String jwtToken){
         try {
             Jwts.parser().setSigningKey(secretToken).parseClaimsJws(jwtToken);

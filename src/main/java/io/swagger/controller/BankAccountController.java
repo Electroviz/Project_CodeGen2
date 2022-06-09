@@ -6,9 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.print.attribute.standard.Media;
+import java.util.List;
 
 @RestController
 public class BankAccountController {
@@ -35,8 +37,9 @@ public class BankAccountController {
         return bankAccountService.GetAllBankAccounts();
     }
 
-    //melle
+    //melle/Nicky
     @RequestMapping(value = "/createBankAccount", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity registerNewBankAccountController(@RequestBody BankAccount account){
         ResponseEntity<String> response = bankAccountService.CreateNewBankAccount();
 
@@ -57,6 +60,19 @@ public class BankAccountController {
         }
         else {
             return ResponseEntity.status(400).body(ba);
+        }
+    }
+
+    //Nicky
+    @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE,value="/getBankAccount/{FULLNAME}")
+    public ResponseEntity getBankAccountInfoByName(@PathVariable("fullName") String fullName) {
+        List<String> ibansToReturn = bankAccountService.getAccountByName(fullName);
+
+        if(ibansToReturn != null) {
+            return new ResponseEntity<List>(ibansToReturn,HttpStatus.FOUND);
+        }
+        else {
+            return ResponseEntity.status(400).body(ibansToReturn);
         }
     }
 }

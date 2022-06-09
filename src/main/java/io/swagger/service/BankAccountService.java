@@ -81,7 +81,7 @@ public class BankAccountService {
     }
 
     //Nicky
-    public ResponseEntity getAccountByName(String fullname){
+    public List<String> getAccountByName(String fullname){
         List<String> returnIbans = null;
         List<BankAccount> allBankAccounts = bankAccountRepository.findAll();
         List<User> allUsers = userRepository.findAll();
@@ -104,7 +104,7 @@ public class BankAccountService {
             }
         }
 
-        return new ResponseEntity<List<String>>(returnIbans,HttpStatus.ACCEPTED);
+        return returnIbans;
     }
 
     public void SaveBankAccount(BankAccount bankAccount) {

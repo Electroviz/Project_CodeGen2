@@ -75,6 +75,10 @@ public class User   {
       }
       return null;
     }
+
+    public String getAuthority() {
+      return name();
+    }
   }
   @JsonProperty("userRole")
   private UserRoleEnum userRole = null;

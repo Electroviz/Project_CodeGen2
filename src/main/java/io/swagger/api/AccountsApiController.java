@@ -1,43 +1,26 @@
 package io.swagger.api;
 
-import io.swagger.controller.BankAccountController;
 import io.swagger.model.BankAccount;
 import io.swagger.model.TransactionInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.service.BankAccountService;
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.*;
 import javax.validation.Valid;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
-import java.util.Map;
-import java.util.Random;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-05-12T15:22:53.754Z[GMT]")
 @RestController
@@ -91,7 +74,13 @@ public class AccountsApiController implements AccountsApi {
     }
 
     public ResponseEntity<List<String>> getAccountByName(@Parameter(in = ParameterIn.PATH, description = "full name of a user", required=true, schema=@Schema()) @PathVariable("fullName") String fullName) {
-        return bankAccountService.getAccountByName(fullName);
+        List<String> ibansToReturn = bankAccountService.getAccountByName(fullName);
+        if(ibansToReturn != null) {
+            return new ResponseEntity<List<String>>(ibansToReturn,HttpStatus.FOUND);
+        }
+        else {
+            return ResponseEntity.status(400).body(ibansToReturn);
+        }
     }
 
     public ResponseEntity<List<BankAccount>> getAccounts(@Min(0)@Parameter(in = ParameterIn.QUERY, description = "number of records to skip for pagination" ,schema=@Schema(allowableValues={  }
