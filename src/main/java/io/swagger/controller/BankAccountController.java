@@ -22,8 +22,31 @@ public class BankAccountController {
     @Autowired
     private BankAccountService bankAccountService;
 
-    //voorbeeld van een request
-    @RequestMapping(method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_VALUE,value = "/all")
+    //melle
+    @RequestMapping(method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE, value= "/putBankAccountType/{type}/{IBAN}")
+    public ResponseEntity putBankAccountTypeByIBAN(@PathVariable("type") String type, @PathVariable("IBAN") String IBAN) {
+        type = type.replaceAll("[{}]",""); //make sure that the {variable} quotes are not taking into consideration
+        BankAccount.AccountTypeEnum bankAccountType = BankAccount.AccountTypeEnum.valueOf(type);
+        BankAccount bankAccountByIban = bankAccountService.GetBankAccountByIban(IBAN);
+        if(bankAccountByIban == null) return ResponseEntity.status(400).body("unknown IBAN or TYPE");
+        else {
+            return bankAccountService.PutBankAccountType(bankAccountType,bankAccountService.GetBankAccountByIban(IBAN));
+        }
+    }
+
+    //melle
+    @RequestMapping(method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, value="/initBankAccounts/{userId}")
+    public ResponseEntity postBankAccountsForUserByUserId(@PathVariable("userId") Long userId) {
+        return bankAccountService.PostOneSavingsAccountAndCurrentAccountForUser(userId);
+    }
+
+    @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value="/bankAccounts/{userId}")
+    public ResponseEntity testFunc(@PathVariable("userId") long userId) {
+        return bankAccountService.GetBankAccountsByUserId(userId);
+    }
+
+    //melle
+    @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE,value = "/allBankAccounts")
     public ResponseEntity getAccountByIBANController(){
         if (bankAccountService.GetAllBankAccounts().getStatusCode().isError()){
             return ResponseEntity.status(400).body("Bad Request");
