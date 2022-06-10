@@ -1,8 +1,10 @@
 package io.swagger.service;
 
 import io.swagger.model.BankAccount;
+import io.swagger.model.TransactionInfo;
 import io.swagger.model.entity.User;
 import io.swagger.repository.BankAccountRepository;
+import io.swagger.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +23,8 @@ public class BankAccountService {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private UserRepository userRepository;
 
     public ResponseEntity PutBankAccountType(BankAccount.AccountTypeEnum type, BankAccount bankAccount) {
         if(bankAccount != null) {
@@ -187,8 +191,69 @@ public class BankAccountService {
         }
     }
 
+    //Nicky
     public void DeleteBankAccount(String iban){
+        List<BankAccount> allBankAccounts;
+        allBankAccounts = bankAccountRepository.findAll();
+        boolean canDel = false;
+        Long deleteId = Long.valueOf(0);
+        for (BankAccount bankAccount : allBankAccounts) {
+            if(bankAccount.getIban() == iban){
+                deleteId = bankAccount.getUserId();
+                canDel = true;
+                break;
+            }
+        }
+        if (canDel)
+        {
+            bankAccountRepository.deleteById(deleteId);
+        }
+    }
 
+    //Nicky
+    public TransactionInfo AccountDeposit(String iban, Double amount){
+        List<BankAccount> allBankAccounts;
+        allBankAccounts = bankAccountRepository.findAll();
+        TransactionInfo transactionInfo = new TransactionInfo();
+        BankAccount depositAccount = null;
+
+        for (BankAccount account : allBankAccounts) {
+            if(iban == account.getIban()){
+                //account.setBalance(account.getBalance() + BigDecimal.valueOf(amount));
+                transactionInfo.setAmount(BigDecimal.valueOf(amount));
+                //transactionInfo.setTimestamp(new SimpleDateFormat("dd-MM-yyyy").format(new Date()));
+                break;
+            }
+        }
+        //ingelogde userid
+        //transactionInfo.setUserIDPerforming();
+
+        return transactionInfo;
+    }
+
+    //Nicky
+    public List<String> getAccountByName(String fullname){
+        List<String> returnIbans = null;
+        List<BankAccount> allBankAccounts = bankAccountRepository.findAll();
+        List<User> allUsers = userRepository.findAll();
+        Long userCompareId = null;
+
+        for (User user : allUsers)
+        {
+            if(user.getFullname() == fullname)
+            {
+                userCompareId = Long.valueOf(user.getId());
+                break;
+            }
+        }
+        for (BankAccount account : allBankAccounts)
+        {
+            if(account.getUserId() == userCompareId)
+            {
+                returnIbans.add(account.getIban());
+            }
+        }
+        return returnIbans;
     }
 
 
@@ -219,4 +284,6 @@ public class BankAccountService {
         }
         return Integer.parseInt(id);
     }
+
+
 }

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface BankAccountRepository extends JpaRepository<BankAccount, Integer> {
+public interface BankAccountRepository extends JpaRepository<BankAccount, Long> {
     List<BankAccount> findByiban(String fromIban);
 
     List<BankAccount> findByuserId(Long fromUserId);
