@@ -29,11 +29,6 @@ public class TransactionService {
         DepositTest(500);
         withdrawTest(100);
 
-        String naam2 = "Jan";
-        BankAccounTest(naam2);
-        DepositTest(200);
-        withdrawTest(100);
-
         return null;
     }
 
