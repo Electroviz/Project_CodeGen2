@@ -6,6 +6,7 @@ import io.swagger.model.User;
 import io.swagger.repository.BankAccountRepository;
 import io.swagger.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -51,7 +52,7 @@ public class BankAccountService {
 
     public ResponseEntity SetBankAccount(BankAccount account) {
         BankAccount newBankAccount = new BankAccount();
-        newBankAccount.SetBalance(0.0);
+        newBankAccount.setBalance(0.0);
         newBankAccount.absoluteLimit(0.0); //-	Balance cannot become lower than a certain number defined per account, referred to as absolute limit
         newBankAccount.SetAccountStatus(BankAccount.AccountStatusEnum.ACTIVE);
         newBankAccount.setCreationDate(new SimpleDateFormat("dd-MM-yyyy").format(new Date()));
@@ -79,7 +80,7 @@ public class BankAccountService {
         int deleteId = 0;
         for (BankAccount bankAccount : allBankAccounts) {
             if(bankAccount.getIban() == iban){
-                deleteId = bankAccount.getId();
+                deleteId = bankAccount.getUserId();
                 canDel = true;
                 break;
             }
@@ -98,7 +99,7 @@ public class BankAccountService {
 
         for (BankAccount account : allBankAccounts) {
             if(iban == account.getIban()){
-                account.setBalance(account.getBalance() + amount);
+                account.setBalance(account.getBalance() + BigDecimal.valueOf(amount));
                 transactionInfo.setAmount(BigDecimal.valueOf(amount));
                 transactionInfo.setTimestamp(new SimpleDateFormat("dd-MM-yyyy").format(new Date()));
                 break;

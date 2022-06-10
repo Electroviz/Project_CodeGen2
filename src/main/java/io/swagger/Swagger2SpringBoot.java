@@ -20,7 +20,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
-import java.math.BigDecimal;
+import java.math.Double;
 import java.util.concurrent.ThreadLocalRandom;
 
 @SpringBootApplication
@@ -65,8 +65,8 @@ public class Swagger2SpringBoot implements CommandLineRunner {
           firstUser.setPhone("+310628495028");
           firstUser.setDateOfBirth("12-03-1997");
           firstUser.setUserRole(User.UserRoleEnum.CUSTOMER);
-          firstUser.setTransactionLimit(BigDecimal.valueOf(3000.0));
-          firstUser.setDayLimit(BigDecimal.valueOf(30000.0));
+          firstUser.setTransactionLimit(3000.0);
+          firstUser.setDayLimit(30000.0);
 
           userService.addUser(firstUser);
 //
