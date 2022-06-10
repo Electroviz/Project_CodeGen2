@@ -1,18 +1,16 @@
 package io.swagger.model;
 
-import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.math.BigDecimal;
-import org.threeten.bp.OffsetDateTime;
 import org.springframework.validation.annotation.Validated;
+import org.threeten.bp.OffsetDateTime;
 
-import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.validation.Valid;
-import javax.validation.constraints.*;
+import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
+import java.util.Objects;
 
 /**
  * Transaction
@@ -20,15 +18,18 @@ import javax.validation.constraints.*;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-05-12T15:22:53.754Z[GMT]")
 
+
+
+
 @Entity
 public class Transaction   {
-
   @Id
   @GeneratedValue
   @JsonProperty("id")
-  private Integer id;
+  private Long id;
+  
   @JsonProperty("transactionID")
-  private Integer transactionID = null;
+  private Long transactionID = null;
 
   @JsonProperty("from")
   private String from = null;
@@ -48,7 +49,7 @@ public class Transaction   {
   @JsonProperty("description")
   private String description = null;
 
-  public Transaction transactionID(Integer transactionID) {
+  public Transaction transactionID(Long transactionID) {
     this.transactionID = transactionID;
     return this;
   }
@@ -59,11 +60,11 @@ public class Transaction   {
    **/
   @Schema(example = "123", description = "")
   
-    public Integer getTransactionID() {
+    public Long getTransactionID() {
     return transactionID;
   }
 
-  public void setTransactionID(Integer transactionID) {
+  public void setTransactionID(Long transactionID) {
     this.transactionID = transactionID;
   }
 

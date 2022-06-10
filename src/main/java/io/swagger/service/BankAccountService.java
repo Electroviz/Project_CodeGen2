@@ -6,14 +6,14 @@ import io.swagger.model.User;
 import io.swagger.repository.BankAccountRepository;
 import io.swagger.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.Date;
+import java.util.List;
+import java.util.Random;
 
 @Service
 public class BankAccountService {
@@ -21,131 +21,32 @@ public class BankAccountService {
     private BankAccountRepository bankAccountRepository;
     private UserRepository userRepository;
 
-    public ResponseEntity PutBankAccountType(BankAccount.AccountTypeEnum type, BankAccount bankAccount) {
-        if(bankAccount != null) {
-            bankAccount.setAccountType(type);
-            bankAccountRepository.save(bankAccount);
-            return ResponseEntity.status(200).body(bankAccount);
-        }
-        else return ResponseEntity.status(400).body("bad request");
-    }
+    //eventueel user service hier ook in auto wiren
 
-    //melle
     public ResponseEntity GetAllBankAccounts() {
-        List<BankAccount> allBankAccounts = bankAccountRepository.findAll();
+        //test account:
+        BankAccount newBankAccount = new BankAccount();
+        newBankAccount.setUserId(1);
+        newBankAccount.setAccountType(BankAccount.AccountTypeEnum.CURRENT);
+        newBankAccount.setBalance(BigDecimal.valueOf(0));
+        newBankAccount.setAbsoluteLimit(BigDecimal.valueOf(0));
+        newBankAccount.setCreationDate("12-02-2022");
+        newBankAccount.setIban("184kjdjanf");
+
+        bankAccountRepository.save(newBankAccount);
+
+        List<BankAccount> allBankAccounts;
+        allBankAccounts = bankAccountRepository.findAll();
+
+
 
         if(bankAccountRepository.count() == 0) {
             return ResponseEntity.status(400).body(allBankAccounts);
         }
         else {
-            return new ResponseEntity<List<BankAccount>>(allBankAccounts,HttpStatus.ACCEPTED);
-        }
-    }
-
-    //Melle
-    public BankAccount GetBankAccountByIban(String iban) {
-        iban = iban.replaceAll("[{}]",""); //make sure that the {variable} quotes are not taking into consideration
-        //if(iban != null) return new ResponseEntity<String>(String.valueOf(bankAccountRepository.findAll().stream().count()),HttpStatus.FOUND);
-        BankAccount correctBankAccount = null;
-        for (BankAccount ba : this.bankAccountRepository.findAll()) {
-            if (Objects.equals(ba.getIban(), iban)) {
-                return ba;
-            }
+            return ResponseEntity.status(201).body(allBankAccounts);
         }
 
-        return null;
-    }
-
-    //melle
-    public void CreateDummyDataBankAccount() {
-        BankAccount newBankAccount = new BankAccount();
-        newBankAccount.setIban(this.generateRandomIban());
-        newBankAccount.setBalance(ThreadLocalRandom.current().nextDouble(300, 1800));
-        newBankAccount.setAbsoluteLimit(0.0);
-        newBankAccount.accountType(BankAccount.AccountTypeEnum.CURRENT);
-        newBankAccount.userId(ThreadLocalRandom.current().nextInt(0, 100000));
-
-        bankAccountRepository.save(newBankAccount);
-    }
-
-    //melle/Nicky
-    public ResponseEntity CreateNewBankAccount() {
-        BankAccount newBankAccount = new BankAccount();
-        newBankAccount.SetBalance(0.0);
-        newBankAccount.absoluteLimit(0.0); //-	Balance cannot become lower than a certain number defined per account, referred to as absolute limit
-        newBankAccount.SetAccountStatus(BankAccount.AccountStatusEnum.ACTIVE);
-        newBankAccount.setIban(generateRandomIban());
-
-
-        //!!create a check for if the user being connected to this bank account does not already have a current and savings account!!
-        return ResponseEntity.status(400).body(newBankAccount);
-    }
-
-    //Nicky
-    public List<String> getAccountByName(String fullname){
-        List<String> returnIbans = null;
-        List<BankAccount> allBankAccounts = bankAccountRepository.findAll();
-        List<User> allUsers = userRepository.findAll();
-        Long userCompareId = null;
-
-        for (User user : allUsers)
-        {
-            if(user.getFullname() == fullname)
-            {
-                userCompareId = Long.valueOf(user.getId());
-                break;
-            }
-        }
-
-        for (BankAccount account : allBankAccounts)
-        {
-            if(account.getUserId() == userCompareId)
-            {
-                returnIbans.add(account.getIban());
-            }
-        }
-
-        return returnIbans;
-    }
-
-    public void SaveBankAccount(BankAccount bankAccount) {
-        bankAccountRepository.save(bankAccount);
-    }
-
-    //melle/Nicky
-    private String generateRandomIban() {
-        boolean succes = true;
-        String newIban = "";
-        List<BankAccount> allBankAccounts = bankAccountRepository.findAll();
-        do {
-            succes = true;
-            newIban = this.IbanStringGenerator();
-            for (int i = 0; i < allBankAccounts.size(); i++) {
-                BankAccount bankAccount = allBankAccounts.get(i);
-                String ibanToCheck = bankAccount.GetIBAN();
-                if (newIban == ibanToCheck) {
-                    succes = false;
-                }
-            }
-        } while(succes == false);
-
-        return newIban;
-    }
-
-    private String IbanStringGenerator() {
-        Random random = new Random();
-        String IBAN = "NL";
-        int index = random.nextInt(10);
-        IBAN += Integer.toString(index);
-        index = random.nextInt(10);
-        IBAN += Integer.toString(index);
-        IBAN += "INHO0";
-        for (int i = 0; i < 10; i++) {
-            int n = random.nextInt(10);
-            IBAN += Integer.toString(n);
-        }
-
-        return IBAN;
     }
 
     public ResponseEntity SetBankAccount(BankAccount account) {

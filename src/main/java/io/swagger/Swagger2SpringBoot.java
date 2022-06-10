@@ -4,7 +4,7 @@ import io.swagger.configuration.LocalDateConverter;
 import io.swagger.configuration.LocalDateTimeConverter;
 
 import io.swagger.model.BankAccount;
-import io.swagger.model.User;
+import io.swagger.model.entity.User;
 import io.swagger.service.BankAccountService;
 import io.swagger.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,19 +54,21 @@ public class Swagger2SpringBoot implements CommandLineRunner {
         for(int i = 0; i < 10; i++)
             bankAccountService.CreateDummyDataBankAccount();
 
-//        //create fake users and transactions
-//        User firstUser = new User();
-//        firstUser.username("Jantje");
-//        firstUser.fullname("Jantje Egberts");
-//        firstUser.email("jantje@live.nl");
-//        firstUser.password("jantje123");
-//        firstUser.phone("+310628495028");
-//        firstUser.dateOfBirth("12-03-1997");
-//        firstUser.userRole(User.UserRoleEnum.CUSTOMER);
-//        firstUser.transactionLimit(BigDecimal.valueOf(3000.0));
-//        firstUser.dayLimit(BigDecimal.valueOf(30000.0));
-//
-//        userService.SaveUser(firstUser);
+
+        //Nick
+//        create fake users and transactions
+          User firstUser = new User();
+          firstUser.setUsername("Jantje");
+          firstUser.setFullname("Jantje Egberts");
+          firstUser.setEmail("jantje@live.nl");
+          firstUser.setPassword("jantje123");
+          firstUser.setPhone("+310628495028");
+          firstUser.setDateOfBirth("12-03-1997");
+          firstUser.setUserRole(User.UserRoleEnum.CUSTOMER);
+          firstUser.setTransactionLimit(BigDecimal.valueOf(3000.0));
+          firstUser.setDayLimit(BigDecimal.valueOf(30000.0));
+
+          userService.addUser(firstUser);
 //
 //        User secondUser = new User();
 //        secondUser.username("Gerard");

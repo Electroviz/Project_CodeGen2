@@ -7,10 +7,11 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
 import org.springframework.validation.annotation.Validated;
+<<<<<<< HEAD:src/main/java/io/swagger/model/UserDTO.java
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.Table;
+=======
+>>>>>>> parent of b79f652 (Merge branch 'Melle' into Nick):src/main/java/io/swagger/model/User.java
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 
@@ -18,15 +19,16 @@ import javax.validation.constraints.*;
  * User
  */
 @Validated
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-05-12T15:22:53.754Z[GMT]")
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-06-07T15:56:57.563Z[GMT]")
 
-@Entity
+<<<<<<< HEAD:src/main/java/io/swagger/model/UserDTO.java
+public class UserDTO   {
+=======
+
 public class User   {
-
-  @Id
-  @GeneratedValue
+>>>>>>> parent of b79f652 (Merge branch 'Melle' into Nick):src/main/java/io/swagger/model/User.java
   @JsonProperty("id")
-  private Integer id = null;
+  private Long id = null;
 
   @JsonProperty("username")
   private String username = null;
@@ -51,7 +53,7 @@ public class User   {
    */
   public enum UserRoleEnum {
     EMPLOYEE("Employee"),
-    
+
     CUSTOMER("Customer");
 
     private String value;
@@ -83,13 +85,17 @@ public class User   {
   @JsonProperty("userRole")
   private UserRoleEnum userRole = null;
 
-  @JsonProperty("transaction limit")
+  @JsonProperty("transactionLimit")
   private BigDecimal transactionLimit = null;
 
-  @JsonProperty("day limit")
+  @JsonProperty("dayLimit")
   private BigDecimal dayLimit = null;
 
-  public User id(Integer id) {
+<<<<<<< HEAD:src/main/java/io/swagger/model/UserDTO.java
+  public UserDTO id(Long id) {
+=======
+  public User id(Long id) {
+>>>>>>> parent of b79f652 (Merge branch 'Melle' into Nick):src/main/java/io/swagger/model/User.java
     this.id = id;
     return this;
   }
@@ -99,16 +105,21 @@ public class User   {
    * @return id
    **/
   @Schema(description = "")
+<<<<<<< HEAD:src/main/java/io/swagger/model/UserDTO.java
+
+  public Long getId() {
+=======
   
-    public Integer getId() {
+    public Long getId() {
+>>>>>>> parent of b79f652 (Merge branch 'Melle' into Nick):src/main/java/io/swagger/model/User.java
     return id;
   }
 
-  public void setId(Integer id) {
+  public void setId(Long id) {
     this.id = id;
   }
 
-  public User username(String username) {
+  public UserDTO username(String username) {
     this.username = username;
     return this;
   }
@@ -118,9 +129,9 @@ public class User   {
    * @return username
    **/
   @Schema(example = "Kees1978", required = true, description = "")
-      @NotNull
+  @NotNull
 
-    public String getUsername() {
+  public String getUsername() {
     return username;
   }
 
@@ -128,7 +139,7 @@ public class User   {
     this.username = username;
   }
 
-  public User fullname(String fullname) {
+  public UserDTO fullname(String fullname) {
     this.fullname = fullname;
     return this;
   }
@@ -138,8 +149,8 @@ public class User   {
    * @return fullname
    **/
   @Schema(example = "Kees Post", description = "")
-  
-    public String getFullname() {
+
+  public String getFullname() {
     return fullname;
   }
 
@@ -147,7 +158,7 @@ public class User   {
     this.fullname = fullname;
   }
 
-  public User email(String email) {
+  public UserDTO email(String email) {
     this.email = email;
     return this;
   }
@@ -157,9 +168,9 @@ public class User   {
    * @return email
    **/
   @Schema(example = "PieterBG@gmail.com", required = true, description = "")
-      @NotNull
+  @NotNull
 
-    public String getEmail() {
+  public String getEmail() {
     return email;
   }
 
@@ -167,7 +178,7 @@ public class User   {
     this.email = email;
   }
 
-  public User password(String password) {
+  public UserDTO password(String password) {
     this.password = password;
     return this;
   }
@@ -177,9 +188,9 @@ public class User   {
    * @return password
    **/
   @Schema(example = "fhdnd_Hdkf", required = true, description = "")
-      @NotNull
+  @NotNull
 
-    public String getPassword() {
+  public String getPassword() {
     return password;
   }
 
@@ -187,7 +198,7 @@ public class User   {
     this.password = password;
   }
 
-  public User phone(String phone) {
+  public UserDTO phone(String phone) {
     this.phone = phone;
     return this;
   }
@@ -197,9 +208,9 @@ public class User   {
    * @return phone
    **/
   @Schema(example = "612345345", required = true, description = "")
-      @NotNull
+  @NotNull
 
-    public String getPhone() {
+  public String getPhone() {
     return phone;
   }
 
@@ -207,7 +218,7 @@ public class User   {
     this.phone = phone;
   }
 
-  public User dateOfBirth(String dateOfBirth) {
+  public UserDTO dateOfBirth(String dateOfBirth) {
     this.dateOfBirth = dateOfBirth;
     return this;
   }
@@ -217,9 +228,9 @@ public class User   {
    * @return dateOfBirth
    **/
   @Schema(example = "17-09-1990", required = true, description = "")
-      @NotNull
+  @NotNull
 
-    public String getDateOfBirth() {
+  public String getDateOfBirth() {
     return dateOfBirth;
   }
 
@@ -227,7 +238,7 @@ public class User   {
     this.dateOfBirth = dateOfBirth;
   }
 
-  public User userRole(UserRoleEnum userRole) {
+  public UserDTO userRole(UserRoleEnum userRole) {
     this.userRole = userRole;
     return this;
   }
@@ -237,8 +248,13 @@ public class User   {
    * @return userRole
    **/
   @Schema(required = true, description = "")
+<<<<<<< HEAD:src/main/java/io/swagger/model/UserDTO.java
+  @NotNull
+=======
+      @NotNull
+>>>>>>> parent of b79f652 (Merge branch 'Melle' into Nick):src/main/java/io/swagger/model/User.java
 
-  public UserRoleEnum getUserRole() {
+    public UserRoleEnum getUserRole() {
     return userRole;
   }
 
@@ -246,7 +262,7 @@ public class User   {
     this.userRole = userRole;
   }
 
-  public User transactionLimit(BigDecimal transactionLimit) {
+  public UserDTO transactionLimit(BigDecimal transactionLimit) {
     this.transactionLimit = transactionLimit;
     return this;
   }
@@ -256,10 +272,10 @@ public class User   {
    * @return transactionLimit
    **/
   @Schema(example = "500", required = true, description = "")
-      @NotNull
+  @NotNull
 
-    @Valid
-    public BigDecimal getTransactionLimit() {
+  @Valid
+  public BigDecimal getTransactionLimit() {
     return transactionLimit;
   }
 
@@ -267,7 +283,7 @@ public class User   {
     this.transactionLimit = transactionLimit;
   }
 
-  public User dayLimit(BigDecimal dayLimit) {
+  public UserDTO dayLimit(BigDecimal dayLimit) {
     this.dayLimit = dayLimit;
     return this;
   }
@@ -277,10 +293,10 @@ public class User   {
    * @return dayLimit
    **/
   @Schema(example = "1000", required = true, description = "")
-      @NotNull
+  @NotNull
 
-    @Valid
-    public BigDecimal getDayLimit() {
+  @Valid
+  public BigDecimal getDayLimit() {
     return dayLimit;
   }
 
@@ -297,17 +313,17 @@ public class User   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    User user = (User) o;
+    UserDTO user = (UserDTO) o;
     return Objects.equals(this.id, user.id) &&
-        Objects.equals(this.username, user.username) &&
-        Objects.equals(this.fullname, user.fullname) &&
-        Objects.equals(this.email, user.email) &&
-        Objects.equals(this.password, user.password) &&
-        Objects.equals(this.phone, user.phone) &&
-        Objects.equals(this.dateOfBirth, user.dateOfBirth) &&
-        Objects.equals(this.userRole, user.userRole) &&
-        Objects.equals(this.transactionLimit, user.transactionLimit) &&
-        Objects.equals(this.dayLimit, user.dayLimit);
+            Objects.equals(this.username, user.username) &&
+            Objects.equals(this.fullname, user.fullname) &&
+            Objects.equals(this.email, user.email) &&
+            Objects.equals(this.password, user.password) &&
+            Objects.equals(this.phone, user.phone) &&
+            Objects.equals(this.dateOfBirth, user.dateOfBirth) &&
+            Objects.equals(this.userRole, user.userRole) &&
+            Objects.equals(this.transactionLimit, user.transactionLimit) &&
+            Objects.equals(this.dayLimit, user.dayLimit);
   }
 
   @Override
@@ -319,7 +335,7 @@ public class User   {
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class User {\n");
-    
+
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    username: ").append(toIndentedString(username)).append("\n");
     sb.append("    fullname: ").append(toIndentedString(fullname)).append("\n");

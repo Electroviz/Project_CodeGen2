@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.math.BigDecimal;
 import org.springframework.validation.annotation.Validated;
 
 import javax.persistence.Entity;
@@ -27,13 +28,13 @@ public class BankAccount   {
   @JsonProperty("id")
   private Integer id;
   @JsonProperty("userId")
-  private Long userId = null;
+  private Integer userId = null;
 
   @JsonProperty("iban")
   private String iban = null;
 
   @JsonProperty("balance")
-  private Double balance = null;
+  private BigDecimal balance = null;
 
   /**
    * Gets or Sets accountType
@@ -65,53 +66,16 @@ public class BankAccount   {
       return null;
     }
   }
-
-  public enum AccountStatusEnum {
-    ACTIVE("Active"),
-
-    INACTIVE("Inactive"),
-
-    CLOSED("Closed");
-
-    private String value;
-
-    AccountStatusEnum(String value) {
-      this.value = value;
-    }
-
-    @Override
-    @JsonValue
-    public String toString() {
-      return String.valueOf(value);
-    }
-
-    @JsonCreator
-    public static AccountStatusEnum fromValue(String text) {
-      for (AccountStatusEnum b : AccountStatusEnum.values()) {
-        if (String.valueOf(b.value).equals(text)) {
-          return b;
-        }
-      }
-      return null;
-    }
-  }
   @JsonProperty("accountType")
   private AccountTypeEnum accountType = null;
 
   @JsonProperty("absolute limit")
-  private Double absoluteLimit = null;
+  private BigDecimal absoluteLimit = null;
 
   @JsonProperty("creationDate")
   private String creationDate = null;
 
-  @JsonProperty("status")
-  private AccountStatusEnum accountStatus = null;
-
-  public void SetAccountStatus(AccountStatusEnum status) {
-    this.accountStatus = status;
-  }
-
-  public BankAccount userId(long userId) {
+  public BankAccount userId(Integer userId) {
     this.userId = userId;
     return this;
   }
@@ -121,33 +85,19 @@ public class BankAccount   {
    * @return userId
    **/
   @Schema(example = "1", required = true, description = "")
+      @NotNull
 
-  public Long getUserId() {
+    public Integer getUserId() {
     return userId;
   }
 
-
-  public Integer getId() {
-    return id;
-  }
-
-  public void setUserId(Long userId) {
-
+  public void setUserId(Integer userId) {
     this.userId = userId;
   }
 
   public BankAccount iban(String iban) {
     this.iban = iban;
     return this;
-  }
-
-  public boolean CanWithdrawMoney(Double amount) {
-    if(this.balance < amount) return false;
-    else return true;
-  }
-
-  public void SetBalance(Double balanceAmount) {
-      this.balance = balanceAmount;
   }
 
   /**
@@ -164,6 +114,11 @@ public class BankAccount   {
     this.iban = iban;
   }
 
+  public BankAccount balance(BigDecimal balance) {
+    this.balance = balance;
+    return this;
+  }
+
   /**
    * Get balance
    * @return balance
@@ -171,11 +126,11 @@ public class BankAccount   {
   @Schema(example = "23.45", description = "")
   
     @Valid
-    public Double getBalance() {
+    public BigDecimal getBalance() {
     return balance;
   }
 
-  public void setBalance(Double balance) {
+  public void setBalance(BigDecimal balance) {
     this.balance = balance;
   }
 
@@ -199,13 +154,9 @@ public class BankAccount   {
     this.accountType = accountType;
   }
 
-  public BankAccount absoluteLimit(Double absoluteLimit) {
+  public BankAccount absoluteLimit(BigDecimal absoluteLimit) {
     this.absoluteLimit = absoluteLimit;
     return this;
-  }
-
-  public String GetIBAN() {
-    return this.iban;
   }
 
   /**
@@ -216,11 +167,11 @@ public class BankAccount   {
       @NotNull
 
     @Valid
-    public Double getAbsoluteLimit() {
+    public BigDecimal getAbsoluteLimit() {
     return absoluteLimit;
   }
 
-  public void setAbsoluteLimit(Double absoluteLimit) {
+  public void setAbsoluteLimit(BigDecimal absoluteLimit) {
     this.absoluteLimit = absoluteLimit;
   }
 

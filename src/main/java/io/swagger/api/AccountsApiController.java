@@ -51,7 +51,16 @@ public class AccountsApiController implements AccountsApi {
     }
 
     public ResponseEntity<BankAccount> createAccount(@Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody BankAccount body) {
-        return bankAccountService.SetBankAccount(body);
+        BankAccount account = new BankAccount();
+        account.setUserId(bankAccountService.GenerateID());
+        account.setIban(bankAccountService.GenerateIban());
+        account.setBalance(BigDecimal.valueOf(0));
+        account.setAbsoluteLimit(body.getAbsoluteLimit());
+        account.setCreationDate(new SimpleDateFormat("dd-MM-yyyy").format(new Date()));
+        account.setAccountType(body.getAccountType());
+
+        bankAccountService.SetBankAccount(account);
+        return new ResponseEntity<BankAccount>(account, HttpStatus.OK);
     }
 
     public ResponseEntity<Void> deleteAccount(@Parameter(in = ParameterIn.PATH, description = "The IBAN", required=true, schema=@Schema()) @PathVariable("iban") String iban) {
