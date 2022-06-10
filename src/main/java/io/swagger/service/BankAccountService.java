@@ -237,6 +237,7 @@ public class BankAccountService {
         List<BankAccount> allBankAccounts = bankAccountRepository.findAll();
         List<User> allUsers = userRepository.findAll();
         Long userCompareId = null;
+        //-fullname = fullname.replaceAll("%20", " ");
 
         for (User user : allUsers)
         {

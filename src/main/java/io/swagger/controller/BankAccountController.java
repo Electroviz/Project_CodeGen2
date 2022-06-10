@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.print.attribute.standard.Media;
+import java.net.URL;
 import java.util.List;
 
 @RestController
@@ -74,8 +75,8 @@ public class BankAccountController {
     }
 
     //Nicky
-    @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE,value="/getBankAccount/{FULLNAME}")
-    public ResponseEntity getBankAccountInfoByName(@PathVariable("fullName") String fullName) {
+    @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE,value="/getBankAccount/name/{FULLNAME}")
+    public ResponseEntity getBankAccountInfoByName(@PathVariable("FULLNAME") String fullName) {
         List<String> ibansToReturn = bankAccountService.getAccountByName(fullName);
 
         if(ibansToReturn != null) {
@@ -85,6 +86,28 @@ public class BankAccountController {
             return ResponseEntity.status(400).body(ibansToReturn);
         }
     }
+
+    //Nicky
+    /*@RequestMapping(method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE,value="/getBankAccount/{IBAN}/Deposit")
+    public ResponseEntity accountDeposit(@PathVariable("IBAN") String IBAN, @RequestBody Double amount) {
+        TransactionInfo transactionInfo = bankAccountService.AccountDeposit(IBAN, amount);
+
+
+    }
+
+    //Nicky
+    @RequestMapping(method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE,value="/getBankAccount/{IBAN}/Withdraw")
+    public ResponseEntity accountWithdraw(@PathVariable("amount") float amount) {
+        //List<String> ibansToReturn = bankAccountService.getAccountByName(fullName);
+
+        //if(ibansToReturn != null) {
+        //    return new ResponseEntity<List>(ibansToReturn,HttpStatus.FOUND);
+        //}
+        //else {
+        //    return ResponseEntity.status(400).body(ibansToReturn);
+        //}
+        return new
+    }*/
 
 
 
