@@ -22,6 +22,13 @@ public class UserService {
         return user;
     }
 
+    //melle
+    public User getUserById(Long id) {
+        Optional<User> optionalUser = userRepository.findById(id);
+        if(optionalUser.isPresent()) return optionalUser.get();
+        else return null;
+    }
+
     public List<User> getAll(){
         return userRepository.findAll();
     }

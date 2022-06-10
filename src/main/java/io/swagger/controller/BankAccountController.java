@@ -22,10 +22,21 @@ public class BankAccountController {
         type = type.replaceAll("[{}]",""); //make sure that the {variable} quotes are not taking into consideration
         BankAccount.AccountTypeEnum bankAccountType = BankAccount.AccountTypeEnum.valueOf(type);
         BankAccount bankAccountByIban = bankAccountService.GetBankAccountByIban(IBAN);
-        if(bankAccountByIban == null) return ResponseEntity.status(400).body("unknown IBAN");
+        if(bankAccountByIban == null) return ResponseEntity.status(400).body("unknown IBAN or TYPE");
         else {
             return bankAccountService.PutBankAccountType(bankAccountType,bankAccountService.GetBankAccountByIban(IBAN));
         }
+    }
+
+    //melle
+    @RequestMapping(method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, value="/initBankAccounts/{userId}")
+    public ResponseEntity postBankAccountsForUserByUserId(@PathVariable("userId") Long userId) {
+        return bankAccountService.PostOneSavingsAccountAndCurrentAccountForUser(userId);
+    }
+
+    @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value="/bankAccounts/{userId}")
+    public ResponseEntity testFunc(@PathVariable("userId") long userId) {
+        return bankAccountService.GetBankAccountsByUserId(userId);
     }
 
     //melle

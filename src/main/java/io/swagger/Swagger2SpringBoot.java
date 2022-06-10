@@ -69,19 +69,26 @@ public class Swagger2SpringBoot implements CommandLineRunner {
           firstUser.setDayLimit(BigDecimal.valueOf(30000.0));
 
           userService.addUser(firstUser);
-//
+//          bankAccountService.CreateDummyDataBankAccount(firstUser.getId(), BankAccount.AccountTypeEnum.CURRENT);
+//          bankAccountService.CreateDummyDataBankAccount(firstUser.getId(), BankAccount.AccountTypeEnum.SAVINGS);
+
 //        User secondUser = new User();
-//        secondUser.username("Gerard");
-//        secondUser.fullname("Gerard Van Brankenstein");
-//        secondUser.email("gerard@live.nl");
-//        secondUser.password("gerard123");
-//        secondUser.phone("+310688473022");
-//        secondUser.dateOfBirth("01-11-1988");
-//        secondUser.userRole(User.UserRoleEnum.CUSTOMER);
-//        secondUser.transactionLimit(BigDecimal.valueOf(3000.0));
-//        secondUser.dayLimit(BigDecimal.valueOf(30000.0));
+
+//        secondUser.setUsername("Gerard");
+//        secondUser.setFullname("Gerard Van Brankenstein");
+//        secondUser.setEmail("gerard@live.nl");
+//        secondUser.setPassword("gerard123");
+//        secondUser.setPhone("+310688473022");
+//        secondUser.setDateOfBirth("01-11-1988");
+//        secondUser.setUserRole(User.UserRoleEnum.CUSTOMER);
+//        secondUser.setTransactionLimit(BigDecimal.valueOf(3000.0));
+//        secondUser.setDayLimit(BigDecimal.valueOf(30000.0));
 //
-//        userService.SaveUser(secondUser);
+//        bankAccountService.CreateDummyDataBankAccount(secondUser.getId(), BankAccount.AccountTypeEnum.CURRENT);
+//        bankAccountService.CreateDummyDataBankAccount(secondUser.getId(), BankAccount.AccountTypeEnum.SAVINGS);
+//
+//
+//        userService.addUser(secondUser);
 
     }
 

@@ -1,6 +1,7 @@
 package io.swagger.service;
 
 import io.swagger.model.BankAccount;
+import io.swagger.model.entity.User;
 import io.swagger.repository.BankAccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,6 +18,9 @@ public class BankAccountService {
     @Autowired
     private BankAccountRepository bankAccountRepository;
 
+    @Autowired
+    private UserService userService;
+
 
     public ResponseEntity PutBankAccountType(BankAccount.AccountTypeEnum type, BankAccount bankAccount) {
         if(bankAccount != null) {
@@ -28,11 +32,49 @@ public class BankAccountService {
     }
 
     //melle
+    public ResponseEntity GetBankAccountsByUserId(Long userId) {
+        return ResponseEntity.status(200).body(bankAccountRepository.findByuserId(userId));
+    }
+
+    //melle
+    public ResponseEntity PostOneSavingsAccountAndCurrentAccountForUser(Long userId) {
+        //check if the userId has not already have a savings or current account
+        User userById = userService.getUserById(userId);
+        if(userById != null) {
+            return ResponseEntity.status(200).body(CreateSavingsAndCurrentAccount(userId));
+        }
+        else {
+            return ResponseEntity.status(404).body("No bank accounts found for this user id");
+        }
+    }
+
+    //melle
+    private List<BankAccount> CreateSavingsAndCurrentAccount(long userId) {
+        List<BankAccount> newBankAccounts = new ArrayList<BankAccount>();
+
+        for(int i = 0; i < 2; i++) {
+
+            BankAccount newBankAccount = new BankAccount();
+            newBankAccount.setIban(this.generateRandomIban());
+            newBankAccount.setBalance(0.0);
+            newBankAccount.setAbsoluteLimit(0.0);
+            if(i == 0) newBankAccount.accountType(BankAccount.AccountTypeEnum.CURRENT);
+            else if(i == 1) newBankAccount.accountType(BankAccount.AccountTypeEnum.SAVINGS);
+
+            newBankAccount.userId(userId);
+            bankAccountRepository.save(newBankAccount);
+            newBankAccounts.add(newBankAccount);
+        }
+
+        return newBankAccounts;
+    }
+
+    //melle
     public ResponseEntity GetAllBankAccounts() {
         List<BankAccount> allBankAccounts = bankAccountRepository.findAll();
 
         if(bankAccountRepository.count() == 0) {
-            return ResponseEntity.status(400).body(allBankAccounts);
+            return ResponseEntity.status(404).body(allBankAccounts);
         }
         else {
             return new ResponseEntity<List<BankAccount>>(allBankAccounts,HttpStatus.ACCEPTED);
@@ -61,6 +103,17 @@ public class BankAccountService {
         newBankAccount.setAbsoluteLimit(0.0);
         newBankAccount.accountType(BankAccount.AccountTypeEnum.CURRENT);
         newBankAccount.userId(ThreadLocalRandom.current().nextInt(0, 100000));
+
+        bankAccountRepository.save(newBankAccount);
+    }
+
+    public void CreateDummyDataBankAccount(Long userId, BankAccount.AccountTypeEnum type) {
+        BankAccount newBankAccount = new BankAccount();
+        newBankAccount.setIban(this.generateRandomIban());
+        newBankAccount.setBalance(ThreadLocalRandom.current().nextDouble(300, 1800));
+        newBankAccount.setAbsoluteLimit(0.0);
+        newBankAccount.accountType(type);
+        newBankAccount.userId(userId);
 
         bankAccountRepository.save(newBankAccount);
     }
