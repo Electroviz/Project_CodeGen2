@@ -8,8 +8,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -177,7 +175,7 @@ public class BankAccountService {
     public ResponseEntity SetBankAccount(BankAccount account) {
 
 
-        //bankAccountRepository.save(account);
+        bankAccountRepository.save(account);
 
         if(account.getAccountType() != BankAccount.AccountTypeEnum.CURRENT && account.getAccountType() != BankAccount.AccountTypeEnum.SAVINGS) {
             return ResponseEntity.status(400).body(account);
@@ -218,5 +216,21 @@ public class BankAccountService {
             id += Integer.toString(n);
         }
         return Integer.parseInt(id);
+    }
+
+    //Murat
+    public Optional<BankAccount> getById(Long userId){
+        return bankAccountRepository.findById(Math.toIntExact(userId)).map(this::toModel);
+    }
+    //Murat
+    BankAccount toModel(BankAccount entity) {
+        BankAccount account = new BankAccount();
+        account.setUserId(entity.getUserId());
+        account.setIban(entity.getIban());
+        account.setBalance(entity.getBalance());
+        account.setAbsoluteLimit(entity.getAbsoluteLimit());
+        account.setCreationDate(entity.getCreationDate());
+        account.setAccountType(BankAccount.AccountTypeEnum.fromValue(String.valueOf(entity.getAccountType())));
+        return account;
     }
 }
