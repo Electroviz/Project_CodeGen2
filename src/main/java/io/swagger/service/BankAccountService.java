@@ -54,7 +54,7 @@ public class BankAccountService {
                 return ResponseEntity.status(400).body("user already has bank accounts");
         }
         else {
-            return ResponseEntity.status(404).body("No bank accounts found for this user id");
+            return ResponseEntity.status(404).body("No user account found for this user id");
         }
     }
 
