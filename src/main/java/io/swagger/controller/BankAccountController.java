@@ -33,9 +33,7 @@ public class BankAccountController {
     //melle
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value="/totalBalance/{userId}")
     public ResponseEntity getTotalBalanceForUserId(@PathVariable("userId") Long userId) {
-
-
-
+        return bankAccountService.GetTotalBalanceByUserId(userId);
     }
 
     //melle
