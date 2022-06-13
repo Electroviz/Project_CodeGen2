@@ -36,11 +36,10 @@ public class BankAccountService {
     }
 
     //melle
-    public ResponseEntity GetBankAccountsByUserId(Long userId) {
+    public List<BankAccount> GetBankAccountsByUserId(Long userId) {
         List<BankAccount> bankAccounts = bankAccountRepository.findByuserId(userId);
 
-        if(bankAccounts.stream().count() == 0 || bankAccounts == null) return ResponseEntity.status(400).body("Not found");
-        else return ResponseEntity.status(200).body(bankAccounts);
+        return bankAccounts;
     }
 
     //melle
