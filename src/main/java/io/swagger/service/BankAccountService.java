@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.threeten.bp.OffsetDateTime;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
@@ -234,15 +235,22 @@ public class BankAccountService {
         BankAccount depositAccount = null;
 
         for (BankAccount account : allBankAccounts) {
-            if(iban == account.getIban()){
+            if(account.getIban().equals(iban)){
+                account.setBalance(account.getBalance() + 25); //geef het account wat geld om te testen
+
+                double balanceCheck = account.getBalance() - amount;
+                if(balanceCheck >= account.getAbsoluteLimit())
+                {
+                    account.setBalance(account.getBalance() - amount);
+                }
+
                 //account.setBalance(account.getBalance() + BigDecimal.valueOf(amount));
                 transactionInfo.setAmount(BigDecimal.valueOf(amount));
-                //transactionInfo.setTimestamp(new SimpleDateFormat("dd-MM-yyyy").format(new Date()));
+                transactionInfo.setTimestamp(OffsetDateTime.now());
+                //transactionInfo.setUserIDPerforming(); get dit van ingelogde persoon.
                 break;
             }
         }
-        //ingelogde userid
-        //transactionInfo.setUserIDPerforming();
 
         return transactionInfo;
     }

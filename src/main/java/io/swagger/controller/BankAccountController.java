@@ -1,6 +1,7 @@
 package io.swagger.controller;
 
 import io.swagger.model.BankAccount;
+import io.swagger.model.Transaction;
 import io.swagger.model.TransactionInfo;
 import io.swagger.service.BankAccountService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,10 +93,15 @@ public class BankAccountController {
 
     //Nicky
     @RequestMapping(method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE,value="/getBankAccount/{IBAN}/Deposit")
-    public ResponseEntity accountDeposit(@PathVariable("IBAN") String IBAN, @RequestBody Double amount) {
-        TransactionInfo transactionInfo = bankAccountService.AccountDeposit(IBAN, amount);
+    public ResponseEntity accountDeposit(@PathVariable("IBAN") String IBAN, @RequestBody Transaction transaction) {
+        TransactionInfo transactionInfo = bankAccountService.AccountDeposit(IBAN, transaction.getAmount());
 
-
+        if(transactionInfo != null) {
+            return new ResponseEntity<TransactionInfo>(transactionInfo,HttpStatus.FOUND);
+        }
+        else {
+            return ResponseEntity.status(400).body("test");
+        }
     }
 
     /*//Nicky
