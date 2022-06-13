@@ -223,7 +223,7 @@ public class BankAccountService {
         }
         if (canDel)
         {
-            bankAccountRepository.deleteById(deleteId);
+            //bankAccountRepository.deleteById(deleteId);
         }
     }
 

@@ -43,3 +43,5 @@ bin
 /dist/*
 /dist/*/
 target/classes/io/swagger/Swagger2SpringBoot$CustomDateConfig.class
+
+target/*
