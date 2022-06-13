@@ -83,19 +83,19 @@ public class BankAccountController {
             return new ResponseEntity<List>(ibansToReturn,HttpStatus.FOUND);
         }
         else {
-            return ResponseEntity.status(400).body(ibansToReturn);
+            return ResponseEntity.status(400).body("test");
         }
     }
 
     //Nicky
-    /*@RequestMapping(method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE,value="/getBankAccount/{IBAN}/Deposit")
+    @RequestMapping(method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE,value="/getBankAccount/{IBAN}/Deposit")
     public ResponseEntity accountDeposit(@PathVariable("IBAN") String IBAN, @RequestBody Double amount) {
         TransactionInfo transactionInfo = bankAccountService.AccountDeposit(IBAN, amount);
 
 
     }
 
-    //Nicky
+    /*//Nicky
     @RequestMapping(method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE,value="/getBankAccount/{IBAN}/Withdraw")
     public ResponseEntity accountWithdraw(@PathVariable("amount") float amount) {
         //List<String> ibansToReturn = bankAccountService.getAccountByName(fullName);

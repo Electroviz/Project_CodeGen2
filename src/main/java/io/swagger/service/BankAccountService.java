@@ -233,15 +233,14 @@ public class BankAccountService {
 
     //Nicky
     public List<String> getAccountByName(String fullname){
-        List<String> returnIbans = null;
+        List<String> returnIbans = new ArrayList<>();
         List<BankAccount> allBankAccounts = bankAccountRepository.findAll();
         List<User> allUsers = userRepository.findAll();
         Long userCompareId = null;
-        //-fullname = fullname.replaceAll("%20", " ");
 
         for (User user : allUsers)
         {
-            if(user.getFullname() == fullname)
+            if(user.getFullname().equals(fullname))
             {
                 userCompareId = Long.valueOf(user.getId());
                 break;
