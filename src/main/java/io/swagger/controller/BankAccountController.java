@@ -38,7 +38,10 @@ public class BankAccountController {
 
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value="/bankAccounts/{userId}")
     public ResponseEntity testFunc(@PathVariable("userId") long userId) {
-        return bankAccountService.GetBankAccountsByUserId(userId);
+        List<BankAccount> bankAccounts = bankAccountService.GetBankAccountsByUserId(userId);
+        
+        if(bankAccounts.stream().count() == 0 || bankAccounts == null) return ResponseEntity.status(400).body("Not found");
+        else return ResponseEntity.status(200).body(bankAccounts);
     }
 
     //melle
