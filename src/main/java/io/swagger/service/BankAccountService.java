@@ -36,8 +36,10 @@ public class BankAccountService {
     }
 
     //melle
-    public ResponseEntity GetBankAccountsByUserId(Long userId) {
-        return ResponseEntity.status(200).body(bankAccountRepository.findByuserId(userId));
+    public List<BankAccount> GetBankAccountsByUserId(Long userId) {
+        List<BankAccount> bankAccounts = bankAccountRepository.findByuserId(userId);
+
+        return bankAccounts;
     }
 
     //melle
@@ -45,11 +47,20 @@ public class BankAccountService {
         //check if the userId has not already have a savings or current account
         User userById = userService.getUserById(userId);
         if(userById != null) {
-            return ResponseEntity.status(200).body(CreateSavingsAndCurrentAccount(userId));
+            if(UserAlreadyHasBankAccounts(userId) == false)
+                return ResponseEntity.status(200).body(CreateSavingsAndCurrentAccount(userId));
+            else
+                return ResponseEntity.status(400).body("user already has bank accounts");
         }
         else {
-            return ResponseEntity.status(404).body("No bank accounts found for this user id");
+            return ResponseEntity.status(404).body("No user account found for this user id");
         }
+    }
+
+    private boolean UserAlreadyHasBankAccounts(Long userId) {
+        List<BankAccount> bankAccounts = bankAccountRepository.findByuserId(userId);
+        if(bankAccounts != null && bankAccounts.stream().count() > 1) return true;
+        else return false;
     }
 
     //melle
@@ -120,6 +131,11 @@ public class BankAccountService {
         newBankAccount.userId(userId);
 
         bankAccountRepository.save(newBankAccount);
+    }
+
+    //melle
+    public boolean BankAccountIsSavings() {
+        return false;
     }
 
     //melle
@@ -206,7 +222,7 @@ public class BankAccountService {
         }
         if (canDel)
         {
-            bankAccountRepository.deleteById(deleteId);
+            //bankAccountRepository.deleteById(deleteId);
         }
     }
 

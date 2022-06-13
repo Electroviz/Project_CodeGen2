@@ -39,7 +39,10 @@ public class BankAccountController {
 
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value="/bankAccounts/{userId}")
     public ResponseEntity testFunc(@PathVariable("userId") long userId) {
-        return bankAccountService.GetBankAccountsByUserId(userId);
+        List<BankAccount> bankAccounts = bankAccountService.GetBankAccountsByUserId(userId);
+        
+        if(bankAccounts.stream().count() == 0 || bankAccounts == null) return ResponseEntity.status(400).body("Not found");
+        else return ResponseEntity.status(200).body(bankAccounts);
     }
 
     //melle
@@ -52,7 +55,7 @@ public class BankAccountController {
     //melle
     @RequestMapping(value = "/createBankAccount", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity registerNewBankAccountController(@RequestBody BankAccount account){
-        ResponseEntity<String> response = bankAccountService.CreateNewBankAccount();
+        ResponseEntity response = bankAccountService.CreateNewBankAccount();
 
         if (response.getStatusCode().isError()) {
             return new ResponseEntity(response.getStatusCode(), HttpStatus.BAD_REQUEST);

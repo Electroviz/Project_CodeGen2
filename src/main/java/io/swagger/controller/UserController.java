@@ -33,6 +33,13 @@ public class UserController {
         return ResponseEntity.status(200).body(dtos);
     }
 
+    //melle
+    @RequestMapping(value = "/testLogin/{username}/{password}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity loginAttempt(@PathVariable("username") String username, @PathVariable("password") String password) {
+        if(userService.TestLoginAttempt(username,password)) return ResponseEntity.status(200).body("Succesful login attempt");
+        else return ResponseEntity.status(400).body("Unsuccesful login attempt");
+    }
+
     @RequestMapping(value = "/registeruser", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity add(@RequestBody UserDTO userDTO){
 
