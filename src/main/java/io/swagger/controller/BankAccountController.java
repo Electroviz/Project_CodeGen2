@@ -1,6 +1,7 @@
 package io.swagger.controller;
 
 import io.swagger.model.BankAccount;
+import io.swagger.model.TransactionInfo;
 import io.swagger.service.BankAccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -9,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.print.attribute.standard.Media;
+import java.util.List;
 
 @RestController
 public class BankAccountController {
@@ -49,7 +51,7 @@ public class BankAccountController {
     //melle
     @RequestMapping(value = "/createBankAccount", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity registerNewBankAccountController(@RequestBody BankAccount account){
-        ResponseEntity<String> response = bankAccountService.CreateNewBankAccount();
+        ResponseEntity response = bankAccountService.CreateNewBankAccount();
 
         if (response.getStatusCode().isError()) {
             return new ResponseEntity(response.getStatusCode(), HttpStatus.BAD_REQUEST);
@@ -70,4 +72,20 @@ public class BankAccountController {
             return ResponseEntity.status(400).body(ba);
         }
     }
+
+    //Nicky
+    @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE,value="/getBankAccount/{FULLNAME}")
+    public ResponseEntity getBankAccountInfoByName(@PathVariable("fullName") String fullName) {
+        List<String> ibansToReturn = bankAccountService.getAccountByName(fullName);
+
+        if(ibansToReturn != null) {
+            return new ResponseEntity<List>(ibansToReturn,HttpStatus.FOUND);
+        }
+        else {
+            return ResponseEntity.status(400).body(ibansToReturn);
+        }
+    }
+
+
+
 }

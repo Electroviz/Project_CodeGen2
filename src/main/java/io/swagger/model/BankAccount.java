@@ -25,7 +25,7 @@ public class BankAccount   {
   @Id
   @GeneratedValue
   @JsonProperty("id")
-  private Integer id;
+  private Long id;
   @JsonProperty("userId")
   private Long userId = null;
 

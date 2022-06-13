@@ -23,6 +23,14 @@ public class UserService {
     }
 
     //melle
+    public boolean TestLoginAttempt(String username, String password) {
+        User usernameUser = userRepository.findByUsername(username);
+
+        if(username != null) return password.equals(usernameUser.getPassword());
+        else return false;
+    }
+
+    //melle
     public User getUserById(Long id) {
         Optional<User> optionalUser = userRepository.findById(id);
         if(optionalUser.isPresent()) return optionalUser.get();

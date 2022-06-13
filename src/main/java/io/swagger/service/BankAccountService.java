@@ -1,13 +1,17 @@
 package io.swagger.service;
 
 import io.swagger.model.BankAccount;
+import io.swagger.model.TransactionInfo;
 import io.swagger.model.entity.User;
 import io.swagger.repository.BankAccountRepository;
+import io.swagger.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -19,6 +23,8 @@ public class BankAccountService {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private UserRepository userRepository;
 
     public ResponseEntity PutBankAccountType(BankAccount.AccountTypeEnum type, BankAccount bankAccount) {
         if(bankAccount != null) {
@@ -31,7 +37,10 @@ public class BankAccountService {
 
     //melle
     public ResponseEntity GetBankAccountsByUserId(Long userId) {
-        return ResponseEntity.status(200).body(bankAccountRepository.findByuserId(userId));
+        List<BankAccount> bankAccounts = bankAccountRepository.findByuserId(userId);
+
+        if(bankAccounts.stream().count() == 0 || bankAccounts == null) return ResponseEntity.status(400).body("Not found");
+        else return ResponseEntity.status(200).body(bankAccounts);
     }
 
     //melle
@@ -39,11 +48,20 @@ public class BankAccountService {
         //check if the userId has not already have a savings or current account
         User userById = userService.getUserById(userId);
         if(userById != null) {
-            return ResponseEntity.status(200).body(CreateSavingsAndCurrentAccount(userId));
+            if(UserAlreadyHasBankAccounts(userId) == false)
+                return ResponseEntity.status(200).body(CreateSavingsAndCurrentAccount(userId));
+            else
+                return ResponseEntity.status(400).body("user already has bank accounts");
         }
         else {
-            return ResponseEntity.status(404).body("No bank accounts found for this user id");
+            return ResponseEntity.status(404).body("No user account found for this user id");
         }
+    }
+
+    private boolean UserAlreadyHasBankAccounts(Long userId) {
+        List<BankAccount> bankAccounts = bankAccountRepository.findByuserId(userId);
+        if(bankAccounts != null && bankAccounts.stream().count() > 1) return true;
+        else return false;
     }
 
     //melle
@@ -117,6 +135,11 @@ public class BankAccountService {
     }
 
     //melle
+    public boolean BankAccountIsSavings() {
+        return false;
+    }
+
+    //melle
     public ResponseEntity CreateNewBankAccount() {
         BankAccount newBankAccount = new BankAccount();
         newBankAccount.SetBalance(0.0);
@@ -175,7 +198,7 @@ public class BankAccountService {
     public ResponseEntity SetBankAccount(BankAccount account) {
 
 
-        bankAccountRepository.save(account);
+        //bankAccountRepository.save(account);
 
         if(account.getAccountType() != BankAccount.AccountTypeEnum.CURRENT && account.getAccountType() != BankAccount.AccountTypeEnum.SAVINGS) {
             return ResponseEntity.status(400).body(account);
@@ -185,8 +208,69 @@ public class BankAccountService {
         }
     }
 
+    //Nicky
     public void DeleteBankAccount(String iban){
+        List<BankAccount> allBankAccounts;
+        allBankAccounts = bankAccountRepository.findAll();
+        boolean canDel = false;
+        Long deleteId = Long.valueOf(0);
+        for (BankAccount bankAccount : allBankAccounts) {
+            if(bankAccount.getIban() == iban){
+                deleteId = bankAccount.getUserId();
+                canDel = true;
+                break;
+            }
+        }
+        if (canDel)
+        {
+            //bankAccountRepository.deleteById(deleteId);
+        }
+    }
 
+    //Nicky
+    public TransactionInfo AccountDeposit(String iban, Double amount){
+        List<BankAccount> allBankAccounts;
+        allBankAccounts = bankAccountRepository.findAll();
+        TransactionInfo transactionInfo = new TransactionInfo();
+        BankAccount depositAccount = null;
+
+        for (BankAccount account : allBankAccounts) {
+            if(iban == account.getIban()){
+                //account.setBalance(account.getBalance() + BigDecimal.valueOf(amount));
+                transactionInfo.setAmount(BigDecimal.valueOf(amount));
+                //transactionInfo.setTimestamp(new SimpleDateFormat("dd-MM-yyyy").format(new Date()));
+                break;
+            }
+        }
+        //ingelogde userid
+        //transactionInfo.setUserIDPerforming();
+
+        return transactionInfo;
+    }
+
+    //Nicky
+    public List<String> getAccountByName(String fullname){
+        List<String> returnIbans = null;
+        List<BankAccount> allBankAccounts = bankAccountRepository.findAll();
+        List<User> allUsers = userRepository.findAll();
+        Long userCompareId = null;
+
+        for (User user : allUsers)
+        {
+            if(user.getFullname() == fullname)
+            {
+                userCompareId = Long.valueOf(user.getId());
+                break;
+            }
+        }
+        for (BankAccount account : allBankAccounts)
+        {
+            if(account.getUserId() == userCompareId)
+            {
+                returnIbans.add(account.getIban());
+            }
+        }
+        return returnIbans;
     }
 
 
@@ -218,19 +302,5 @@ public class BankAccountService {
         return Integer.parseInt(id);
     }
 
-    //Murat
-    public Optional<BankAccount> getById(Long userId){
-        return bankAccountRepository.findById(Math.toIntExact(userId)).map(this::toModel);
-    }
-    //Murat
-    BankAccount toModel(BankAccount entity) {
-        BankAccount account = new BankAccount();
-        account.setUserId(entity.getUserId());
-        account.setIban(entity.getIban());
-        account.setBalance(entity.getBalance());
-        account.setAbsoluteLimit(entity.getAbsoluteLimit());
-        account.setCreationDate(entity.getCreationDate());
-        account.setAccountType(BankAccount.AccountTypeEnum.fromValue(String.valueOf(entity.getAccountType())));
-        return account;
-    }
+
 }
