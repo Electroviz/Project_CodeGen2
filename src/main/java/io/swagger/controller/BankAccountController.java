@@ -31,6 +31,14 @@ public class BankAccountController {
     }
 
     //melle
+    @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value="/totalBalance/{userId}")
+    public ResponseEntity getTotalBalanceForUserId(@PathVariable("userId") Long userId) {
+
+
+
+    }
+
+    //melle
     @RequestMapping(method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, value="/initBankAccounts/{userId}")
     public ResponseEntity postBankAccountsForUserByUserId(@PathVariable("userId") Long userId) {
         return bankAccountService.PostOneSavingsAccountAndCurrentAccountForUser(userId);
