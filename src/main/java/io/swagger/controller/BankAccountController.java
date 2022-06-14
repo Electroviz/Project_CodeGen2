@@ -104,6 +104,19 @@ public class BankAccountController {
         }
     }
 
+    //Nicky
+    @RequestMapping(method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE,value="/deleteAccount/{IBAN}")
+    public ResponseEntity deleteAccount(@PathVariable("IBAN") String IBAN) {
+        BankAccount bankAccount = bankAccountService.DeleteBankAccount(IBAN);
+
+        if(bankAccount != null) {
+            return new ResponseEntity<BankAccount>(bankAccount,HttpStatus.OK);
+        }
+        else {
+            return ResponseEntity.status(400).body("test");
+        }
+    }
+
     /*//Nicky
     @RequestMapping(method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE,value="/getBankAccount/{IBAN}/Withdraw")
     public ResponseEntity accountWithdraw(@PathVariable("amount") float amount) {

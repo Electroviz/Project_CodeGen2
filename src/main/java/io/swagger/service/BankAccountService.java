@@ -1,9 +1,11 @@
 package io.swagger.service;
 
 import io.swagger.model.BankAccount;
+import io.swagger.model.Transaction;
 import io.swagger.model.TransactionInfo;
 import io.swagger.model.entity.User;
 import io.swagger.repository.BankAccountRepository;
+import io.swagger.repository.TransactionRepository;
 import io.swagger.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,6 +28,9 @@ public class BankAccountService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private TransactionRepository transactionRepository;
 
     public ResponseEntity PutBankAccountType(BankAccount.AccountTypeEnum type, BankAccount bankAccount) {
         if(bankAccount != null) {
@@ -209,22 +214,25 @@ public class BankAccountService {
     }
 
     //Nicky
-    public void DeleteBankAccount(String iban){
+    public BankAccount DeleteBankAccount(String iban){
         List<BankAccount> allBankAccounts;
         allBankAccounts = bankAccountRepository.findAll();
+        BankAccount deletedAccount = null;
         boolean canDel = false;
         Long deleteId = Long.valueOf(0);
         for (BankAccount bankAccount : allBankAccounts) {
-            if(bankAccount.getIban() == iban){
-                deleteId = bankAccount.getUserId();
+            if(bankAccount.getIban().equals(iban)){
+                deleteId = bankAccount.getId();
                 canDel = true;
+                deletedAccount = bankAccount;
                 break;
             }
         }
         if (canDel)
         {
-            //bankAccountRepository.deleteById(deleteId);
+            bankAccountRepository.deleteById(deleteId);
         }
+        return deletedAccount;
     }
 
     //Nicky
@@ -232,19 +240,31 @@ public class BankAccountService {
         List<BankAccount> allBankAccounts;
         allBankAccounts = bankAccountRepository.findAll();
         TransactionInfo transactionInfo = new TransactionInfo();
-        BankAccount depositAccount = null;
+        Transaction depositTrans = new Transaction();
 
         for (BankAccount account : allBankAccounts) {
             if(account.getIban().equals(iban)){
-                account.setBalance(account.getBalance() + 25); //geef het account wat geld om te testen
+                //account.setBalance(account.getBalance() + 25); //geef het account wat geld om te testen
 
-                double balanceCheck = account.getBalance() - amount;
-                if(balanceCheck >= account.getAbsoluteLimit())
-                {
-                    account.setBalance(account.getBalance() - amount);
+                if(amount > 0){
+                    account.setBalance(account.getBalance() + amount);
                 }
+                else if(amount == 0){
+                    new ResponseEntity(HttpStatus.BAD_REQUEST);
+                }
+                else {
+                    amount = amount * -1;
+                    account.setBalance(account.getBalance() + amount);
+                }
+                depositTrans.setAmount(amount);
+                depositTrans.setDescription("Deposit");
+                depositTrans.setTimestamp(OffsetDateTime.now());
+                depositTrans.setFrom("NL01INHO0000000001");
+                depositTrans.setTo(iban);
+                transactionRepository.save(depositTrans);
+                //depositTrans.setUserIDPerforming();
 
-                //account.setBalance(account.getBalance() + BigDecimal.valueOf(amount));
+
                 transactionInfo.setAmount(BigDecimal.valueOf(amount));
                 transactionInfo.setTimestamp(OffsetDateTime.now());
                 //transactionInfo.setUserIDPerforming(); get dit van ingelogde persoon.

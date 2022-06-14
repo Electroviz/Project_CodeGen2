@@ -126,6 +126,10 @@ public class BankAccount   {
     return userId;
   }
 
+  public Long getId() {
+    return id;
+  }
+
   public void setUserId(long userId) {
     this.userId = userId;
   }
