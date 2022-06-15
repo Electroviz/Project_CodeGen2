@@ -23,11 +23,13 @@ public class UserService {
     }
 
     //melle
-    public boolean TestLoginAttempt(String username, String password) {
-        User usernameUser = userRepository.findByUsername(username);
+    public User TestLoginAttempt(String username, String password) {
+        User usernameUser = userRepository.findByusername(username);
 
-        if(username != null) return password.equals(usernameUser.getPassword());
-        else return false;
+        if(username != null)
+            if(password.equals(usernameUser.getPassword())) return usernameUser;
+            else return null;
+        else return null;
     }
 
     //melle
