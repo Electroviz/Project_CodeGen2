@@ -10,15 +10,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
+@RequestMapping("/user")
 public class UserController {
 
     @Autowired
     private UserService userService;
 
-    @RequestMapping(value = "/users", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/getall", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity getAll(){
 
         List<User> users = userService.getAll();
@@ -53,5 +55,16 @@ public class UserController {
         return ResponseEntity.status(201).body(response);
     }
 
+    @RequestMapping(value = "/get/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity getUserById(@PathVariable("id") Long id){
+
+        ModelMapper modelMapper = new ModelMapper();
+
+        User user = userService.findById(id);
+
+        UserDTO response = modelMapper.map(user, UserDTO.class);
+
+        return ResponseEntity.status(201).body(response);
+    }
 
 }
