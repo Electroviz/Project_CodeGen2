@@ -261,8 +261,9 @@ public class BankAccountService {
                 depositTrans.setTimestamp(OffsetDateTime.now());
                 depositTrans.setFrom("NL01INHO0000000001");
                 depositTrans.setTo(iban);
+                depositTrans.setUserIDPerforming(Math.toIntExact(Long.valueOf(account.getUserId())));
                 transactionRepository.save(depositTrans);
-                //depositTrans.setUserIDPerforming();
+                depositTrans.setUserIDPerforming(Math.toIntExact(Long.valueOf(account.getUserId())));
 
 
                 transactionInfo.setAmount(BigDecimal.valueOf(amount));
