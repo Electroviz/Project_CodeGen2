@@ -42,4 +42,14 @@ public class UserService {
     public List<User> getAll(){
         return userRepository.findAll();
     }
+
+    public User findById(Long id){
+
+        Optional<User> test = userRepository.findById(id);
+        User test2 = test.get();
+
+        System.out.println(test2);
+
+        return test2;
+    }
 }

@@ -1,14 +1,17 @@
 package io.swagger.service;
 
 import io.swagger.model.BankAccount;
+import io.swagger.model.Transaction;
 import io.swagger.model.TransactionInfo;
 import io.swagger.model.entity.User;
 import io.swagger.repository.BankAccountRepository;
+import io.swagger.repository.TransactionRepository;
 import io.swagger.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.threeten.bp.OffsetDateTime;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
@@ -25,6 +28,9 @@ public class BankAccountService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private TransactionRepository transactionRepository;
 
     public ResponseEntity PutBankAccountType(BankAccount.AccountTypeEnum type, BankAccount bankAccount) {
         if(bankAccount != null) {
@@ -218,22 +224,25 @@ public class BankAccountService {
     }
 
     //Nicky
-    public void DeleteBankAccount(String iban){
+    public BankAccount DeleteBankAccount(String iban){
         List<BankAccount> allBankAccounts;
         allBankAccounts = bankAccountRepository.findAll();
+        BankAccount deletedAccount = null;
         boolean canDel = false;
         Long deleteId = Long.valueOf(0);
         for (BankAccount bankAccount : allBankAccounts) {
-            if(bankAccount.getIban() == iban){
-                deleteId = bankAccount.getUserId();
+            if(bankAccount.getIban().equals(iban)){
+                deleteId = bankAccount.getId();
                 canDel = true;
+                deletedAccount = bankAccount;
                 break;
             }
         }
         if (canDel)
         {
-            //bankAccountRepository.deleteById(deleteId);
+            bankAccountRepository.deleteById(deleteId);
         }
+        return deletedAccount;
     }
 
     //Nicky
@@ -241,32 +250,53 @@ public class BankAccountService {
         List<BankAccount> allBankAccounts;
         allBankAccounts = bankAccountRepository.findAll();
         TransactionInfo transactionInfo = new TransactionInfo();
-        BankAccount depositAccount = null;
+        Transaction depositTrans = new Transaction();
 
         for (BankAccount account : allBankAccounts) {
-            if(iban == account.getIban()){
-                //account.setBalance(account.getBalance() + BigDecimal.valueOf(amount));
+            if(account.getIban().equals(iban)){
+                //account.setBalance(account.getBalance() + 25); //geef het account wat geld om te testen
+
+                if(amount > 0){
+                    account.setBalance(account.getBalance() + amount);
+                }
+                else if(amount == 0){
+                    new ResponseEntity(HttpStatus.BAD_REQUEST);
+                }
+                else {
+                    amount = amount * -1;
+                    account.setBalance(account.getBalance() + amount);
+                }
+                depositTrans.setAmount(amount);
+                depositTrans.setDescription("Deposit");
+                depositTrans.setTimestamp(OffsetDateTime.now());
+                depositTrans.setFrom("NL01INHO0000000001");
+                depositTrans.setTo(iban);
+                depositTrans.setUserIDPerforming(Math.toIntExact(Long.valueOf(account.getUserId())));
+                depositTrans.setUserIDPerforming(Math.toIntExact(Long.valueOf(account.getUserId())));
+                transactionRepository.save(depositTrans);
+
+
                 transactionInfo.setAmount(BigDecimal.valueOf(amount));
-                //transactionInfo.setTimestamp(new SimpleDateFormat("dd-MM-yyyy").format(new Date()));
+                transactionInfo.setTimestamp(OffsetDateTime.now());
+                transactionInfo.setUserIDPerforming(Math.toIntExact(Long.valueOf(account.getUserId())));
+
                 break;
             }
         }
-        //ingelogde userid
-        //transactionInfo.setUserIDPerforming();
 
         return transactionInfo;
     }
 
     //Nicky
     public List<String> getAccountByName(String fullname){
-        List<String> returnIbans = null;
+        List<String> returnIbans = new ArrayList<>();
         List<BankAccount> allBankAccounts = bankAccountRepository.findAll();
         List<User> allUsers = userRepository.findAll();
         Long userCompareId = null;
 
         for (User user : allUsers)
         {
-            if(user.getFullname() == fullname)
+            if(user.getFullname().equals(fullname))
             {
                 userCompareId = Long.valueOf(user.getId());
                 break;
