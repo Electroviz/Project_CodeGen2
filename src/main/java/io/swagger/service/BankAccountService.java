@@ -1,7 +1,9 @@
 package io.swagger.service;
 
+import io.swagger.api.ApiException;
 import io.swagger.model.BankAccount;
 import io.swagger.model.TransactionInfo;
+import io.swagger.model.entity.BankAccountEntity;
 import io.swagger.model.entity.User;
 import io.swagger.repository.BankAccountRepository;
 import io.swagger.repository.UserRepository;
@@ -299,6 +301,59 @@ public class BankAccountService {
             id += Integer.toString(n);
         }
         return Integer.parseInt(id);
+    }
+
+
+    //Murat
+    public BankAccount updateBankAccount(User currentUser, String iban, BankAccount bankAccount) throws ApiException {
+        return updateBankAccount(currentUser, iban, bankAccount, true);
+    }
+    //Murat
+    public BankAccount updateBankAccount(User currentUser, String iban, BankAccount bankAccount, boolean shouldCheckEmployeeOrOwner) {
+
+        // find account by iban. If not found, throw an exception
+        BankAccountEntity accountEntity = (BankAccountEntity) bankAccountRepository.findByiban(iban);
+        BankAccount account = toModel(accountEntity);
+
+//        if(shouldCheckEmployeeOrOwner) {
+//            // ensure it is either an employee or owner of account updating the account
+//            //authenticationService.requireEmployeeOrOwner(currentUser, account.getUserId());
+//        }
+
+        // we only update the balance, absolute limit and account type
+        account.setBalance(bankAccount.getBalance());
+        account.setAbsoluteLimit(bankAccount.getAbsoluteLimit());
+        account.setAccountType(bankAccount.getAccountType());
+
+        // convert the bank account to an entity
+        BankAccountEntity entity = toEntity(account);
+        BankAccount accountFromEntity = toModel(entity);
+        // update the account in the db
+        BankAccount savedEntity = bankAccountRepository.save(accountFromEntity);
+
+        return savedEntity;
+    }
+    //Murat
+    BankAccount toModel(BankAccountEntity entity) {
+        BankAccount account = new BankAccount();
+        account.setUserId(entity.getUserId());
+        account.setIban(entity.getIban());
+        account.setBalance(entity.getBalance().doubleValue());
+        account.setAbsoluteLimit(entity.getAbsoluteLimit().doubleValue());
+        account.setCreationDate(entity.getCreationDate());
+        account.setAccountType(BankAccount.AccountTypeEnum.fromValue(entity.getAccountType()));
+        return account;
+    }
+    //Murat
+    BankAccountEntity toEntity(BankAccount bankAccount) {
+        BankAccountEntity entity = new BankAccountEntity();
+        entity.setUserId(bankAccount.getUserId());
+        entity.setIban(bankAccount.getIban());
+        entity.setBalance(BigDecimal.valueOf(bankAccount.getBalance()));
+        entity.setAbsoluteLimit(BigDecimal.valueOf(bankAccount.getAbsoluteLimit()));
+        entity.setAccountType(bankAccount.getAccountType().toString());
+        entity.setCreationDate(bankAccount.getCreationDate());
+        return entity;
     }
 
 

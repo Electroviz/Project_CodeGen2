@@ -1,6 +1,7 @@
 package io.swagger.repository;
 
 import io.swagger.model.BankAccount;
+import io.swagger.model.entity.BankAccountEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -12,3 +13,5 @@ public interface BankAccountRepository extends JpaRepository<BankAccount, Long> 
 
     List<BankAccount> findByuserId(Long fromUserId);
 }
+
+
