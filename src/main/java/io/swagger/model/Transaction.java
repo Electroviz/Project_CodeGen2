@@ -19,15 +19,12 @@ import javax.validation.constraints.*;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-05-12T15:22:53.754Z[GMT]")
 
-@Entity
 public class Transaction   {
 
   @Id
   @GeneratedValue
   @JsonProperty("id")
   private Long id;
-  @JsonProperty("transactionID")
-  private Long transactionID = null;
 
   @JsonProperty("from")
   private String from = null;
@@ -47,24 +44,12 @@ public class Transaction   {
   @JsonProperty("description")
   private String description = null;
 
-  public Transaction transactionID(Long transactionID) {
-    this.transactionID = transactionID;
-    return this;
-  }
 
   /**
    * Get transactionID
    * @return transactionID
    **/
-  @Schema(example = "123", description = "")
-  
-    public Long getTransactionID() {
-    return transactionID;
-  }
 
-  public void setTransactionID(Long transactionID) {
-    this.transactionID = transactionID;
-  }
 
   public Transaction from(String from) {
     this.from = from;
@@ -196,7 +181,7 @@ public class Transaction   {
       return false;
     }
     Transaction transaction = (Transaction) o;
-    return Objects.equals(this.transactionID, transaction.transactionID) &&
+    return
         Objects.equals(this.from, transaction.from) &&
         Objects.equals(this.to, transaction.to) &&
         Objects.equals(this.userIDPerforming, transaction.userIDPerforming) &&
@@ -207,15 +192,14 @@ public class Transaction   {
 
   @Override
   public int hashCode() {
-    return Objects.hash(transactionID, from, to, userIDPerforming, amount, timestamp, description);
+    return Objects.hash(from, to, userIDPerforming, amount, timestamp, description);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class Transaction {\n");
-    
-    sb.append("    transactionID: ").append(toIndentedString(transactionID)).append("\n");
+
     sb.append("    from: ").append(toIndentedString(from)).append("\n");
     sb.append("    to: ").append(toIndentedString(to)).append("\n");
     sb.append("    userIDPerforming: ").append(toIndentedString(userIDPerforming)).append("\n");
