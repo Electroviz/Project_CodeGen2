@@ -3,6 +3,7 @@ package io.swagger.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import io.swagger.enums.Role;
 import io.swagger.model.UserDTO;
 
 import javax.persistence.*;
@@ -68,13 +69,16 @@ public class User {
     @Column(nullable = false)
     private User.UserRoleEnum userRole;
 
+    @ElementCollection(fetch = FetchType.EAGER)
+    private List<Role> roles;
+
     @Column(nullable = false)
     private BigDecimal transactionLimit;
 
     @Column(nullable = false)
     private BigDecimal dayLimit;
 
-    public User(Long id, String username, String fullname, String email, String password, String phone, String dateOfBirth, UserRoleEnum userRole, BigDecimal transactionLimit, BigDecimal dayLimit) {
+    public User(Long id, String username, String fullname, String email, String password, String phone, String dateOfBirth, UserRoleEnum userRole, List<Role> roles, BigDecimal transactionLimit, BigDecimal dayLimit) {
         this.id = id;
         this.username = username;
         this.fullname = fullname;
@@ -83,6 +87,7 @@ public class User {
         this.phone = phone;
         this.dateOfBirth = dateOfBirth;
         this.userRole = userRole;
+        this.roles = roles;
         this.transactionLimit = transactionLimit;
         this.dayLimit = dayLimit;
     }
@@ -168,5 +173,13 @@ public class User {
 
     public void setDayLimit(BigDecimal dayLimit) {
         this.dayLimit = dayLimit;
+    }
+
+    public List<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<Role> roles) {
+        this.roles = roles;
     }
 }
