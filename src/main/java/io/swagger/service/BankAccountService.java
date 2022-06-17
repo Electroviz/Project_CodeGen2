@@ -262,13 +262,14 @@ public class BankAccountService {
                 depositTrans.setFrom("NL01INHO0000000001");
                 depositTrans.setTo(iban);
                 depositTrans.setUserIDPerforming(Math.toIntExact(Long.valueOf(account.getUserId())));
-                transactionRepository.save(depositTrans);
                 depositTrans.setUserIDPerforming(Math.toIntExact(Long.valueOf(account.getUserId())));
+                transactionRepository.save(depositTrans);
 
 
                 transactionInfo.setAmount(BigDecimal.valueOf(amount));
                 transactionInfo.setTimestamp(OffsetDateTime.now());
-                //transactionInfo.setUserIDPerforming(); get dit van ingelogde persoon.
+                transactionInfo.setUserIDPerforming(Math.toIntExact(Long.valueOf(account.getUserId())));
+
                 break;
             }
         }
