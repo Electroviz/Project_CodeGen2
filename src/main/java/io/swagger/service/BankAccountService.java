@@ -73,7 +73,7 @@ public class BankAccountService {
         }
     }
 
-    private boolean UserAlreadyHasBankAccounts(Long userId) {
+    public boolean UserAlreadyHasBankAccounts(Long userId) {
         List<BankAccount> bankAccounts = bankAccountRepository.findByuserId(userId);
         if(bankAccounts != null && bankAccounts.stream().count() > 1) return true;
         else return false;

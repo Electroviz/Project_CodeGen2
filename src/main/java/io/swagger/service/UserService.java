@@ -15,11 +15,24 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private BankAccountService bankAccountService;
+
     private List<User> userList = new ArrayList<>();
 
     public User addUser(User user){
         user = userRepository.save(user);
         return user;
+    }
+
+    //melle
+    public List<User> getUsersWithoutBankAccount() {
+        List<User> allUsers = userRepository.findAll();
+        List<User> usersWithoutBankAccount = new ArrayList<>();
+        for(User u : allUsers)
+            if(!bankAccountService.UserAlreadyHasBankAccounts(u.getId())) usersWithoutBankAccount.add(u);
+
+        return usersWithoutBankAccount;
     }
 
     //melle

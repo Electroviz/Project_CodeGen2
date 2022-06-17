@@ -36,6 +36,15 @@ public class UserController {
     }
 
     //melle
+    @CrossOrigin
+    @RequestMapping(value = "/getAllUsersWithoutBankAccounts", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity getUsersWithoutBankAccounts() {
+        List<User> usersWithoutBankAccounts = userService.getUsersWithoutBankAccount();
+
+        return ResponseEntity.status(200).body(usersWithoutBankAccounts);
+    }
+
+    //melle
     @CrossOrigin(origins = "http://localhost:3000")
     @RequestMapping(value = "/testLogin/{username}/{password}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity loginAttempt(@PathVariable("username") String username, @PathVariable("password") String password) {
