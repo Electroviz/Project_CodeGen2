@@ -245,7 +245,6 @@ public class BankAccountService {
 
         for (BankAccount account : allBankAccounts) {
             if(account.getIban().equals(iban)){
-                //account.setBalance(account.getBalance() + 25); //geef het account wat geld om te testen
                 //if(amount < user.getTransactionLimit() && amount < user.getDayLimit()){
                     if(amount > 0){
                         account.setBalance(account.getBalance() + amount);
@@ -259,6 +258,7 @@ public class BankAccountService {
                     }
                 //}
 
+                //maak nieuwe transaction aan
                 depositTrans.setAmount(amount);
                 depositTrans.setDescription("Deposit");
                 depositTrans.setTimestamp(OffsetDateTime.now());
