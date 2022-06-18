@@ -1,13 +1,16 @@
 package io.swagger.model;
 
+import java.util.List;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import io.swagger.enums.Role;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
 import org.springframework.validation.annotation.Validated;
 
+import javax.persistence.ElementCollection;
 import javax.persistence.Table;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
@@ -70,8 +73,10 @@ public class UserDTO   {
       return null;
     }
   }
+
+  @ElementCollection
   @JsonProperty("userRole")
-  private UserRoleEnum userRole = null;
+  private List<Role> userRole = null;
 
   @JsonProperty("transactionLimit")
   private BigDecimal transactionLimit = null;
@@ -217,7 +222,7 @@ public class UserDTO   {
     this.dateOfBirth = dateOfBirth;
   }
 
-  public UserDTO userRole(UserRoleEnum userRole) {
+  public UserDTO userRole(List<Role> userRole) {
     this.userRole = userRole;
     return this;
   }
@@ -229,11 +234,11 @@ public class UserDTO   {
   @Schema(required = true, description = "")
   @NotNull
 
-  public UserRoleEnum getUserRole() {
+  public List<Role> getUserRole() {
     return userRole;
   }
 
-  public void setUserRole(UserRoleEnum userRole) {
+  public void setUserRole(List<Role> userRole) {
     this.userRole = userRole;
   }
 
