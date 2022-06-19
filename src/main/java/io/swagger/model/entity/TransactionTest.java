@@ -5,7 +5,6 @@ import org.threeten.bp.OffsetDateTime;
 
 import javax.persistence.*;
 
-@Entity
 @Table(name = "TransactionsDTO")
 public class TransactionTest {
 

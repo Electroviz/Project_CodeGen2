@@ -87,7 +87,7 @@ public class BankAccountController {
             return new ResponseEntity<List>(ibansToReturn,HttpStatus.FOUND);
         }
         else {
-            return ResponseEntity.status(400).body("test");
+            return ResponseEntity.status(400).body("No ibans could be found that belong to the given name");
         }
     }
 
@@ -100,7 +100,7 @@ public class BankAccountController {
             return new ResponseEntity<TransactionInfo>(transactionInfo,HttpStatus.FOUND);
         }
         else {
-            return ResponseEntity.status(400).body("test");
+            return ResponseEntity.status(400).body("Deposit failed");
         }
     }
 
@@ -113,21 +113,20 @@ public class BankAccountController {
             return new ResponseEntity<BankAccount>(bankAccount,HttpStatus.OK);
         }
         else {
-            return ResponseEntity.status(400).body("test");
+            return ResponseEntity.status(400).body("Request failed");
         }
     }
 
-    /*//Nicky
+    //Nicky
     @RequestMapping(method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE,value="/getBankAccount/{IBAN}/Withdraw")
-    public ResponseEntity accountWithdraw(@PathVariable("amount") float amount) {
-        //List<String> ibansToReturn = bankAccountService.getAccountByName(fullName);
+    public ResponseEntity accountWithdraw(@PathVariable("IBAN") String IBAN, @RequestBody Transaction transaction) {
+        TransactionInfo transactionInfo = bankAccountService.AccountWithdraw(IBAN, transaction.getAmount());
 
-        //if(ibansToReturn != null) {
-        //    return new ResponseEntity<List>(ibansToReturn,HttpStatus.FOUND);
-        //}
-        //else {
-        //    return ResponseEntity.status(400).body(ibansToReturn);
-        //}
-        return new
-    }*/
+        if(transactionInfo != null) {
+            return new ResponseEntity<TransactionInfo>(transactionInfo,HttpStatus.FOUND);
+        }
+        else {
+            return ResponseEntity.status(400).body("Deposit failed");
+        }
+    }
 }
