@@ -182,6 +182,7 @@ public class User {
         return dayLimit;
     }
 
+    //nicky
     public void setDayLimit(BigDecimal dayLimit) {
         var currentTime = new Date().getTime();
         if(currentTime - lastUpdateTime >= 24*60*60*1000) // number of milliseconds in a day
