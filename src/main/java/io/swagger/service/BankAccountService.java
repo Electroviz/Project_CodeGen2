@@ -251,21 +251,27 @@ public class BankAccountService {
         TransactionInfo transactionInfo = new TransactionInfo();
         Transaction depositTrans = new Transaction(); //make object with transaction entity
 
-        System.out.println(GetBankAccountByIban(iban).getAccountType());
         if(GetBankAccountByIban(iban) != null && GetBankAccountByIban(iban).getAccountType() == BankAccount.AccountTypeEnum.CURRENT){
             BankAccount account = GetBankAccountByIban(iban);
-            //if(amount < user.getTransactionLimit() && amount < user.getDayLimit()){
-            if(amount > 0){
-                account.setBalance(account.getBalance() + amount);
+            User user = userService.getUserById(account.getUserId());
+
+            if(amount <= user.getTransactionLimit().doubleValue() && amount <= user.getDayLimit().doubleValue()){
+                if(amount > 0){
+                    account.setBalance(account.getBalance() + amount);
+                    Double change = user.getDayLimit().doubleValue() - amount;
+                    user.setDayLimit(BigDecimal.valueOf(change));
+                }
+                else if(amount == 0.0){
+                    return null;
+                }
+                else {
+                    amount = amount * -1;
+                    account.setBalance(account.getBalance() + amount);
+                }
             }
-            else if(amount == 0.0){
-                return transactionInfo = null;
+            else{
+                return null;
             }
-            else {
-                amount = amount * -1;
-                account.setBalance(account.getBalance() + amount);
-            }
-            //}
 
             //maak nieuwe transaction aan
             depositTrans.setAmount(amount);
@@ -275,9 +281,10 @@ public class BankAccountService {
             depositTrans.setTo(iban);
             depositTrans.setUserIDPerforming(Math.toIntExact(Long.valueOf(account.getUserId())));
 
-            //sla de transaction op en update het account
+            //sla de transaction op en update het account en de user
             transactionRepository.save(depositTrans);
             bankAccountRepository.save(account);
+            userRepository.save(user);
 
             //maak het transactioninfo object aan
             transactionInfo.setAmount(BigDecimal.valueOf(amount));
@@ -285,7 +292,7 @@ public class BankAccountService {
             transactionInfo.setUserIDPerforming(Math.toIntExact(Long.valueOf(account.getUserId())));
         }
         else{
-            return transactionInfo = null;
+            return null;
         }
 
         return transactionInfo;
@@ -298,21 +305,28 @@ public class BankAccountService {
 
         if(GetBankAccountByIban(iban) != null && GetBankAccountByIban(iban).getAccountType() == BankAccount.AccountTypeEnum.CURRENT){
             BankAccount account = GetBankAccountByIban(iban);
-            //if(amount < user.getTransactionLimit() && amount < user.getDayLimit() && (account.getBalance() - amount)  > account.getAbsoluteLimit()){
-            if((account.getBalance() - amount) >= account.getAbsoluteLimit()) {
-                if (amount > 0) {
-                    account.setBalance(account.getBalance() - amount);
-                } else if (amount == 0) {
-                    return transactionInfo = null;
-                } else {
-                    amount = amount * -1;
-                    account.setBalance(account.getBalance() - amount);
+            User user = userService.getUserById(account.getUserId());
+
+            if(amount <= user.getTransactionLimit().doubleValue() && amount <= user.getDayLimit().doubleValue() && (account.getBalance() - amount)  > account.getAbsoluteLimit()){
+                if((account.getBalance() - amount) >= account.getAbsoluteLimit()) {
+                    if (amount > 0) {
+                        account.setBalance(account.getBalance() - amount);
+                        Double change = user.getDayLimit().doubleValue() - amount;
+                        user.setDayLimit(BigDecimal.valueOf(change));
+                    } else if (amount == 0) {
+                        return null;
+                    } else {
+                        amount = amount * -1;
+                        account.setBalance(account.getBalance() - amount);
+                    }
+                }
+                else{
+                    return null;
                 }
             }
             else{
-                return transactionInfo = null;
+                return null;
             }
-            //}
 
             withdrawTrans.setAmount(amount);
             withdrawTrans.setDescription("Withdraw");
@@ -324,6 +338,7 @@ public class BankAccountService {
             //sla de transaction op en update het account
             transactionRepository.save(withdrawTrans);
             bankAccountRepository.save(account);
+            userRepository.save(user);
 
             //maak het transactioninfo object aan
             transactionInfo.setAmount(BigDecimal.valueOf(amount));
@@ -331,7 +346,7 @@ public class BankAccountService {
             transactionInfo.setUserIDPerforming(Math.toIntExact(Long.valueOf(account.getUserId())));
         }
         else{
-            return transactionInfo = null;
+            return null;
         }
 
         return transactionInfo;

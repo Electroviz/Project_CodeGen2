@@ -8,6 +8,7 @@ import io.swagger.model.UserDTO;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -74,6 +75,9 @@ public class User {
     @Column(nullable = false)
     private BigDecimal dayLimit;
 
+    private BigDecimal dayLimitConst;
+    private Long lastUpdateTime;
+
     public User(Long id, String username, String fullname, String email, String password, String phone, String dateOfBirth, UserRoleEnum userRole, BigDecimal transactionLimit, BigDecimal dayLimit) {
         this.id = id;
         this.username = username;
@@ -85,9 +89,21 @@ public class User {
         this.userRole = userRole;
         this.transactionLimit = transactionLimit;
         this.dayLimit = dayLimit;
+        this.dayLimitConst = dayLimit;
+
+        this.lastUpdateTime = new Date().getTime();
     }
 
     public User() {
+
+    }
+
+    public BigDecimal getDayLimitConst() {
+        return dayLimitConst;
+    }
+
+    public void setDayLimitConst(BigDecimal dayLimitConst) {
+        this.dayLimitConst = dayLimitConst;
     }
 
     public Long getId() {
@@ -167,6 +183,16 @@ public class User {
     }
 
     public void setDayLimit(BigDecimal dayLimit) {
-        this.dayLimit = dayLimit;
+        var currentTime = new Date().getTime();
+        if(currentTime - lastUpdateTime >= 24*60*60*1000) // number of milliseconds in a day
+        {
+            lastUpdateTime = currentTime;
+            this.dayLimit = dayLimitConst;
+            this.dayLimit = dayLimit;
+        }
+        else {
+            this.dayLimit = dayLimit;
+        }
     }
+
 }
