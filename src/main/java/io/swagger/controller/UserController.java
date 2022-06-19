@@ -36,10 +36,24 @@ public class UserController {
     }
 
     //melle
+    @CrossOrigin
+    @RequestMapping(value = "/getAllUsersWithoutBankAccounts", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity getUsersWithoutBankAccounts() {
+        List<User> usersWithoutBankAccounts = userService.getUsersWithoutBankAccount();
+
+        return ResponseEntity.status(200).body(usersWithoutBankAccounts);
+    }
+
+    //melle
+    @CrossOrigin(origins = "http://localhost:3000")
     @RequestMapping(value = "/testLogin/{username}/{password}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity loginAttempt(@PathVariable("username") String username, @PathVariable("password") String password) {
-        if(userService.TestLoginAttempt(username,password)) return ResponseEntity.status(200).body("Succesful login attempt");
-        else return ResponseEntity.status(400).body("Unsuccesful login attempt");
+
+        User u = this.userService.TestLoginAttempt(username, password);
+
+        if(u == null) return ResponseEntity.status(400).body(null);
+        else return ResponseEntity.status(200).body(u);
+
     }
 
     @RequestMapping(value = "/registeruser", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)

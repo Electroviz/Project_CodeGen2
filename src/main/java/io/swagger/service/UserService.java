@@ -15,6 +15,9 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private BankAccountService bankAccountService;
+
     private List<User> userList = new ArrayList<>();
 
     public User addUser(User user){
@@ -23,11 +26,23 @@ public class UserService {
     }
 
     //melle
-    public boolean TestLoginAttempt(String username, String password) {
-        User usernameUser = userRepository.findByUsername(username);
+    public List<User> getUsersWithoutBankAccount() {
+        List<User> allUsers = userRepository.findAll();
+        List<User> usersWithoutBankAccount = new ArrayList<>();
+        for(User u : allUsers)
+            if(!bankAccountService.UserAlreadyHasBankAccounts(u.getId())) usersWithoutBankAccount.add(u);
 
-        if(username != null) return password.equals(usernameUser.getPassword());
-        else return false;
+        return usersWithoutBankAccount;
+    }
+
+    //melle
+    public User TestLoginAttempt(String username, String password) {
+        User usernameUser = userRepository.findByusername(username);
+
+        if(username != null)
+            if(password.equals(usernameUser.getPassword())) return usernameUser;
+            else return null;
+        else return null;
     }
 
     //melle

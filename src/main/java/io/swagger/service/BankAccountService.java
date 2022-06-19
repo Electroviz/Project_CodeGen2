@@ -43,6 +43,16 @@ public class BankAccountService {
     }
 
     //melle
+    public ResponseEntity GetTotalBalanceByUserId(Long userId) {
+        List<BankAccount> bankAccounts = this.GetBankAccountsByUserId(userId);
+        double totalAmount = 0;
+        for(int i = 0; i < bankAccounts.size(); i++) totalAmount += bankAccounts.get(i).getBalance();
+
+        if(bankAccounts.stream().count() < 2) return ResponseEntity.status(400).body(null);
+        else return ResponseEntity.status(200).body(totalAmount);
+    }
+
+    //melle
     public List<BankAccount> GetBankAccountsByUserId(Long userId) {
         List<BankAccount> bankAccounts = bankAccountRepository.findByuserId(userId);
 
@@ -64,7 +74,7 @@ public class BankAccountService {
         }
     }
 
-    private boolean UserAlreadyHasBankAccounts(Long userId) {
+    public boolean UserAlreadyHasBankAccounts(Long userId) {
         List<BankAccount> bankAccounts = bankAccountRepository.findByuserId(userId);
         if(bankAccounts != null && bankAccounts.stream().count() > 1) return true;
         else return false;
