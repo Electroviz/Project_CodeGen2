@@ -31,7 +31,6 @@ public class MyWebSecurityConfig extends WebSecurityConfigurerAdapter {
             "/webjars/**",
             "/api-docs/**",
             "/swagger-ui/**",
-            "/user/registeruser",
             "/user/login"
     };
 
@@ -56,9 +55,9 @@ public class MyWebSecurityConfig extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder(12);
     }
 
-    @Override
     @Bean
-    public AuthenticationManager authenticationManager() throws Exception{
+    @Override
+    public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }
 }

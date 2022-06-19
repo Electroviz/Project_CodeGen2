@@ -50,6 +50,7 @@ public class UserController {
     }
 
     @RequestMapping(value = "/registeruser", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole("")")
     public ResponseEntity add(@RequestBody UserDTO userDTO){
 
         ModelMapper modelMapper = new ModelMapper();
@@ -63,7 +64,6 @@ public class UserController {
     }
 
     @RequestMapping(value = "/get/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasRole('EMPLOYEE')")
     public ResponseEntity getUserById(@PathVariable("id") Long id){
 
         ModelMapper modelMapper = new ModelMapper();
@@ -78,6 +78,7 @@ public class UserController {
     @RequestMapping(value = "/login", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public String login(@RequestBody Login login){
 
+        String test = "test";
         return userService.login(login.getUsername(), login.getPassword());
     }
 

@@ -81,7 +81,6 @@ public class UserService {
         String token = "";
 
         try {
-
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
             User user = userRepository.findByusername(username);
             token = jwtTokenProvider.createToken(username, user.getRoles());
