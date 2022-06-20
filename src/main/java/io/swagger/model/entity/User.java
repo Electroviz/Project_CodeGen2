@@ -14,6 +14,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -85,6 +86,10 @@ public class User {
     }
 
     public User(Long id, String username, String fullname, String email, String password, String phone, String dateOfBirth, UserRoleEnum role, BigDecimal transactionLimit, BigDecimal dayLimit, List<UserRoleEnum> roles) {
+    private BigDecimal dayLimitConst;
+    private Long lastUpdateTime;
+
+    public User(Long id, String username, String fullname, String email, String password, String phone, String dateOfBirth, UserRoleEnum userRole, BigDecimal transactionLimit, BigDecimal dayLimit) {
         this.id = id;
         this.username = username;
         this.fullname = fullname;
@@ -96,6 +101,21 @@ public class User {
         this.transactionLimit = transactionLimit;
         this.dayLimit = dayLimit;
         this.roles = roles;
+        this.dayLimitConst = dayLimit;
+
+        this.lastUpdateTime = new Date().getTime();
+    }
+
+    public User() {
+
+    }
+
+    public BigDecimal getDayLimitConst() {
+        return dayLimitConst;
+    }
+
+    public void setDayLimitConst(BigDecimal dayLimitConst) {
+        this.dayLimitConst = dayLimitConst;
     }
 
     public Long getId() {
@@ -166,8 +186,18 @@ public class User {
         return dayLimit;
     }
 
+    //nicky
     public void setDayLimit(BigDecimal dayLimit) {
-        this.dayLimit = dayLimit;
+        var currentTime = new Date().getTime();
+        if(currentTime - lastUpdateTime >= 24*60*60*1000) // number of milliseconds in a day
+        {
+            lastUpdateTime = currentTime;
+            this.dayLimit = dayLimitConst;
+            this.dayLimit = dayLimit;
+        }
+        else {
+            this.dayLimit = dayLimit;
+        }
     }
 
     @Override

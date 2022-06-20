@@ -3,6 +3,7 @@ package io.swagger.service;
 import io.swagger.model.BankAccount;
 import io.swagger.model.Transaction;
 import io.swagger.model.TransactionInfo;
+import io.swagger.model.entity.TransactionTest;
 import io.swagger.model.entity.User;
 import io.swagger.repository.BankAccountRepository;
 import io.swagger.repository.TransactionRepository;
@@ -14,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.threeten.bp.OffsetDateTime;
 
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -31,6 +31,7 @@ public class BankAccountService {
 
     @Autowired
     private TransactionRepository transactionRepository;
+
 
     public ResponseEntity PutBankAccountType(BankAccount.AccountTypeEnum type, BankAccount bankAccount) {
         if(bankAccount != null) {
@@ -247,41 +248,105 @@ public class BankAccountService {
 
     //Nicky
     public TransactionInfo AccountDeposit(String iban, Double amount){
-        List<BankAccount> allBankAccounts;
-        allBankAccounts = bankAccountRepository.findAll();
         TransactionInfo transactionInfo = new TransactionInfo();
-        Transaction depositTrans = new Transaction();
+        Transaction depositTrans = new Transaction(); //make object with transaction entity
 
-        for (BankAccount account : allBankAccounts) {
-            if(account.getIban().equals(iban)){
-                //account.setBalance(account.getBalance() + 25); //geef het account wat geld om te testen
+        if(GetBankAccountByIban(iban) != null && GetBankAccountByIban(iban).getAccountType() == BankAccount.AccountTypeEnum.CURRENT){
+            BankAccount account = GetBankAccountByIban(iban);
+            User user = userService.getUserById(account.getUserId());
 
+            if(amount <= user.getTransactionLimit().doubleValue() && amount <= user.getDayLimit().doubleValue()){
                 if(amount > 0){
                     account.setBalance(account.getBalance() + amount);
+                    Double change = user.getDayLimit().doubleValue() - amount;
+                    user.setDayLimit(BigDecimal.valueOf(change));
                 }
-                else if(amount == 0){
-                    new ResponseEntity(HttpStatus.BAD_REQUEST);
+                else if(amount == 0.0){
+                    return null;
                 }
                 else {
                     amount = amount * -1;
                     account.setBalance(account.getBalance() + amount);
                 }
-                depositTrans.setAmount(amount);
-                depositTrans.setDescription("Deposit");
-                depositTrans.setTimestamp(OffsetDateTime.now());
-                depositTrans.setFrom("NL01INHO0000000001");
-                depositTrans.setTo(iban);
-                depositTrans.setUserIDPerforming(Math.toIntExact(Long.valueOf(account.getUserId())));
-                depositTrans.setUserIDPerforming(Math.toIntExact(Long.valueOf(account.getUserId())));
-                transactionRepository.save(depositTrans);
-
-
-                transactionInfo.setAmount(BigDecimal.valueOf(amount));
-                transactionInfo.setTimestamp(OffsetDateTime.now());
-                transactionInfo.setUserIDPerforming(Math.toIntExact(Long.valueOf(account.getUserId())));
-
-                break;
             }
+            else{
+                return null;
+            }
+
+            //maak nieuwe transaction aan
+            depositTrans.setAmount(amount);
+            depositTrans.setDescription("Deposit");
+            depositTrans.setTimestamp(OffsetDateTime.now());
+            depositTrans.setFrom("NL01INHO0000000001");
+            depositTrans.setTo(iban);
+            depositTrans.setUserIDPerforming(Math.toIntExact(Long.valueOf(account.getUserId())));
+
+            //sla de transaction op en update het account en de user
+            transactionRepository.save(depositTrans);
+            bankAccountRepository.save(account);
+            userRepository.save(user);
+
+            //maak het transactioninfo object aan
+            transactionInfo.setAmount(BigDecimal.valueOf(amount));
+            transactionInfo.setTimestamp(OffsetDateTime.now());
+            transactionInfo.setUserIDPerforming(Math.toIntExact(Long.valueOf(account.getUserId())));
+        }
+        else{
+            return null;
+        }
+
+        return transactionInfo;
+    }
+
+    //Nicky
+    public TransactionInfo AccountWithdraw(String iban, Double amount){
+        TransactionInfo transactionInfo = new TransactionInfo();
+        Transaction withdrawTrans = new Transaction();
+
+        if(GetBankAccountByIban(iban) != null && GetBankAccountByIban(iban).getAccountType() == BankAccount.AccountTypeEnum.CURRENT){
+            BankAccount account = GetBankAccountByIban(iban);
+            User user = userService.getUserById(account.getUserId());
+
+            if(amount <= user.getTransactionLimit().doubleValue() && amount <= user.getDayLimit().doubleValue() && (account.getBalance() - amount)  > account.getAbsoluteLimit()){
+                if((account.getBalance() - amount) >= account.getAbsoluteLimit()) {
+                    if (amount > 0) {
+                        account.setBalance(account.getBalance() - amount);
+                        Double change = user.getDayLimit().doubleValue() - amount;
+                        user.setDayLimit(BigDecimal.valueOf(change));
+                    } else if (amount == 0) {
+                        return null;
+                    } else {
+                        amount = amount * -1;
+                        account.setBalance(account.getBalance() - amount);
+                    }
+                }
+                else{
+                    return null;
+                }
+            }
+            else{
+                return null;
+            }
+
+            withdrawTrans.setAmount(amount);
+            withdrawTrans.setDescription("Withdraw");
+            withdrawTrans.setTimestamp(OffsetDateTime.now());
+            withdrawTrans.setTo("NL01INHO0000000001");
+            withdrawTrans.setFrom(iban);
+            withdrawTrans.setUserIDPerforming(Math.toIntExact(Long.valueOf(account.getUserId())));
+
+            //sla de transaction op en update het account
+            transactionRepository.save(withdrawTrans);
+            bankAccountRepository.save(account);
+            userRepository.save(user);
+
+            //maak het transactioninfo object aan
+            transactionInfo.setAmount(BigDecimal.valueOf(amount));
+            transactionInfo.setTimestamp(OffsetDateTime.now());
+            transactionInfo.setUserIDPerforming(Math.toIntExact(Long.valueOf(account.getUserId())));
+        }
+        else{
+            return null;
         }
 
         return transactionInfo;

@@ -24,6 +24,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.concurrent.ThreadLocalRandom;
 
 @SpringBootApplication
@@ -35,8 +36,11 @@ public class Swagger2SpringBoot implements CommandLineRunner {
 
     @Autowired
     UserService userService;
+
+
     @Override
     public void run(String... arg0) throws Exception {
+
         if (arg0.length > 0 && arg0[0].equals("exitcode")) {
             throw new ExitException();
         }
@@ -109,6 +113,7 @@ public class Swagger2SpringBoot implements CommandLineRunner {
     }
 
     public static void main(String[] args) throws Exception {
+        var lastUpdated = new Date().getTime();
         new SpringApplication(Swagger2SpringBoot.class).run(args);
     }
 
