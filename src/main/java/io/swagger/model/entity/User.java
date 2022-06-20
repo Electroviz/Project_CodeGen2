@@ -2,47 +2,26 @@ package io.swagger.model.entity;
 
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
+import io.swagger.enums.UserRoleEnum;
 import io.swagger.model.UserDTO;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jdk.jfr.DataAmount;
 
 import javax.persistence.*;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Entity
 @Table(name = "users")
 public class User {
-
-    public enum UserRoleEnum {
-        EMPLOYEE("Employee"),
-
-        CUSTOMER("Customer");
-
-        private String value;
-
-        UserRoleEnum(String value) {
-            this.value = value;
-        }
-
-        @Override
-        @JsonValue
-        public String toString() {
-            return String.valueOf(value);
-        }
-
-        @JsonCreator
-        public static User.UserRoleEnum fromValue(String text) {
-            for (User.UserRoleEnum b : User.UserRoleEnum.values()) {
-                if (String.valueOf(b.value).equals(text)) {
-                    return b;
-                }
-            }
-            return null;
-        }
-    }
 
     @Id
     @GeneratedValue
@@ -66,8 +45,8 @@ public class User {
     @Column(nullable = false)
     private String dateOfBirth;
 
-    @Column(nullable = false)
-    private User.UserRoleEnum userRole;
+    @JsonProperty("role")
+    private UserRoleEnum role = null;
 
     @Column(nullable = false)
     private BigDecimal transactionLimit;
@@ -78,25 +57,55 @@ public class User {
     private BigDecimal dayLimitConst;
     private Long lastUpdateTime;
 
-    public User(Long id, String username, String fullname, String email, String password, String phone, String dateOfBirth, UserRoleEnum userRole, BigDecimal transactionLimit, BigDecimal dayLimit) {
-        this.id = id;
-        this.username = username;
-        this.fullname = fullname;
-        this.email = email;
-        this.password = password;
-        this.phone = phone;
-        this.dateOfBirth = dateOfBirth;
-        this.userRole = userRole;
-        this.transactionLimit = transactionLimit;
-        this.dayLimit = dayLimit;
-        this.dayLimitConst = dayLimit;
+    /**
+     * Get role
+     * @return role
+     **/
+    @Schema(required = true, description = "")
+    @NotNull
 
-        this.lastUpdateTime = new Date().getTime();
+    @Valid
+    public UserRoleEnum getRole() {
+        return role;
     }
 
+    public void setRole(UserRoleEnum role) {
+        this.role = role;
+    }
+
+
+    // Get a list of all available roles
+    @ElementCollection(fetch = FetchType.EAGER)
+    private List<UserRoleEnum> roles;
+
+    public List<UserRoleEnum> getRoles() {
+        return roles;
+    }
+    public void setRoles(List<UserRoleEnum> roles) {
+        this.roles = roles;
+    }
     public User() {
 
     }
+//    public User(Long id, String username, String fullname, String email, String password, String phone, String dateOfBirth, UserRoleEnum role, BigDecimal transactionLimit, BigDecimal dayLimit, List<UserRoleEnum> roles) {
+//
+//        this.id = id;
+//        this.username = username;
+//        this.fullname = fullname;
+//        this.email = email;
+//        this.password = password;
+//        this.phone = phone;
+//        this.dateOfBirth = dateOfBirth;
+//        this.role = role;
+//        this.transactionLimit = transactionLimit;
+//        this.dayLimit = dayLimit;
+//        this.roles = roles;
+//        this.dayLimitConst = dayLimit;
+//
+//        this.lastUpdateTime = new Date().getTime();
+//    }
+
+
 
     public BigDecimal getDayLimitConst() {
         return dayLimitConst;
@@ -162,14 +171,6 @@ public class User {
         this.dateOfBirth = dateOfBirth;
     }
 
-    public UserRoleEnum getUserRole() {
-        return userRole;
-    }
-
-    public void setUserRole(UserRoleEnum userRole) {
-        this.userRole = userRole;
-    }
-
     public BigDecimal getTransactionLimit() {
         return transactionLimit;
     }
@@ -184,16 +185,40 @@ public class User {
 
     //nicky
     public void setDayLimit(BigDecimal dayLimit) {
-        var currentTime = new Date().getTime();
-        if(currentTime - lastUpdateTime >= 24*60*60*1000) // number of milliseconds in a day
-        {
-            lastUpdateTime = currentTime;
-            this.dayLimit = dayLimitConst;
-            this.dayLimit = dayLimit;
-        }
-        else {
-            this.dayLimit = dayLimit;
-        }
+//        var currentTime = new Date().getTime();
+//        if(currentTime - lastUpdateTime >= 24*60*60*1000) // number of milliseconds in a day
+//        {
+//            lastUpdateTime = currentTime;
+//            this.dayLimit = dayLimitConst;
+//            this.dayLimit = dayLimit;
+//        }
+//        else {
+//            this.dayLimit = dayLimit;
+//        }
+
+        this.dayLimit = dayLimit;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", fullname='" + fullname + '\'' +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", phone='" + phone + '\'' +
+                ", dateOfBirth='" + dateOfBirth + '\'' +
+                ", role=" + role +
+                ", transactionLimit=" + transactionLimit +
+                ", dayLimit=" + dayLimit +
+                ", roles=" + roles +
+                '}';
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, username, fullname, email, password, phone, dateOfBirth, transactionLimit, dayLimit, role, roles);
     }
 
 }

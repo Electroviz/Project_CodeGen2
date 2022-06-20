@@ -1,13 +1,19 @@
 package io.swagger.model;
 
+import java.util.List;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import io.swagger.enums.UserRoleEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
+
 import org.springframework.validation.annotation.Validated;
 
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
+import javax.persistence.FetchType;
 import javax.persistence.Table;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
@@ -40,55 +46,31 @@ public class UserDTO   {
   @JsonProperty("dateOfBirth")
   private String dateOfBirth = null;
 
-  /**
-   * Gets or Sets userRole
-   */
-  public enum UserRoleEnum {
-    EMPLOYEE("Employee"),
-
-    CUSTOMER("Customer");
-
-    private String value;
-
-    UserRoleEnum(String value) {
-      this.value = value;
-    }
-
-    @Override
-    @JsonValue
-    public String toString() {
-      return String.valueOf(value);
-    }
-
-    @JsonCreator
-    public static UserRoleEnum fromValue(String text) {
-      for (UserRoleEnum b : UserRoleEnum.values()) {
-        if (String.valueOf(b.value).equals(text)) {
-          return b;
-        }
-      }
-      return null;
-    }
-  }
-  @JsonProperty("userRole")
-  private UserRoleEnum userRole = null;
-
   @JsonProperty("transactionLimit")
-  private BigDecimal transactionLimit = null;
+  private BigDecimal transactionLimit;
 
   @JsonProperty("dayLimit")
-  private BigDecimal dayLimit = null;
+  private BigDecimal dayLimit;
 
-  public UserDTO id(Long id) {
-    this.id = id;
-    return this;
+  @JsonProperty("role")
+  private UserRoleEnum role = null;
+
+
+  public UserDTO() {
   }
 
-  /**
-   * Get id
-   * @return id
-   **/
-  @Schema(description = "")
+  public UserDTO(Long id, String username, String fullname, String email, String password, String phone, String dateOfBirth, BigDecimal transactionLimit, BigDecimal dayLimit, UserRoleEnum role) {
+    this.id = id;
+    this.username = username;
+    this.fullname = fullname;
+    this.email = email;
+    this.password = password;
+    this.phone = phone;
+    this.dateOfBirth = dateOfBirth;
+    this.transactionLimit = transactionLimit;
+    this.dayLimit = dayLimit;
+    this.role = role;
+  }
 
   public Long getId() {
     return id;
@@ -98,18 +80,6 @@ public class UserDTO   {
     this.id = id;
   }
 
-  public UserDTO username(String username) {
-    this.username = username;
-    return this;
-  }
-
-  /**
-   * Get username
-   * @return username
-   **/
-  @Schema(example = "Kees1978", required = true, description = "")
-  @NotNull
-
   public String getUsername() {
     return username;
   }
@@ -117,17 +87,6 @@ public class UserDTO   {
   public void setUsername(String username) {
     this.username = username;
   }
-
-  public UserDTO fullname(String fullname) {
-    this.fullname = fullname;
-    return this;
-  }
-
-  /**
-   * Get fullname
-   * @return fullname
-   **/
-  @Schema(example = "Kees Post", description = "")
 
   public String getFullname() {
     return fullname;
@@ -137,18 +96,6 @@ public class UserDTO   {
     this.fullname = fullname;
   }
 
-  public UserDTO email(String email) {
-    this.email = email;
-    return this;
-  }
-
-  /**
-   * Get email
-   * @return email
-   **/
-  @Schema(example = "PieterBG@gmail.com", required = true, description = "")
-  @NotNull
-
   public String getEmail() {
     return email;
   }
@@ -156,18 +103,6 @@ public class UserDTO   {
   public void setEmail(String email) {
     this.email = email;
   }
-
-  public UserDTO password(String password) {
-    this.password = password;
-    return this;
-  }
-
-  /**
-   * Get password
-   * @return password
-   **/
-  @Schema(example = "fhdnd_Hdkf", required = true, description = "")
-  @NotNull
 
   public String getPassword() {
     return password;
@@ -177,18 +112,6 @@ public class UserDTO   {
     this.password = password;
   }
 
-  public UserDTO phone(String phone) {
-    this.phone = phone;
-    return this;
-  }
-
-  /**
-   * Get phone
-   * @return phone
-   **/
-  @Schema(example = "612345345", required = true, description = "")
-  @NotNull
-
   public String getPhone() {
     return phone;
   }
@@ -196,18 +119,6 @@ public class UserDTO   {
   public void setPhone(String phone) {
     this.phone = phone;
   }
-
-  public UserDTO dateOfBirth(String dateOfBirth) {
-    this.dateOfBirth = dateOfBirth;
-    return this;
-  }
-
-  /**
-   * Get dateOfBirth
-   * @return dateOfBirth
-   **/
-  @Schema(example = "17-09-1990", required = true, description = "")
-  @NotNull
 
   public String getDateOfBirth() {
     return dateOfBirth;
@@ -217,39 +128,6 @@ public class UserDTO   {
     this.dateOfBirth = dateOfBirth;
   }
 
-  public UserDTO userRole(UserRoleEnum userRole) {
-    this.userRole = userRole;
-    return this;
-  }
-
-  /**
-   * Get userRole
-   * @return userRole
-   **/
-  @Schema(required = true, description = "")
-  @NotNull
-
-  public UserRoleEnum getUserRole() {
-    return userRole;
-  }
-
-  public void setUserRole(UserRoleEnum userRole) {
-    this.userRole = userRole;
-  }
-
-  public UserDTO transactionLimit(BigDecimal transactionLimit) {
-    this.transactionLimit = transactionLimit;
-    return this;
-  }
-
-  /**
-   * Get transactionLimit
-   * @return transactionLimit
-   **/
-  @Schema(example = "500", required = true, description = "")
-  @NotNull
-
-  @Valid
   public BigDecimal getTransactionLimit() {
     return transactionLimit;
   }
@@ -258,19 +136,6 @@ public class UserDTO   {
     this.transactionLimit = transactionLimit;
   }
 
-  public UserDTO dayLimit(BigDecimal dayLimit) {
-    this.dayLimit = dayLimit;
-    return this;
-  }
-
-  /**
-   * Get dayLimit
-   * @return dayLimit
-   **/
-  @Schema(example = "1000", required = true, description = "")
-  @NotNull
-
-  @Valid
   public BigDecimal getDayLimit() {
     return dayLimit;
   }
@@ -279,50 +144,54 @@ public class UserDTO   {
     this.dayLimit = dayLimit;
   }
 
+  /**
+   * Get role
+   * @return role
+   **/
+  @Schema(required = true, description = "")
+  @NotNull
 
-  @Override
-  public boolean equals(java.lang.Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    UserDTO user = (UserDTO) o;
-    return Objects.equals(this.id, user.id) &&
-            Objects.equals(this.username, user.username) &&
-            Objects.equals(this.fullname, user.fullname) &&
-            Objects.equals(this.email, user.email) &&
-            Objects.equals(this.password, user.password) &&
-            Objects.equals(this.phone, user.phone) &&
-            Objects.equals(this.dateOfBirth, user.dateOfBirth) &&
-            Objects.equals(this.userRole, user.userRole) &&
-            Objects.equals(this.transactionLimit, user.transactionLimit) &&
-            Objects.equals(this.dayLimit, user.dayLimit);
+  @Valid
+  public UserRoleEnum getRole() {
+    return role;
   }
 
-  @Override
-  public int hashCode() {
-    return Objects.hash(id, username, fullname, email, password, phone, dateOfBirth, userRole, transactionLimit, dayLimit);
+  public void setRole(UserRoleEnum role) {
+    this.role = role;
+  }
+
+
+  // Get a list of all available roles
+  @ElementCollection(fetch = FetchType.EAGER)
+  private List<UserRoleEnum> roles;
+
+  public List<UserRoleEnum> getRoles() {
+    return roles;
+  }
+  public void setRoles(List<UserRoleEnum> roles) {
+    this.roles = roles;
   }
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append("class User {\n");
+    return "UserDTO{" +
+            "id=" + id +
+            ", username='" + username + '\'' +
+            ", fullname='" + fullname + '\'' +
+            ", email='" + email + '\'' +
+            ", password='" + password + '\'' +
+            ", phone='" + phone + '\'' +
+            ", dateOfBirth='" + dateOfBirth + '\'' +
+            ", transactionLimit=" + transactionLimit +
+            ", dayLimit=" + dayLimit +
+            ", role=" + role +
+            ", roles=" + roles +
+            '}';
+  }
 
-    sb.append("    id: ").append(toIndentedString(id)).append("\n");
-    sb.append("    username: ").append(toIndentedString(username)).append("\n");
-    sb.append("    fullname: ").append(toIndentedString(fullname)).append("\n");
-    sb.append("    email: ").append(toIndentedString(email)).append("\n");
-    sb.append("    password: ").append(toIndentedString(password)).append("\n");
-    sb.append("    phone: ").append(toIndentedString(phone)).append("\n");
-    sb.append("    dateOfBirth: ").append(toIndentedString(dateOfBirth)).append("\n");
-    sb.append("    userRole: ").append(toIndentedString(userRole)).append("\n");
-    sb.append("    transactionLimit: ").append(toIndentedString(transactionLimit)).append("\n");
-    sb.append("    dayLimit: ").append(toIndentedString(dayLimit)).append("\n");
-    sb.append("}");
-    return sb.toString();
+  @Override
+  public int hashCode() {
+    return Objects.hash(id, username, fullname, email, password, phone, dateOfBirth, transactionLimit, dayLimit, role, roles);
   }
 
   /**

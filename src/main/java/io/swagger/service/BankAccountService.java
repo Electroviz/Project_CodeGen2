@@ -33,6 +33,7 @@ public class BankAccountService {
     private TransactionRepository transactionRepository;
 
 
+    //melle
     public ResponseEntity PutBankAccountType(BankAccount.AccountTypeEnum type, BankAccount bankAccount) {
         if(bankAccount != null) {
             bankAccount.setAccountType(type);
@@ -40,6 +41,13 @@ public class BankAccountService {
             return ResponseEntity.status(200).body(bankAccount);
         }
         else return ResponseEntity.status(400).body("bad request");
+    }
+
+    //melle
+    public ResponseEntity PutBankAccountStatus(BankAccount.AccountStatusEnum status, BankAccount bankAccount) {
+        bankAccount.SetAccountStatus(status);
+        bankAccountRepository.save(bankAccount);
+        return ResponseEntity.status(200).body(bankAccount);
     }
 
     //melle
@@ -369,7 +377,7 @@ public class BankAccountService {
         }
         for (BankAccount account : allBankAccounts)
         {
-            if(account.getUserId() == userCompareId)
+            if(account.getUserId() == userCompareId && account.getAccountType() != BankAccount.AccountTypeEnum.SAVINGS)
             {
                 returnIbans.add(account.getIban());
             }
