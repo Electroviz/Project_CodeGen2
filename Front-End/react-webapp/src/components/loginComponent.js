@@ -7,8 +7,8 @@ const LoginComp = () => {
                 var instance = axios.create();
 
                 const params = JSON.stringify({
-                    "username": "test",
-                    "password": "geheim"
+                    "username": document.getElementById("uname").value,
+                    "password": document.getElementById("passW").value
                 })
                 //delete instance.defaults.headers.common.Authorization;
                 instance.post('http://localhost:8080/api/user/login', params, {
