@@ -10,13 +10,20 @@ function App() {
     <Router>
       <div className="App">
         {/* <LoginComp /> */}
-        <Routes>
-          <Route path="/homePage" element={ BankingPage() } />
-        </Routes>
 
         <Routes>
           <Route path="/" element={ LoginComp() } />
         </Routes>
+
+        <Routes>
+          <Route path="/login" element={ LoginComp() } />
+        </Routes>
+
+        <Routes>
+          <Route path="/homePage" element={ BankingPage() } />
+        </Routes>
+
+        
 
         
       </div>

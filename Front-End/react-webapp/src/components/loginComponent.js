@@ -21,8 +21,6 @@ const LoginComp = () => {
                         console.log(res.data);
                         document.cookie = "jwt=" + res.data;
                         window.location.href = "/homePage";
-
-
                     }
                     
                 })

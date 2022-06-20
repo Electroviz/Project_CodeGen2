@@ -41,6 +41,27 @@ public class UserController {
 
     //melle
     @CrossOrigin
+    @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value= "/getUserIdJwtValidation")
+    public ResponseEntity getUserIdByJwtTokenVerification() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        try {
+            String uname = authentication.getName();
+            if(uname != null) {
+                if(uname.length() > 0) {
+                    Long uId = userService.getUserIdByUsername(uname);
+                    if(uId != -1) return ResponseEntity.status(200).body(uId);
+                    else return ResponseEntity.status(400).body("");
+                }
+            }
+
+            return ResponseEntity.status(400).body("");
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body("");
+        }
+    }
+
+    //melle
+    @CrossOrigin
     @RequestMapping(value = "/getAllUsersWithoutBankAccounts", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity getUsersWithoutBankAccounts() {
         List<User> usersWithoutBankAccounts = userService.getUsersWithoutBankAccount();
@@ -81,6 +102,7 @@ public class UserController {
         return ResponseEntity.status(201).body(response);
     }
 
+    @CrossOrigin
     @RequestMapping(value = "/get/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity getUserById(@PathVariable("id") Long id){
 

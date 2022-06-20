@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.print.attribute.standard.Media;
@@ -97,7 +99,6 @@ public class BankAccountController {
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE,value="/getBankAccount/name/{FULLNAME}")
     public ResponseEntity getBankAccountInfoByName(@PathVariable("FULLNAME") String fullName) {
 
-        //fullName = java.net.URLDecoder.decode(fullName, StandardCharsets.UTF_8);
         List<String> ibansToReturn = bankAccountService.getAccountByName(fullName);
 
         if(ibansToReturn != null) {
