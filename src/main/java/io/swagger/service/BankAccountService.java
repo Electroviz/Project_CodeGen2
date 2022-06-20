@@ -1,19 +1,20 @@
 package io.swagger.service;
 
-import io.swagger.api.ApiException;
 import io.swagger.model.BankAccount;
+import io.swagger.model.Transaction;
 import io.swagger.model.TransactionInfo;
-import io.swagger.model.entity.BankAccountEntity;
+import io.swagger.model.entity.TransactionTest;
 import io.swagger.model.entity.User;
 import io.swagger.repository.BankAccountRepository;
+import io.swagger.repository.TransactionRepository;
 import io.swagger.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.threeten.bp.OffsetDateTime;
 
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -28,6 +29,11 @@ public class BankAccountService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private TransactionRepository transactionRepository;
+
+
+    //melle
     public ResponseEntity PutBankAccountType(BankAccount.AccountTypeEnum type, BankAccount bankAccount) {
         if(bankAccount != null) {
             bankAccount.setAccountType(type);
@@ -35,6 +41,23 @@ public class BankAccountService {
             return ResponseEntity.status(200).body(bankAccount);
         }
         else return ResponseEntity.status(400).body("bad request");
+    }
+
+    //melle
+    public ResponseEntity PutBankAccountStatus(BankAccount.AccountStatusEnum status, BankAccount bankAccount) {
+        bankAccount.SetAccountStatus(status);
+        bankAccountRepository.save(bankAccount);
+        return ResponseEntity.status(200).body(bankAccount);
+    }
+
+    //melle
+    public ResponseEntity GetTotalBalanceByUserId(Long userId) {
+        List<BankAccount> bankAccounts = this.GetBankAccountsByUserId(userId);
+        double totalAmount = 0;
+        for(int i = 0; i < bankAccounts.size(); i++) totalAmount += bankAccounts.get(i).getBalance();
+
+        if(bankAccounts.stream().count() < 2) return ResponseEntity.status(400).body(null);
+        else return ResponseEntity.status(200).body(totalAmount);
     }
 
     //melle
@@ -59,7 +82,7 @@ public class BankAccountService {
         }
     }
 
-    private boolean UserAlreadyHasBankAccounts(Long userId) {
+    public boolean UserAlreadyHasBankAccounts(Long userId) {
         List<BankAccount> bankAccounts = bankAccountRepository.findByuserId(userId);
         if(bankAccounts != null && bankAccounts.stream().count() > 1) return true;
         else return false;
@@ -210,55 +233,143 @@ public class BankAccountService {
     }
 
     //Nicky
-    public void DeleteBankAccount(String iban){
+    public BankAccount DeleteBankAccount(String iban){
         List<BankAccount> allBankAccounts;
         allBankAccounts = bankAccountRepository.findAll();
+        BankAccount deletedAccount = null;
         boolean canDel = false;
         Long deleteId = Long.valueOf(0);
         for (BankAccount bankAccount : allBankAccounts) {
-            if(bankAccount.getIban() == iban){
-                deleteId = bankAccount.getUserId();
+            if(bankAccount.getIban().equals(iban)){
+                deleteId = bankAccount.getId();
                 canDel = true;
+                deletedAccount = bankAccount;
                 break;
             }
         }
         if (canDel)
         {
-            //bankAccountRepository.deleteById(deleteId);
+            bankAccountRepository.deleteById(deleteId);
         }
+        return deletedAccount;
     }
 
     //Nicky
     public TransactionInfo AccountDeposit(String iban, Double amount){
-        List<BankAccount> allBankAccounts;
-        allBankAccounts = bankAccountRepository.findAll();
         TransactionInfo transactionInfo = new TransactionInfo();
-        BankAccount depositAccount = null;
+        Transaction depositTrans = new Transaction(); //make object with transaction entity
 
-        for (BankAccount account : allBankAccounts) {
-            if(iban == account.getIban()){
-                //account.setBalance(account.getBalance() + BigDecimal.valueOf(amount));
-                transactionInfo.setAmount(BigDecimal.valueOf(amount));
-                //transactionInfo.setTimestamp(new SimpleDateFormat("dd-MM-yyyy").format(new Date()));
-                break;
+        if(GetBankAccountByIban(iban) != null && GetBankAccountByIban(iban).getAccountType() == BankAccount.AccountTypeEnum.CURRENT && GetBankAccountByIban(iban).getAccountStatus() == BankAccount.AccountStatusEnum.ACTIVE){
+            BankAccount account = GetBankAccountByIban(iban);
+            User user = userService.getUserById(account.getUserId());
+
+            if(amount <= user.getTransactionLimit().doubleValue() && amount <= user.getDayLimit().doubleValue()){
+                if(amount > 0){
+                    account.setBalance(account.getBalance() + amount);
+                    Double change = user.getDayLimit().doubleValue() - amount;
+                    user.setDayLimit(BigDecimal.valueOf(change));
+                }
+                else if(amount == 0.0){
+                    return null;
+                }
+                else {
+                    amount = amount * -1;
+                    account.setBalance(account.getBalance() + amount);
+                }
             }
+            else{
+                return null;
+            }
+
+            //maak nieuwe transaction aan
+            depositTrans.setAmount(amount);
+            depositTrans.setDescription("Deposit");
+            depositTrans.setTimestamp(OffsetDateTime.now());
+            depositTrans.setFrom("NL01INHO0000000001");
+            depositTrans.setTo(iban);
+            depositTrans.setUserIDPerforming(Math.toIntExact(Long.valueOf(account.getUserId())));
+
+            //sla de transaction op en update het account en de user
+            transactionRepository.save(depositTrans);
+            bankAccountRepository.save(account);
+            userRepository.save(user);
+
+            //maak het transactioninfo object aan
+            transactionInfo.setAmount(BigDecimal.valueOf(amount));
+            transactionInfo.setTimestamp(OffsetDateTime.now());
+            transactionInfo.setUserIDPerforming(Math.toIntExact(Long.valueOf(account.getUserId())));
         }
-        //ingelogde userid
-        //transactionInfo.setUserIDPerforming();
+        else{
+            return null;
+        }
+
+        return transactionInfo;
+    }
+
+    //Nicky
+    public TransactionInfo AccountWithdraw(String iban, Double amount){
+        TransactionInfo transactionInfo = new TransactionInfo();
+        Transaction withdrawTrans = new Transaction();
+
+        if(GetBankAccountByIban(iban) != null && GetBankAccountByIban(iban).getAccountType() == BankAccount.AccountTypeEnum.CURRENT && GetBankAccountByIban(iban).getAccountStatus() == BankAccount.AccountStatusEnum.ACTIVE){
+            BankAccount account = GetBankAccountByIban(iban);
+            User user = userService.getUserById(account.getUserId());
+
+            if(amount <= user.getTransactionLimit().doubleValue() && amount <= user.getDayLimit().doubleValue() && (account.getBalance() - amount)  > account.getAbsoluteLimit()){
+                if((account.getBalance() - amount) >= account.getAbsoluteLimit()) {
+                    if (amount > 0) {
+                        account.setBalance(account.getBalance() - amount);
+                        Double change = user.getDayLimit().doubleValue() - amount;
+                        user.setDayLimit(BigDecimal.valueOf(change));
+                    } else if (amount == 0) {
+                        return null;
+                    } else {
+                        amount = amount * -1;
+                        account.setBalance(account.getBalance() - amount);
+                    }
+                }
+                else{
+                    return null;
+                }
+            }
+            else{
+                return null;
+            }
+
+            withdrawTrans.setAmount(amount);
+            withdrawTrans.setDescription("Withdraw");
+            withdrawTrans.setTimestamp(OffsetDateTime.now());
+            withdrawTrans.setTo("NL01INHO0000000001");
+            withdrawTrans.setFrom(iban);
+            withdrawTrans.setUserIDPerforming(Math.toIntExact(Long.valueOf(account.getUserId())));
+
+            //sla de transaction op en update het account
+            transactionRepository.save(withdrawTrans);
+            bankAccountRepository.save(account);
+            userRepository.save(user);
+
+            //maak het transactioninfo object aan
+            transactionInfo.setAmount(BigDecimal.valueOf(amount));
+            transactionInfo.setTimestamp(OffsetDateTime.now());
+            transactionInfo.setUserIDPerforming(Math.toIntExact(Long.valueOf(account.getUserId())));
+        }
+        else{
+            return null;
+        }
 
         return transactionInfo;
     }
 
     //Nicky
     public List<String> getAccountByName(String fullname){
-        List<String> returnIbans = null;
+        List<String> returnIbans = new ArrayList<>();
         List<BankAccount> allBankAccounts = bankAccountRepository.findAll();
         List<User> allUsers = userRepository.findAll();
         Long userCompareId = null;
 
         for (User user : allUsers)
         {
-            if(user.getFullname() == fullname)
+            if(user.getFullname().equals(fullname))
             {
                 userCompareId = Long.valueOf(user.getId());
                 break;
@@ -266,7 +377,7 @@ public class BankAccountService {
         }
         for (BankAccount account : allBankAccounts)
         {
-            if(account.getUserId() == userCompareId)
+            if(account.getUserId() == userCompareId && account.getAccountType() != BankAccount.AccountTypeEnum.SAVINGS)
             {
                 returnIbans.add(account.getIban());
             }
@@ -301,59 +412,6 @@ public class BankAccountService {
             id += Integer.toString(n);
         }
         return Integer.parseInt(id);
-    }
-
-
-    //Murat
-    public BankAccount updateBankAccount(User currentUser, String iban, BankAccount bankAccount) throws ApiException {
-        return updateBankAccount(currentUser, iban, bankAccount, true);
-    }
-    //Murat
-    public BankAccount updateBankAccount(User currentUser, String iban, BankAccount bankAccount, boolean shouldCheckEmployeeOrOwner) {
-
-        // find account by iban. If not found, throw an exception
-        BankAccountEntity accountEntity = (BankAccountEntity) bankAccountRepository.findByiban(iban);
-        BankAccount account = toModel(accountEntity);
-
-//        if(shouldCheckEmployeeOrOwner) {
-//            // ensure it is either an employee or owner of account updating the account
-//            //authenticationService.requireEmployeeOrOwner(currentUser, account.getUserId());
-//        }
-
-        // we only update the balance, absolute limit and account type
-        account.setBalance(bankAccount.getBalance());
-        account.setAbsoluteLimit(bankAccount.getAbsoluteLimit());
-        account.setAccountType(bankAccount.getAccountType());
-
-        // convert the bank account to an entity
-        BankAccountEntity entity = toEntity(account);
-        BankAccount accountFromEntity = toModel(entity);
-        // update the account in the db
-        BankAccount savedEntity = bankAccountRepository.save(accountFromEntity);
-
-        return savedEntity;
-    }
-    //Murat
-    BankAccount toModel(BankAccountEntity entity) {
-        BankAccount account = new BankAccount();
-        account.setUserId(entity.getUserId());
-        account.setIban(entity.getIban());
-        account.setBalance(entity.getBalance().doubleValue());
-        account.setAbsoluteLimit(entity.getAbsoluteLimit().doubleValue());
-        account.setCreationDate(entity.getCreationDate());
-        account.setAccountType(BankAccount.AccountTypeEnum.fromValue(entity.getAccountType()));
-        return account;
-    }
-    //Murat
-    BankAccountEntity toEntity(BankAccount bankAccount) {
-        BankAccountEntity entity = new BankAccountEntity();
-        entity.setUserId(bankAccount.getUserId());
-        entity.setIban(bankAccount.getIban());
-        entity.setBalance(BigDecimal.valueOf(bankAccount.getBalance()));
-        entity.setAbsoluteLimit(BigDecimal.valueOf(bankAccount.getAbsoluteLimit()));
-        entity.setAccountType(bankAccount.getAccountType().toString());
-        entity.setCreationDate(bankAccount.getCreationDate());
-        return entity;
     }
 
 

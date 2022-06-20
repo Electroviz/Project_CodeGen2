@@ -2,7 +2,6 @@ package io.swagger.model;
 
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
 import org.threeten.bp.OffsetDateTime;
@@ -11,7 +10,6 @@ import org.springframework.validation.annotation.Validated;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.Table;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 
@@ -28,8 +26,6 @@ public class Transaction   {
   @GeneratedValue
   @JsonProperty("id")
   private Long id;
-  @JsonProperty("transactionID")
-  private Long transactionID = null;
 
   @JsonProperty("from")
   private String from = null;
@@ -41,7 +37,7 @@ public class Transaction   {
   private Integer userIDPerforming = null;
 
   @JsonProperty("amount")
-  private BigDecimal amount = null;
+  private Double amount = null;
 
   @JsonProperty("timestamp")
   private OffsetDateTime timestamp = null;
@@ -49,24 +45,12 @@ public class Transaction   {
   @JsonProperty("description")
   private String description = null;
 
-  public Transaction transactionID(Long transactionID) {
-    this.transactionID = transactionID;
-    return this;
-  }
 
   /**
    * Get transactionID
    * @return transactionID
    **/
-  @Schema(example = "123", description = "")
-  
-    public Long getTransactionID() {
-    return transactionID;
-  }
 
-  public void setTransactionID(Long transactionID) {
-    this.transactionID = transactionID;
-  }
 
   public Transaction from(String from) {
     this.from = from;
@@ -128,7 +112,7 @@ public class Transaction   {
     this.userIDPerforming = userIDPerforming;
   }
 
-  public Transaction amount(BigDecimal amount) {
+  public Transaction amount(Double amount) {
     this.amount = amount;
     return this;
   }
@@ -138,14 +122,12 @@ public class Transaction   {
    * @return amount
    **/
   @Schema(example = "1", required = true, description = "")
-      @NotNull
 
-    @Valid
-    public BigDecimal getAmount() {
+  public Double getAmount() {
     return amount;
   }
 
-  public void setAmount(BigDecimal amount) {
+  public void setAmount(Double amount) {
     this.amount = amount;
   }
 
@@ -200,7 +182,7 @@ public class Transaction   {
       return false;
     }
     Transaction transaction = (Transaction) o;
-    return Objects.equals(this.transactionID, transaction.transactionID) &&
+    return
         Objects.equals(this.from, transaction.from) &&
         Objects.equals(this.to, transaction.to) &&
         Objects.equals(this.userIDPerforming, transaction.userIDPerforming) &&
@@ -211,15 +193,14 @@ public class Transaction   {
 
   @Override
   public int hashCode() {
-    return Objects.hash(transactionID, from, to, userIDPerforming, amount, timestamp, description);
+    return Objects.hash(from, to, userIDPerforming, amount, timestamp, description);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class Transaction {\n");
-    
-    sb.append("    transactionID: ").append(toIndentedString(transactionID)).append("\n");
+
     sb.append("    from: ").append(toIndentedString(from)).append("\n");
     sb.append("    to: ").append(toIndentedString(to)).append("\n");
     sb.append("    userIDPerforming: ").append(toIndentedString(userIDPerforming)).append("\n");

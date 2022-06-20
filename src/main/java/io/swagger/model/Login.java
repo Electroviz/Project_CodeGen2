@@ -22,19 +22,15 @@ public class Login   {
   @JsonProperty("password")
   private String password = null;
 
-  public Login username(String username) {
+  public Login(String username, String password) {
     this.username = username;
-    return this;
+    this.password = password;
   }
 
-  /**
-   * Get username
-   * @return username
-   **/
-  @Schema(required = true, description = "")
-      @NotNull
+  public Login() {
+  }
 
-    public String getUsername() {
+  public String getUsername() {
     return username;
   }
 
@@ -42,38 +38,12 @@ public class Login   {
     this.username = username;
   }
 
-  public Login password(String password) {
-    this.password = password;
-    return this;
-  }
-
-  /**
-   * Get password
-   * @return password
-   **/
-  @Schema(required = true, description = "")
-      @NotNull
-
-    public String getPassword() {
+  public String getPassword() {
     return password;
   }
 
   public void setPassword(String password) {
     this.password = password;
-  }
-
-
-  @Override
-  public boolean equals(java.lang.Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    Login login = (Login) o;
-    return Objects.equals(this.username, login.username) &&
-        Objects.equals(this.password, login.password);
   }
 
   @Override
@@ -84,18 +54,14 @@ public class Login   {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class Login {\n");
-    
+    sb.append("class UserLogin {\n");
+
     sb.append("    username: ").append(toIndentedString(username)).append("\n");
     sb.append("    password: ").append(toIndentedString(password)).append("\n");
     sb.append("}");
     return sb.toString();
   }
 
-  /**
-   * Convert the given object to string with each line indented by 4 spaces
-   * (except the first line).
-   */
   private String toIndentedString(java.lang.Object o) {
     if (o == null) {
       return "null";

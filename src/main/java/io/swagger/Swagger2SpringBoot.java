@@ -3,6 +3,7 @@ package io.swagger;
 import io.swagger.configuration.LocalDateConverter;
 import io.swagger.configuration.LocalDateTimeConverter;
 
+import io.swagger.enums.UserRoleEnum;
 import io.swagger.model.BankAccount;
 import io.swagger.model.entity.User;
 import io.swagger.service.BankAccountService;
@@ -21,6 +22,9 @@ import org.springframework.format.FormatterRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.concurrent.ThreadLocalRandom;
 
 @SpringBootApplication
@@ -32,80 +36,59 @@ public class Swagger2SpringBoot implements CommandLineRunner {
 
     @Autowired
     UserService userService;
+
+
     @Override
     public void run(String... arg0) throws Exception {
+
         if (arg0.length > 0 && arg0[0].equals("exitcode")) {
             throw new ExitException();
         }
 
         //melle
         //create the banks own account
-//        BankAccount ourMainBankAccount = new BankAccount();
-//        ourMainBankAccount.setIban("NL01INHO0000000001");
-//        ourMainBankAccount.setBalance(1000000000.0); //miljard
-//        ourMainBankAccount.setAbsoluteLimit(-1000000000.0); //minus 1 miljard in het rood
-//        ourMainBankAccount.setAccountType(BankAccount.AccountTypeEnum.CURRENT); //not a savings account
-//        ourMainBankAccount.setUserId(-1);
-//
-//        bankAccountService.SaveBankAccount(ourMainBankAccount);
+        BankAccount ourMainBankAccount = new BankAccount();
+        ourMainBankAccount.setIban("NL01INHO0000000001");
+        ourMainBankAccount.setBalance(1000000000.0); //miljard
+        ourMainBankAccount.setAbsoluteLimit(-1000000000.0); //minus 1 miljard in het rood
+        ourMainBankAccount.setAccountType(BankAccount.AccountTypeEnum.CURRENT); //not a savings account
+        ourMainBankAccount.setUserId(-1);
+
+        bankAccountService.SaveBankAccount(ourMainBankAccount);
 
         //melle
         //create 10 fake bank accounts without user associations
         for(int i = 0; i < 10; i++)
             bankAccountService.CreateDummyDataBankAccount();
-        //Murat
-        BankAccount bankAccount1 = new BankAccount();
-        bankAccount1.setIban("NL80INHO06969124964");
-        bankAccount1.accountType(BankAccount.AccountTypeEnum.CURRENT);
-        bankAccount1.setBalance(500.0);
-        bankAccount1.userId(12);
-        bankAccount1.setAbsoluteLimit(10000.0);
-
-        bankAccountService.SetBankAccount(bankAccount1);
-
-        //Create user
-        User firstUser1 = new User();
-        firstUser1.setId(11L);
-        firstUser1.setUsername("Jantje");
-        firstUser1.setFullname("Jantje Egberts");
-        firstUser1.setEmail("jantje@live.nl");
-        firstUser1.setPassword("jantje123");
-        firstUser1.setPhone("+310628495028");
-        firstUser1.setDateOfBirth("12-03-1997");
-        firstUser1.setUserRole(User.UserRoleEnum.CUSTOMER);
-        firstUser1.setTransactionLimit(BigDecimal.valueOf(3000.0));
-        firstUser1.setDayLimit(BigDecimal.valueOf(30000.0));
-        userService.addUser(firstUser1);
-
-        //Create user
-        User firstUser2 = new User();
-        firstUser2.setId(12L);
-        firstUser2.setUsername("Hans");
-        firstUser2.setFullname("Hans Egberts");
-        firstUser2.setEmail("Hans@live.nl");
-        firstUser2.setPassword("Hans");
-        firstUser2.setPhone("+310628495028");
-        firstUser2.setDateOfBirth("12-03-1997");
-        firstUser2.setUserRole(User.UserRoleEnum.CUSTOMER);
-        firstUser2.setTransactionLimit(BigDecimal.valueOf(3000.0));
-        firstUser2.setDayLimit(BigDecimal.valueOf(30000.0));
-        userService.addUser(firstUser2);
 
 
         //Nick
 //        create fake users and transactions
-//          User firstUser = new User();
-//          firstUser.setUsername("Jantje");
-//          firstUser.setFullname("Jantje Egberts");
-//          firstUser.setEmail("jantje@live.nl");
-//          firstUser.setPassword("jantje123");
-//          firstUser.setPhone("+310628495028");
-//          firstUser.setDateOfBirth("12-03-1997");
-//          firstUser.setUserRole(User.UserRoleEnum.CUSTOMER);
-//          firstUser.setTransactionLimit(BigDecimal.valueOf(3000.0));
-//          firstUser.setDayLimit(BigDecimal.valueOf(30000.0));
+          User firstUser = new User();
+          firstUser.setUsername("test");
+          firstUser.setFullname("Jantje Egberts");
+          firstUser.setEmail("jantje@live.nl");
+          firstUser.setPassword("geheim");
+          firstUser.setPhone("+310628495028");
+          firstUser.setDateOfBirth("12-03-1997");
+          firstUser.setRole(UserRoleEnum.ROLE_EMPLOYEE);
+          firstUser.setTransactionLimit(BigDecimal.valueOf(3000.0));
+          firstUser.setDayLimit(BigDecimal.valueOf(30000.0));
 
-//          userService.addUser(firstUser);
+          userService.addUser(firstUser);
+
+        User second = new User();
+        second.setUsername("Eland");
+        second.setFullname("Eland Egberts");
+        second.setEmail("Eland@live.nl");
+        second.setPassword("jantje123");
+        second.setPhone("+310628495028");
+        second.setDateOfBirth("12-03-1997");
+        second.setRole(UserRoleEnum.ROLE_CUSTOMER);
+        second.setTransactionLimit(BigDecimal.valueOf(3000.0));
+        second.setDayLimit(BigDecimal.valueOf(30000.0));
+
+        userService.addUser(second);
 //          bankAccountService.CreateDummyDataBankAccount(firstUser.getId(), BankAccount.AccountTypeEnum.CURRENT);
 //          bankAccountService.CreateDummyDataBankAccount(firstUser.getId(), BankAccount.AccountTypeEnum.SAVINGS);
 
@@ -130,6 +113,7 @@ public class Swagger2SpringBoot implements CommandLineRunner {
     }
 
     public static void main(String[] args) throws Exception {
+        var lastUpdated = new Date().getTime();
         new SpringApplication(Swagger2SpringBoot.class).run(args);
     }
 
