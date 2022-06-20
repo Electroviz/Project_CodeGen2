@@ -369,7 +369,7 @@ public class BankAccountService {
         }
         for (BankAccount account : allBankAccounts)
         {
-            if(account.getUserId() == userCompareId)
+            if(account.getUserId() == userCompareId && account.getAccountType() != BankAccount.AccountTypeEnum.SAVINGS)
             {
                 returnIbans.add(account.getIban());
             }

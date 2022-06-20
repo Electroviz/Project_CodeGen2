@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.print.attribute.standard.Media;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @RestController
@@ -92,12 +93,15 @@ public class BankAccountController {
     }
 
     //Nicky
+    @CrossOrigin
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE,value="/getBankAccount/name/{FULLNAME}")
     public ResponseEntity getBankAccountInfoByName(@PathVariable("FULLNAME") String fullName) {
+
+        //fullName = java.net.URLDecoder.decode(fullName, StandardCharsets.UTF_8);
         List<String> ibansToReturn = bankAccountService.getAccountByName(fullName);
 
         if(ibansToReturn != null) {
-            return new ResponseEntity<List>(ibansToReturn,HttpStatus.FOUND);
+            return new ResponseEntity<List>(ibansToReturn,HttpStatus.ACCEPTED);
         }
         else {
             return ResponseEntity.status(400).body("No ibans could be found that belong to the given name");
@@ -105,6 +109,7 @@ public class BankAccountController {
     }
 
     //Nicky
+    @CrossOrigin
     @RequestMapping(method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE,value="/getBankAccount/{IBAN}/Deposit")
     public ResponseEntity accountDeposit(@PathVariable("IBAN") String IBAN, @RequestBody Transaction transaction) {
         TransactionInfo transactionInfo = bankAccountService.AccountDeposit(IBAN, transaction.getAmount());
@@ -118,6 +123,7 @@ public class BankAccountController {
     }
 
     //Nicky
+    @CrossOrigin
     @RequestMapping(method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE,value="/deleteAccount/{IBAN}")
     public ResponseEntity deleteAccount(@PathVariable("IBAN") String IBAN) {
         BankAccount bankAccount = bankAccountService.DeleteBankAccount(IBAN);
@@ -131,6 +137,7 @@ public class BankAccountController {
     }
 
     //Nicky
+    @CrossOrigin
     @RequestMapping(method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE,value="/getBankAccount/{IBAN}/Withdraw")
     public ResponseEntity accountWithdraw(@PathVariable("IBAN") String IBAN, @RequestBody Transaction transaction) {
         TransactionInfo transactionInfo = bankAccountService.AccountWithdraw(IBAN, transaction.getAmount());

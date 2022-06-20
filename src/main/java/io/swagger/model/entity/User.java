@@ -54,6 +54,9 @@ public class User {
     @Column(nullable = false)
     private BigDecimal dayLimit;
 
+    private BigDecimal dayLimitConst;
+    private Long lastUpdateTime;
+
     /**
      * Get role
      * @return role
@@ -81,34 +84,28 @@ public class User {
     public void setRoles(List<UserRoleEnum> roles) {
         this.roles = roles;
     }
-
-    public User() {
-    }
-
-    public User(Long id, String username, String fullname, String email, String password, String phone, String dateOfBirth, UserRoleEnum role, BigDecimal transactionLimit, BigDecimal dayLimit, List<UserRoleEnum> roles) {
-    private BigDecimal dayLimitConst;
-    private Long lastUpdateTime;
-
-    public User(Long id, String username, String fullname, String email, String password, String phone, String dateOfBirth, UserRoleEnum userRole, BigDecimal transactionLimit, BigDecimal dayLimit) {
-        this.id = id;
-        this.username = username;
-        this.fullname = fullname;
-        this.email = email;
-        this.password = password;
-        this.phone = phone;
-        this.dateOfBirth = dateOfBirth;
-        this.role = role;
-        this.transactionLimit = transactionLimit;
-        this.dayLimit = dayLimit;
-        this.roles = roles;
-        this.dayLimitConst = dayLimit;
-
-        this.lastUpdateTime = new Date().getTime();
-    }
-
     public User() {
 
     }
+//    public User(Long id, String username, String fullname, String email, String password, String phone, String dateOfBirth, UserRoleEnum role, BigDecimal transactionLimit, BigDecimal dayLimit, List<UserRoleEnum> roles) {
+//
+//        this.id = id;
+//        this.username = username;
+//        this.fullname = fullname;
+//        this.email = email;
+//        this.password = password;
+//        this.phone = phone;
+//        this.dateOfBirth = dateOfBirth;
+//        this.role = role;
+//        this.transactionLimit = transactionLimit;
+//        this.dayLimit = dayLimit;
+//        this.roles = roles;
+//        this.dayLimitConst = dayLimit;
+//
+//        this.lastUpdateTime = new Date().getTime();
+//    }
+
+
 
     public BigDecimal getDayLimitConst() {
         return dayLimitConst;
@@ -188,16 +185,18 @@ public class User {
 
     //nicky
     public void setDayLimit(BigDecimal dayLimit) {
-        var currentTime = new Date().getTime();
-        if(currentTime - lastUpdateTime >= 24*60*60*1000) // number of milliseconds in a day
-        {
-            lastUpdateTime = currentTime;
-            this.dayLimit = dayLimitConst;
-            this.dayLimit = dayLimit;
-        }
-        else {
-            this.dayLimit = dayLimit;
-        }
+//        var currentTime = new Date().getTime();
+//        if(currentTime - lastUpdateTime >= 24*60*60*1000) // number of milliseconds in a day
+//        {
+//            lastUpdateTime = currentTime;
+//            this.dayLimit = dayLimitConst;
+//            this.dayLimit = dayLimit;
+//        }
+//        else {
+//            this.dayLimit = dayLimit;
+//        }
+
+        this.dayLimit = dayLimit;
     }
 
     @Override
