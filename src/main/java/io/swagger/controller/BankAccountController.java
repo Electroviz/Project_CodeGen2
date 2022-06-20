@@ -21,6 +21,7 @@ public class BankAccountController {
     private BankAccountService bankAccountService;
 
     //melle
+    @CrossOrigin
     @RequestMapping(method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE, value= "/putBankAccountType/{type}/{IBAN}")
     public ResponseEntity putBankAccountTypeByIBAN(@PathVariable("type") String type, @PathVariable("IBAN") String IBAN) {
         type = type.replaceAll("[{}]",""); //make sure that the {variable} quotes are not taking into consideration
@@ -33,17 +34,20 @@ public class BankAccountController {
     }
 
     //melle
+    @CrossOrigin
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value="/totalBalance/{userId}")
     public ResponseEntity getTotalBalanceForUserId(@PathVariable("userId") Long userId) {
         return bankAccountService.GetTotalBalanceByUserId(userId);
     }
 
     //melle
+    @CrossOrigin
     @RequestMapping(method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, value="/initBankAccounts/{userId}")
     public ResponseEntity postBankAccountsForUserByUserId(@PathVariable("userId") Long userId) {
         return bankAccountService.PostOneSavingsAccountAndCurrentAccountForUser(userId);
     }
 
+    @CrossOrigin
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value="/bankAccounts/{userId}")
     public ResponseEntity testFunc(@PathVariable("userId") long userId) {
         List<BankAccount> bankAccounts = bankAccountService.GetBankAccountsByUserId(userId);
@@ -53,6 +57,7 @@ public class BankAccountController {
     }
 
     //melle
+    @CrossOrigin
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE,value = "/allBankAccounts")
     public ResponseEntity getAccountByIBANController(){
 
@@ -60,6 +65,7 @@ public class BankAccountController {
     }
 
     //melle
+    @CrossOrigin
     @RequestMapping(value = "/createBankAccount", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity registerNewBankAccountController(@RequestBody BankAccount account){
         ResponseEntity response = bankAccountService.CreateNewBankAccount();
@@ -72,6 +78,7 @@ public class BankAccountController {
     }
 
     //melle
+    @CrossOrigin
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE,value="/getBankAccount/{IBAN}")
     public ResponseEntity getBankAccountInfoByIbanController(@PathVariable("IBAN") String IBAN) {
         BankAccount ba = bankAccountService.GetBankAccountByIban(IBAN);

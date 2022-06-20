@@ -46,6 +46,11 @@ public class UserService {
     }
 
     //melle
+//    public User getUserByJwtToken(String token) {
+//
+//    }
+
+    //melle
     public List<User> getUsersWithoutBankAccount() {
         List<User> allUsers = userRepository.findAll();
         List<User> usersWithoutBankAccount = new ArrayList<>();

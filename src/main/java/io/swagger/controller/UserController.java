@@ -49,7 +49,7 @@ public class UserController {
     }
 
     //melle
-    @CrossOrigin(origins = "http://localhost:3000")
+    @CrossOrigin
     @RequestMapping(value = "/testLogin/{username}/{password}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity loginAttempt(@PathVariable("username") String username, @PathVariable("password") String password) {
 
@@ -59,6 +59,14 @@ public class UserController {
         else return ResponseEntity.status(200).body(u);
 
     }
+
+    //melle
+//    @CrossOrigin
+//    @RequestMapping(value = "/userByJwtToken/{token}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+//    public ResponseEntity getUserByJwtToken(@PathVariable("token") String token) {
+//        Authentication ath = new SecurityContextHolder.getContext().getAuthentication();
+//        return ResponseEntity.status(200).body()
+//    }
 
     @RequestMapping(value = "/registeruser", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity add(@RequestBody UserDTO userDTO){
@@ -85,6 +93,7 @@ public class UserController {
         return ResponseEntity.status(201).body(response);
     }
 
+    @CrossOrigin
     @RequestMapping(value = "/login", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public String login(@RequestBody Login login){
 
