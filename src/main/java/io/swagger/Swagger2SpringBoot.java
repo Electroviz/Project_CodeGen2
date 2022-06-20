@@ -3,6 +3,7 @@ package io.swagger;
 import io.swagger.configuration.LocalDateConverter;
 import io.swagger.configuration.LocalDateTimeConverter;
 
+import io.swagger.enums.UserRoleEnum;
 import io.swagger.model.BankAccount;
 import io.swagger.model.entity.User;
 import io.swagger.service.BankAccountService;
@@ -21,6 +22,8 @@ import org.springframework.format.FormatterRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.concurrent.ThreadLocalRandom;
 
 @SpringBootApplication
@@ -58,13 +61,13 @@ public class Swagger2SpringBoot implements CommandLineRunner {
         //Nick
 //        create fake users and transactions
           User firstUser = new User();
-          firstUser.setUsername("Jantje");
+          firstUser.setUsername("test");
           firstUser.setFullname("Jantje Egberts");
           firstUser.setEmail("jantje@live.nl");
-          firstUser.setPassword("jantje123");
+          firstUser.setPassword("geheim");
           firstUser.setPhone("+310628495028");
           firstUser.setDateOfBirth("12-03-1997");
-          firstUser.setUserRole(User.UserRoleEnum.CUSTOMER);
+          firstUser.setRole(UserRoleEnum.ROLE_EMPLOYEE);
           firstUser.setTransactionLimit(BigDecimal.valueOf(3000.0));
           firstUser.setDayLimit(BigDecimal.valueOf(30000.0));
 

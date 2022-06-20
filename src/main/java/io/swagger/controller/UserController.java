@@ -1,5 +1,6 @@
 package io.swagger.controller;
 
+import io.swagger.model.Login;
 import io.swagger.model.UserDTO;
 import io.swagger.model.entity.User;
 import io.swagger.service.UserService;
@@ -7,6 +8,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -79,6 +83,13 @@ public class UserController {
         UserDTO response = modelMapper.map(user, UserDTO.class);
 
         return ResponseEntity.status(201).body(response);
+    }
+
+    @RequestMapping(value = "/login", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public String login(@RequestBody Login login){
+
+        String test = "test";
+        return userService.login(login.getUsername(), login.getPassword());
     }
 
 }

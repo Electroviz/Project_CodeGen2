@@ -2,46 +2,25 @@ package io.swagger.model.entity;
 
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
+import io.swagger.enums.UserRoleEnum;
 import io.swagger.model.UserDTO;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jdk.jfr.DataAmount;
 
 import javax.persistence.*;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Entity
 @Table(name = "users")
 public class User {
-
-    public enum UserRoleEnum {
-        EMPLOYEE("Employee"),
-
-        CUSTOMER("Customer");
-
-        private String value;
-
-        UserRoleEnum(String value) {
-            this.value = value;
-        }
-
-        @Override
-        @JsonValue
-        public String toString() {
-            return String.valueOf(value);
-        }
-
-        @JsonCreator
-        public static User.UserRoleEnum fromValue(String text) {
-            for (User.UserRoleEnum b : User.UserRoleEnum.values()) {
-                if (String.valueOf(b.value).equals(text)) {
-                    return b;
-                }
-            }
-            return null;
-        }
-    }
 
     @Id
     @GeneratedValue
@@ -65,8 +44,8 @@ public class User {
     @Column(nullable = false)
     private String dateOfBirth;
 
-    @Column(nullable = false)
-    private User.UserRoleEnum userRole;
+    @JsonProperty("role")
+    private UserRoleEnum role = null;
 
     @Column(nullable = false)
     private BigDecimal transactionLimit;
@@ -74,7 +53,38 @@ public class User {
     @Column(nullable = false)
     private BigDecimal dayLimit;
 
-    public User(Long id, String username, String fullname, String email, String password, String phone, String dateOfBirth, UserRoleEnum userRole, BigDecimal transactionLimit, BigDecimal dayLimit) {
+    /**
+     * Get role
+     * @return role
+     **/
+    @Schema(required = true, description = "")
+    @NotNull
+
+    @Valid
+    public UserRoleEnum getRole() {
+        return role;
+    }
+
+    public void setRole(UserRoleEnum role) {
+        this.role = role;
+    }
+
+
+    // Get a list of all available roles
+    @ElementCollection(fetch = FetchType.EAGER)
+    private List<UserRoleEnum> roles;
+
+    public List<UserRoleEnum> getRoles() {
+        return roles;
+    }
+    public void setRoles(List<UserRoleEnum> roles) {
+        this.roles = roles;
+    }
+
+    public User() {
+    }
+
+    public User(Long id, String username, String fullname, String email, String password, String phone, String dateOfBirth, UserRoleEnum role, BigDecimal transactionLimit, BigDecimal dayLimit, List<UserRoleEnum> roles) {
         this.id = id;
         this.username = username;
         this.fullname = fullname;
@@ -82,12 +92,10 @@ public class User {
         this.password = password;
         this.phone = phone;
         this.dateOfBirth = dateOfBirth;
-        this.userRole = userRole;
+        this.role = role;
         this.transactionLimit = transactionLimit;
         this.dayLimit = dayLimit;
-    }
-
-    public User() {
+        this.roles = roles;
     }
 
     public Long getId() {
@@ -146,14 +154,6 @@ public class User {
         this.dateOfBirth = dateOfBirth;
     }
 
-    public UserRoleEnum getUserRole() {
-        return userRole;
-    }
-
-    public void setUserRole(UserRoleEnum userRole) {
-        this.userRole = userRole;
-    }
-
     public BigDecimal getTransactionLimit() {
         return transactionLimit;
     }
@@ -169,4 +169,27 @@ public class User {
     public void setDayLimit(BigDecimal dayLimit) {
         this.dayLimit = dayLimit;
     }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", fullname='" + fullname + '\'' +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", phone='" + phone + '\'' +
+                ", dateOfBirth='" + dateOfBirth + '\'' +
+                ", role=" + role +
+                ", transactionLimit=" + transactionLimit +
+                ", dayLimit=" + dayLimit +
+                ", roles=" + roles +
+                '}';
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, username, fullname, email, password, phone, dateOfBirth, transactionLimit, dayLimit, role, roles);
+    }
+
 }
