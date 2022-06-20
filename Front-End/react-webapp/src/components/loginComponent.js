@@ -25,20 +25,6 @@ const LoginComp = () => {
                     
                 })
                 .catch((error) => console.log(error));
-
-                // instance.get('http://localhost:8080/api/user/testLogin/' + document.getElementById("uname").value + '/' + document.getElementById("passW").value, {
-                //     headers: {
-                //         'Content-Type': null,
-                //     }
-                // })
-                // .then(res => {
-                //     if(res.status == 200) {
-                //         console.log(res.data);
-                //         window.location.href = "/continue";
-                //     }
-                    
-                // })
-                // .catch((error) => console.log(error));
             }
 
     return (
@@ -49,7 +35,8 @@ const LoginComp = () => {
             <h3>Password</h3>
             <input id="passW" defaultValue="geheim" type="password" />
 
-            <button onClick={ LoginAttempt } style={{ display: 'block' }}>Login</button>
+            <button onClick={ LoginAttempt } style={{ display: 'block', width: "40%", marginLeft: "30%", marginTop: "2rem", cursor: "pointer" }}>Login</button>
+            <a href="/register" style={{ display: 'block', width: "40%", marginLeft: "30%", marginTop: "0.5rem", cursor: "pointer" }}>Registreer</a>
         </div>
     )
 }
