@@ -30,15 +30,15 @@ public class TransactionService {
     private UserService userService;
 
 
-    public void createTransaction(User currentUser, Transaction transaction) throws ApiException {
+    public void createTransaction(User currentUser, TransactionEntity transaction) throws ApiException {
 
         //Check if amount is valid
         if (transaction.getAmount().doubleValue() <=0)
             throw ApiException.badRequest("Invalid amount");
 
         //Check the iban from the sender + receiver
-        BankAccount fromBankAccount = bankAccountService.GetBankAccountByIban(transaction.getFrom());
-        BankAccount toBankAccount = bankAccountService.GetBankAccountByIban(transaction.getTo());
+        BankAccount fromBankAccount = bankAccountService.GetBankAccountByIban(transaction.getFromAccount());
+        BankAccount toBankAccount = bankAccountService.GetBankAccountByIban(transaction.getToAccount());
 
         //Prevent transfers from a savings account to an account of not the same customer
         if(fromBankAccount.getAccountType().equals(BankAccount.AccountTypeEnum.SAVINGS)){
@@ -69,7 +69,7 @@ public class TransactionService {
 
         // get the from/to bank accounts
         // compute the from account balance
-        BigDecimal fromAccountBalance = BigDecimal.valueOf(fromBankAccount.getBalance()).subtract(BigDecimal.valueOf(transaction.getAmount()));
+        BigDecimal fromAccountBalance = BigDecimal.valueOf(fromBankAccount.getBalance()).subtract(transaction.getAmount());
 
         // ensure the new balance is not less than the absolute limit
         if (fromAccountBalance.doubleValue() < fromBankAccount.getAbsoluteLimit().doubleValue()) {
@@ -81,7 +81,7 @@ public class TransactionService {
         BigDecimal totalDayTransactions = getTotalDayTransactions(fromUser);
 
         // compute the total day transactions if this transaction were to go through
-        BigDecimal newDayTotal = totalDayTransactions.add(BigDecimal.valueOf(transaction.getAmount()));
+        BigDecimal newDayTotal = totalDayTransactions.add(transaction.getAmount());
         if (newDayTotal.longValue() > fromUser.getDayLimit().longValue()) {
             throw ApiException.badRequest("Transaction failed. This transaction will exceed your day limit.");
         }
@@ -167,7 +167,7 @@ public class TransactionService {
 
         // get the from/to bank accounts
         // compute the from account balance
-        BigDecimal fromAccountBalance = BigDecimal.valueOf(fromBankAccount.getBalance()).subtract(BigDecimal.valueOf(transaction.getAmount()));
+        BigDecimal fromAccountBalance = BigDecimal.valueOf(fromBankAccount.getBalance()).subtract(transaction.getAmount());
 
         // ensure the new balance is not less than the absolute limit
         if (fromAccountBalance.doubleValue() < fromBankAccount.getAbsoluteLimit().doubleValue()) {
@@ -179,7 +179,7 @@ public class TransactionService {
         BigDecimal totalDayTransactions = getTotalDayTransactions(fromUser);
 
         // compute the total day transactions if this transaction were to go through
-        BigDecimal newDayTotal = totalDayTransactions.add(BigDecimal.valueOf(transaction.getAmount()));
+        BigDecimal newDayTotal = totalDayTransactions.add(transaction.getAmount());
         if (newDayTotal.longValue() > fromUser.getDayLimit().longValue()) {
             throw ApiException.badRequest("Transaction failed. This transaction will exceed your day limit.");
         }
@@ -187,7 +187,7 @@ public class TransactionService {
         // ----  start the  transaction ----
 
         // update the "to" bank balance
-        BigDecimal toBalance = BigDecimal.valueOf(toBankAccount.getBalance()).add(BigDecimal.valueOf(transaction.getAmount()));
+        BigDecimal toBalance = BigDecimal.valueOf(toBankAccount.getBalance()).add(transaction.getAmount());
         toBankAccount.setBalance(toBalance.doubleValue());
         bankAccountService.updateBankAccount(currentUser, toBankAccount.getIban(), toBankAccount, false);
 
@@ -204,7 +204,7 @@ public class TransactionService {
 
     public TransactionEntity toEntity(Transaction transaction) {
         TransactionEntity entity = new TransactionEntity();
-        entity.setAmount(BigDecimal.valueOf(transaction.getAmount()));
+        entity.setAmount(transaction.getAmount());
         entity.setToAccount(transaction.getTo());
         entity.setFromAccount(transaction.getFrom());
         entity.setUserIDPerforming(new Long(transaction.getUserIDPerforming()));

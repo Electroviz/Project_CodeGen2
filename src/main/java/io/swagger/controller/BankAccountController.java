@@ -126,7 +126,7 @@ public class BankAccountController {
     @CrossOrigin
     @RequestMapping(method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE,value="/getBankAccount/{IBAN}/Deposit")
     public ResponseEntity accountDeposit(@PathVariable("IBAN") String IBAN, @RequestBody Transaction transaction) {
-        TransactionInfo transactionInfo = bankAccountService.AccountDeposit(IBAN, transaction.getAmount());
+        TransactionInfo transactionInfo = bankAccountService.AccountDeposit(IBAN, transaction.getAmount().doubleValue());
 
         if(transactionInfo != null) {
             return new ResponseEntity<TransactionInfo>(transactionInfo,HttpStatus.FOUND);
@@ -154,7 +154,7 @@ public class BankAccountController {
     @CrossOrigin
     @RequestMapping(method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE,value="/getBankAccount/{IBAN}/Withdraw")
     public ResponseEntity accountWithdraw(@PathVariable("IBAN") String IBAN, @RequestBody Transaction transaction) {
-        TransactionInfo transactionInfo = bankAccountService.AccountWithdraw(IBAN, transaction.getAmount());
+        TransactionInfo transactionInfo = bankAccountService.AccountWithdraw(IBAN, transaction.getAmount().doubleValue());
 
         if(transactionInfo != null) {
             return new ResponseEntity<TransactionInfo>(transactionInfo,HttpStatus.FOUND);
