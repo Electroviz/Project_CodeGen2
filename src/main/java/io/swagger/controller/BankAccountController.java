@@ -36,6 +36,19 @@ public class BankAccountController {
         }
     }
 
+    //Melle
+    @CrossOrigin
+    @RequestMapping(method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE, value = "/putBankAccountStatus/{status}/{IBAN}")
+    public ResponseEntity putBankAccountStatusByIban(@PathVariable("status") String status, @PathVariable("IBAN") String IBAN) {
+        BankAccount.AccountStatusEnum bankAccountStatus = BankAccount.AccountStatusEnum.valueOf(status);
+        BankAccount bankAccountByIban = bankAccountService.GetBankAccountByIban(IBAN);
+
+        if(bankAccountByIban == null || bankAccountStatus == null) return ResponseEntity.status(400).body("");
+        else {
+            return bankAccountService.PutBankAccountStatus(bankAccountStatus,bankAccountByIban);
+        }
+    }
+
     //melle
     @CrossOrigin
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value="/totalBalance/{userId}")

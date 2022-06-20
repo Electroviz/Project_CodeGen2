@@ -6,7 +6,9 @@ const bankingPageComponent = () => {
     var instance = axios.create();
     var jwtToken = "";
     var userId = -1;
-    
+    var userRights = "none";
+    var allBankAccountsInfo = null;
+
     const GetIbanByFullName = (e) => {
         if(jwtToken == "") {
             let name = "jwt" + "=";
@@ -42,6 +44,22 @@ const bankingPageComponent = () => {
         .catch((error) => console.log(error));
         
     }
+
+    const CreateBankAccountsForUser = (e) => {
+        if(userId != -1) {
+            instance.post('http://localhost:8080/api/initBankAccounts/' + userId,{
+                headers: {
+                    'Content-Type': null,
+                    Authorization: "Bearer " + jwtToken,
+                }
+            })
+            .then(res => {
+                //
+            });
+
+            window.location.reload();
+        }
+     }
 
     const SetBankingInfoCurrentUser = () => {
         //first get and set the User id by JWT token, if JWT token is not valid anymore return to login page
@@ -93,7 +111,6 @@ const bankingPageComponent = () => {
                     if(res.status >= 200 && res.status <= 300) {
                         if(res.data.length > 0) {
                             for(let i = 0; i < res.data.length; i++) {
-                                console.log(res.data[i]);
                                 if(res.data[i]["accountType"] == "Current") {
                                     document.getElementById("currentIban").innerHTML = res.data[i]["iban"];
                                     document.getElementById("currentBalance").innerHTML = "€ " + res.data[i]["balance"];
@@ -105,7 +122,6 @@ const bankingPageComponent = () => {
                                     document.getElementById("savingBalance").innerHTML = "€ " + res.data[i]["balance"];
                                     document.getElementById("savingAbsoluteLimit").innerHTML = "€ " + res.data[i]["absolute limit"];
                                 }
-
                             }
                         }
                         else {
@@ -113,8 +129,30 @@ const bankingPageComponent = () => {
                             document.getElementById("createBankAccountsButt").style.visibility = "visible";
                         }
                     }
-                    else document.getElementById("displayTotalBalance").innerHTML = "€ 0";
+                }).catch((error) => {
+                    document.getElementById("displayTotalBalance").innerHTML = "€ 0";
+                    //show button to create bank accounts for user ID
+                    document.getElementById("createBankAccountsButt").style.visibility = "visible"; 
+                    document.getElementById("currentUsersBankingInfo").remove();
                 });
+
+                if(userId != -1) {
+                    //set user info
+                    instance.get('http://localhost:8080/api/user/get/' + userId, {
+                    headers: {
+                        'Content-Type': null,
+                        Authorization: "Bearer " + jwtToken,
+                    }
+                    })
+                    .then(res => { 
+                        if(res.status >= 200 && res.status <= 300) {
+                            document.getElementById("currentUserFullName").innerHTML = "Welcome " + res.data["fullname"];
+                            userRights = res.data["role"];
+                            if(userRights != "employee") document.getElementById("EmployeeContainer").remove();
+                            else loadAllBankAccountInfo();
+                        }
+                    });
+                }
             }
             else {
                 if(window.location.pathname == "/")window.location.href = "/login";
@@ -126,49 +164,128 @@ const bankingPageComponent = () => {
         });
 
     }
+
+    const ChangeBankAccountStatus = (e) => {
+        var iban = document.getElementById("changeStatusIban").value;
+        var status = document.getElementById("changeStatus").value.toUpperCase();
+
+        instance.put('http://localhost:8080/api/putBankAccountStatus/' + status + '/' + iban, {
+                headers: {
+                    'Content-Type': null,
+                    Authorization: "Bearer " + jwtToken,
+                }
+                })
+                .then(res => { 
+                    if(res.status >= 200 && res.status <= 300) {
+                        alert("Succes");
+                        loadAllBankAccountInfo();
+                    }
+                }).catch((error) => {
+                    alert("Failed to change the status");
+                });
+    }
+
+    // const ChangeBankAccountStatus = (e) => { 
+    //     var iban = document.getElementById("changeStatusIban").value;
+    //     var status = document.getElementById("changeStatus").value;
+    //     console.log(iban + "  and   " + status);
+
+    //     instance.get('http://localhost:8080/api/user/get/' + userId, {
+    //                 headers: {
+    //                     'Content-Type': null,
+    //                     Authorization: "Bearer " + jwtToken,
+    //                 }
+    //                 })
+    //                 .then(res => { 
+    //                     if(res.status >= 200 && res.status <= 300) {
+    //                         alert("Succesfully changed");
+    //                         window.location.reload;
+    //                     }
+    //                 });
+            
+    // }
+
+    function loadAllBankAccountInfo() {
+        instance.get('http://localhost:8080/api/allBankAccounts', {
+            headers: {
+                'Content-Type': null,
+                Authorization: "Bearer " + jwtToken,
+            }
+            })
+            .then(res => { 
+                if(res.status >= 200 && res.status <= 300) {
+                    var container = document.getElementById("allBankAccountsList");
+                    container.innerHTML = "";
+                    for(let i = 0; i < res.data.length; i++) {
+                        var bankAccInfoElm = document.createElement("p");
+                        bankAccInfoElm.style.textAlign = "center";
+                        bankAccInfoElm.style.marginBottom = "0.8rem";
+                        bankAccInfoElm.style.borderBottom = "0.1rem solid black";
+                        bankAccInfoElm.innerHTML = 
+                        "Id: " + res.data[i]["id"] + ", " +
+                        "Account type: " + res.data[i]["accountType"] + ", " +
+                        "iban: " + res.data[i]["iban"] + ", " +
+                        "balance: " + res.data[i]["balance"] + ", " +
+                        "Creation date: " + res.data[i]["creationDate"] + ", " +
+                        "Status: " + res.data[i]["status"] + ", " +
+                        "Owner id: " + res.data[i]["userId"] + ", " +
+                        "absolute limit: " + res.data[i]["absolute limit"];
+                        
+                        
+                        container.append(bankAccInfoElm);
+                        
+                    }
+                }
+            });
+    }
     
     return (
         <div>
-            
-            <div id="currentUsersBankingInfo" style={{ marginTop: "4rem", width: "100%", paddingLeft: "10rem;", borderBottom: "0.4rem solid black"}}>
+            <div style={{ marginTop: "0.8rem", width: "100%", paddingLeft: "10rem;", borderBottom: "0.4rem solid black"}}>
                 <h1>BANKING APPLICATION</h1>
                 <div style={{ display: "block" }}>
-                    <p style={{ display: "inline-block"}}>Total Balance: </p>
-                    <p id="displayTotalBalance" style={{ display: "inline-block", paddingLeft: "0.3rem"}}></p>
-                </div>
-                <h2>Current account:</h2>
-                <div style={{ display: "block", marginTop: "-0.8rem" }}>
-                    <p style={{ display: "inline-block"}}>IBAN: </p>
-                    <p id="currentIban" style={{ display: "inline-block", paddingLeft: "0.3rem"}}></p>
-                </div>
-                <div style={{ display: "block", marginTop: "-1.8rem" }}>
-                    <p style={{ display: "inline-block"}}>Balance: </p>
-                    <p id="currentBalance" style={{ display: "inline-block", paddingLeft: "0.3rem"}}></p>
-                </div>
-                <div style={{ display: "block", marginTop: "-1.8rem" }}>
-                    <p style={{ display: "inline-block"}}>Absolute limit: </p>
-                    <p id="currentAbsoluteLimit" style={{ display: "inline-block", paddingLeft: "0.3rem"}}></p>
+                    <p id="currentUserFullName" style={{ width: "100%", textAlign: "center"}}></p>
                 </div>
 
-                <h3>Savings account:</h3>
-                <div style={{ display: "block", marginTop: "-0.8rem" }}>
-                    <p style={{ display: "inline-block"}}>IBAN: </p>
-                    <p id="savingIban" style={{ display: "inline-block", paddingLeft: "0.3rem"}}></p>
-                </div>
-                <div style={{ display: "block", marginTop: "-1.8rem" }}>
-                    <p style={{ display: "inline-block"}}>Balance: </p>
-                    <p id="savingBalance" style={{ display: "inline-block", paddingLeft: "0.3rem"}}></p>
-                </div>
-                <div style={{ display: "block", marginTop: "-1.8rem" }}>
-                    <p style={{ display: "inline-block"}}>Absolute limit: </p>
-                    <p id="savingAbsoluteLimit" style={{ display: "inline-block", paddingLeft: "0.3rem"}}></p>
+                <div id="currentUsersBankingInfo">
+                    <div style={{ display: "block" }}>
+                        <p style={{ display: "inline-block"}}>Total Balance: </p>
+                        <p id="displayTotalBalance" style={{ display: "inline-block", paddingLeft: "0.3rem"}}></p>
+                    </div>
+                    <h2>Current account:</h2>
+                    <div style={{ display: "block", marginTop: "-0.8rem" }}>
+                        <p style={{ display: "inline-block"}}>IBAN: </p>
+                        <p id="currentIban" style={{ display: "inline-block", paddingLeft: "0.3rem"}}></p>
+                    </div>
+                    <div style={{ display: "block", marginTop: "-1.8rem" }}>
+                        <p style={{ display: "inline-block"}}>Balance: </p>
+                        <p id="currentBalance" style={{ display: "inline-block", paddingLeft: "0.3rem"}}></p>
+                    </div>
+                    <div style={{ display: "block", marginTop: "-1.8rem" }}>
+                        <p style={{ display: "inline-block"}}>Absolute limit: </p>
+                        <p id="currentAbsoluteLimit" style={{ display: "inline-block", paddingLeft: "0.3rem"}}></p>
+                    </div>
+
+                    <h3>Savings account:</h3>
+                    <div style={{ display: "block", marginTop: "-0.8rem" }}>
+                        <p style={{ display: "inline-block"}}>IBAN: </p>
+                        <p id="savingIban" style={{ display: "inline-block", paddingLeft: "0.3rem"}}></p>
+                    </div>
+                    <div style={{ display: "block", marginTop: "-1.8rem" }}>
+                        <p style={{ display: "inline-block"}}>Balance: </p>
+                        <p id="savingBalance" style={{ display: "inline-block", paddingLeft: "0.3rem"}}></p>
+                    </div>
+                    <div style={{ display: "block", marginTop: "-1.8rem" }}>
+                        <p style={{ display: "inline-block"}}>Absolute limit: </p>
+                        <p id="savingAbsoluteLimit" style={{ display: "inline-block", paddingLeft: "0.3rem"}}></p>
+                    </div>
                 </div>
 
-                <button id="createBankAccountsButt" style={{ display: "block", visibility: "hidden", width: "15%", marginLeft: "42.5%", marginBottom: "1.8rem"}}>create your banking accounts</button>
+                <button id="createBankAccountsButt" onClick={ CreateBankAccountsForUser } style={{ display: "block", visibility: "hidden", width: "15%", marginLeft: "42.5%", marginBottom: "1.8rem"}}>create your banking accounts</button>
             </div>
 
 
-            <div style={{ marginTop: "4rem", width: "100%", paddingLeft: "0" }}>
+            <div style={{ marginTop: "-2.2rem", width: "100%", paddingLeft: "0" }}>
                 
                 <p style={{ marginTop: "6rem"}}>Search iban by Full name</p>
                 <input id="inputFullNameToIban" placeholder="full name" />
@@ -176,8 +293,32 @@ const bankingPageComponent = () => {
                 <p style={{ display: "inline-block", color: "red", fontWeight: "bold", paddingRight: "0.6rem"}}>result: </p>
                 <p id="fullNameToIbanResult" style={{ display: "inline-block", color: "red", fontWeight: "bold"}}>test</p>
             </div>
+
+            <div id="EmployeeContainer" style={{ marginBottom: "40rem"}}>
+                <h4 style={{ fontSize: "3rem", borderTop: "0.4rem solid black"}}>Employee</h4>
+
+                <div>
+                    <p style={{ fontSize: "1.4rem", fontWeight: "bold", marginBottom: "0rem"}}>All bank accounts info</p>
+                    <div id="allBankAccountsList" style={{height: "20rem", width: "50%", marginLeft: "25%", overflow: "auto", display: "block"}}>
+                        
+                    </div>
+
+                    <p style={{ fontSize: "1.15rem", marginBottom: "0rem", display: "inline-block"}}>Change status of iban: </p>
+                    <input id="changeStatusIban" style={{ display: "inline-block", fontSize: "1.15rem", marginLeft: "0.2rem", marginRight: "0.2rem"}} />
+                    <select id="changeStatus" style={{ display: "inline-block"}}>
+                        <option>Active</option>
+                        <option>Inactive</option>
+                        <option>Closed</option>
+                    </select>
+                    <button onClick={ ChangeBankAccountStatus } style={{ display: "inline-block", fontSize: "1.15rem", marginLeft: "0.2rem"}}>Confirm</button>
+
+                </div>
+            </div>
+
             { SetBankingInfoCurrentUser() }
         </div>
+
+        
 
     )
 }

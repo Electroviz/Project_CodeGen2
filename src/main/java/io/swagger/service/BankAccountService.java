@@ -43,6 +43,13 @@ public class BankAccountService {
     }
 
     //melle
+    public ResponseEntity PutBankAccountStatus(BankAccount.AccountStatusEnum status, BankAccount bankAccount) {
+        bankAccount.SetAccountStatus(status);
+        bankAccountRepository.save(bankAccount);
+        return ResponseEntity.status(200).body(bankAccount);
+    }
+
+    //melle
     public ResponseEntity GetTotalBalanceByUserId(Long userId) {
         List<BankAccount> bankAccounts = this.GetBankAccountsByUserId(userId);
         double totalAmount = 0;
