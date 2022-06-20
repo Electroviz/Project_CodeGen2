@@ -95,6 +95,15 @@ public class BankAccount   {
       return null;
     }
   }
+
+  public AccountStatusEnum getAccountStatus() {
+    return accountStatus;
+  }
+
+  public void setAccountStatus(AccountStatusEnum accountStatus) {
+    this.accountStatus = accountStatus;
+  }
+
   @JsonProperty("accountType")
   private AccountTypeEnum accountType = null;
 
