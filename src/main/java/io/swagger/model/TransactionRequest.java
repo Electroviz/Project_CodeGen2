@@ -188,12 +188,12 @@ public class TransactionRequest {
 
     public Transaction toTransaction() {
         Transaction transaction = new Transaction();
-        transaction.setTransactionID(0L);
+        transaction.setTransactionID(0);
         transaction.setFrom(from);
         transaction.setTo(to);
         transaction.setUserIDPerforming(userIDPerforming);
-        transaction.setAmount(amount);
-        transaction.setTimestamp(OffsetDateTime.parse(LocalDateTime.now().toString()));
+        transaction.setAmount(BigDecimal.valueOf(amount.doubleValue()));
+        transaction.setTimestamp(String.valueOf(OffsetDateTime.parse(LocalDateTime.now().toString())));
         transaction.setDescription(description);
         return transaction;
     }

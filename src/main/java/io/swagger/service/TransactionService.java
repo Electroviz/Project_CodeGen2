@@ -29,34 +29,6 @@ public class TransactionService {
     @Autowired
     private UserService userService;
 
-    public ResponseEntity MakeTransaction(Long userId) {
-        User userById = userService.getUserById(userId);
-
-        BankAccount Bank1 = bankAccountService.GetBankAccountByIban("NL26INHO07371341839");
-        //Long userId =  Bank1.getUserId();
-        User user = userService.getUserById(userId);
-        String iban = String.valueOf(bankAccountService.GetBankAccountsByUserId(userId));
-
-        // System.out.println(iban);
-
-//        Double balanceSender = from.getBalance();
-//        Double balanceReceiver = To.getBalance();
-//
-//
-//        from.setBalance(balanceReceiver+100);
-//        To.SetBalance(balanceReceiver+100);
-        if(userById != null) {
-            System.out.println(userById.getUsername());
-            System.out.println(userById.getUserRole());
-            return ResponseEntity.status(200).body("goedzo");
-        }
-        else {
-            return ResponseEntity.status(404).body("Faya bro");
-        }
-
-    }
-
-
 
     public void createTransaction(User currentUser, Transaction transaction) throws ApiException {
 
@@ -83,7 +55,12 @@ public class TransactionService {
         }
 
         //Get the from user (the sender)
-        User fromUser = userService.findById(fromBankAccount.getUserId()).orElseThrow(() -> ApiException.badRequest("No such from user"));
+        User fromUser = userService.findById(fromBankAccount.getUserId());
+
+        if (fromUser == null){
+            ApiException.badRequest("No such from user");
+        }
+
 
         // check the transaction limit for the from user
         if (transaction.getAmount().doubleValue() > fromUser.getTransactionLimit().doubleValue()) {
@@ -92,7 +69,7 @@ public class TransactionService {
 
         // get the from/to bank accounts
         // compute the from account balance
-        BigDecimal fromAccountBalance = BigDecimal.valueOf(fromBankAccount.getBalance()).subtract(transaction.getAmount());
+        BigDecimal fromAccountBalance = BigDecimal.valueOf(fromBankAccount.getBalance()).subtract(BigDecimal.valueOf(transaction.getAmount()));
 
         // ensure the new balance is not less than the absolute limit
         if (fromAccountBalance.doubleValue() < fromBankAccount.getAbsoluteLimit().doubleValue()) {
@@ -104,7 +81,7 @@ public class TransactionService {
         BigDecimal totalDayTransactions = getTotalDayTransactions(fromUser);
 
         // compute the total day transactions if this transaction were to go through
-        BigDecimal newDayTotal = totalDayTransactions.add(transaction.getAmount());
+        BigDecimal newDayTotal = totalDayTransactions.add(BigDecimal.valueOf(transaction.getAmount()));
         if (newDayTotal.longValue() > fromUser.getDayLimit().longValue()) {
             throw ApiException.badRequest("Transaction failed. This transaction will exceed your day limit.");
         }
@@ -178,8 +155,10 @@ public class TransactionService {
         }
 
         // get the from user
-        User fromUser = userService.findById(fromBankAccount.getUserId())
-                .orElseThrow(() -> ApiException.badRequest("No such from user"));
+        User fromUser = userService.findById(fromBankAccount.getUserId());
+        if (fromUser == null){
+            ApiException.badRequest("No such from user");
+        }
 
         // check the transaction limit for the from user
         if (transaction.getAmount().doubleValue() > fromUser.getTransactionLimit().doubleValue()) {
@@ -188,7 +167,7 @@ public class TransactionService {
 
         // get the from/to bank accounts
         // compute the from account balance
-        BigDecimal fromAccountBalance = BigDecimal.valueOf(fromBankAccount.getBalance()).subtract(transaction.getAmount());
+        BigDecimal fromAccountBalance = BigDecimal.valueOf(fromBankAccount.getBalance()).subtract(BigDecimal.valueOf(transaction.getAmount()));
 
         // ensure the new balance is not less than the absolute limit
         if (fromAccountBalance.doubleValue() < fromBankAccount.getAbsoluteLimit().doubleValue()) {
@@ -200,7 +179,7 @@ public class TransactionService {
         BigDecimal totalDayTransactions = getTotalDayTransactions(fromUser);
 
         // compute the total day transactions if this transaction were to go through
-        BigDecimal newDayTotal = totalDayTransactions.add(transaction.getAmount());
+        BigDecimal newDayTotal = totalDayTransactions.add(BigDecimal.valueOf(transaction.getAmount()));
         if (newDayTotal.longValue() > fromUser.getDayLimit().longValue()) {
             throw ApiException.badRequest("Transaction failed. This transaction will exceed your day limit.");
         }
@@ -208,7 +187,7 @@ public class TransactionService {
         // ----  start the  transaction ----
 
         // update the "to" bank balance
-        BigDecimal toBalance = BigDecimal.valueOf(toBankAccount.getBalance()).add(transaction.getAmount());
+        BigDecimal toBalance = BigDecimal.valueOf(toBankAccount.getBalance()).add(BigDecimal.valueOf(transaction.getAmount()));
         toBankAccount.setBalance(toBalance.doubleValue());
         bankAccountService.updateBankAccount(currentUser, toBankAccount.getIban(), toBankAccount, false);
 
@@ -225,7 +204,7 @@ public class TransactionService {
 
     public TransactionEntity toEntity(Transaction transaction) {
         TransactionEntity entity = new TransactionEntity();
-        entity.setAmount(transaction.getAmount());
+        entity.setAmount(BigDecimal.valueOf(transaction.getAmount()));
         entity.setToAccount(transaction.getTo());
         entity.setFromAccount(transaction.getFrom());
         entity.setUserIDPerforming(new Long(transaction.getUserIDPerforming()));
