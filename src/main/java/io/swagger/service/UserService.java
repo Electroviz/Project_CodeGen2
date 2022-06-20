@@ -24,7 +24,8 @@ public class UserService {
 
     @Autowired
     private BankAccountService bankAccountService;
-    
+
+    @Autowired
     JwtTokenProvider jwtTokenProvider;
 
     @Autowired

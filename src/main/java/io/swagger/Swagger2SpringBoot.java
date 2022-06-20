@@ -80,7 +80,7 @@ public class Swagger2SpringBoot implements CommandLineRunner {
         second.setPassword("jantje123");
         second.setPhone("+310628495028");
         second.setDateOfBirth("12-03-1997");
-        second.setUserRole(User.UserRoleEnum.CUSTOMER);
+        second.setRole(UserRoleEnum.ROLE_EMPLOYEE);
         second.setTransactionLimit(BigDecimal.valueOf(3000.0));
         second.setDayLimit(BigDecimal.valueOf(30000.0));
 
