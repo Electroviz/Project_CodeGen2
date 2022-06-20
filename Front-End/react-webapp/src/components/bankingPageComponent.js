@@ -339,7 +339,7 @@ const bankingPageComponent = () => {
 
                 <div>
                     <p style={{ fontSize: "1.4rem", fontWeight: "bold", marginBottom: "0rem"}}>All bank accounts info:</p>
-                    <div id="allBankAccountsList" style={{height: "20rem", width: "50%", marginLeft: "25%", overflow: "auto", display: "block"}}>
+                    <div id="allBankAccountsList" style={{height: "auto", maxHeight: "20rem", width: "50%", marginLeft: "25%", overflow: "auto", display: "block"}}>
                         
                     </div>
 
