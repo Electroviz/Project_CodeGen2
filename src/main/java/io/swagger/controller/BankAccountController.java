@@ -129,7 +129,7 @@ public class BankAccountController {
         TransactionInfo transactionInfo = bankAccountService.AccountDeposit(IBAN, transaction.getAmount());
 
         if(transactionInfo != null) {
-            return new ResponseEntity<TransactionInfo>(transactionInfo,HttpStatus.FOUND);
+            return new ResponseEntity<TransactionInfo>(transactionInfo,HttpStatus.ACCEPTED);
         }
         else {
             return ResponseEntity.status(400).body("Deposit failed");
@@ -157,7 +157,7 @@ public class BankAccountController {
         TransactionInfo transactionInfo = bankAccountService.AccountWithdraw(IBAN, transaction.getAmount());
 
         if(transactionInfo != null) {
-            return new ResponseEntity<TransactionInfo>(transactionInfo,HttpStatus.FOUND);
+            return new ResponseEntity<TransactionInfo>(transactionInfo,HttpStatus.ACCEPTED);
         }
         else {
             return ResponseEntity.status(400).body("Deposit failed");
