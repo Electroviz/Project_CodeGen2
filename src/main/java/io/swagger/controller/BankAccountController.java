@@ -1,9 +1,12 @@
 package io.swagger.controller;
 
+import io.swagger.enums.UserRoleEnum;
 import io.swagger.model.BankAccount;
 import io.swagger.model.Transaction;
 import io.swagger.model.TransactionInfo;
+import io.swagger.model.entity.User;
 import io.swagger.service.BankAccountService;
+import io.swagger.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -22,6 +25,9 @@ public class BankAccountController {
 
     @Autowired
     private BankAccountService bankAccountService;
+
+    @Autowired
+    private UserService userService;
 
     //melle
     @CrossOrigin
@@ -112,14 +118,29 @@ public class BankAccountController {
     @CrossOrigin
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE,value="/getBankAccount/{IBAN}")
     public ResponseEntity getBankAccountInfoByIbanController(@PathVariable("IBAN") String IBAN) {
-        BankAccount ba = bankAccountService.GetBankAccountByIban(IBAN);
+        //protection for requesting bankaccount info
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User u = userService.getUserById(userService.getUserIdByUsername(authentication.getName()));
 
-        if(ba != null) {
-            return new ResponseEntity<BankAccount>(ba,HttpStatus.FOUND);
-        }
+        boolean canPerform = false;
+
+        if(u.getRole() == UserRoleEnum.ROLE_EMPLOYEE || u.getRole() == UserRoleEnum.ROLE_BANK) canPerform = true;
         else {
-            return ResponseEntity.status(400).body("Bad Request");
+            //check if the asked iban is the users iban
+            if(bankAccountService.GetBankAccountByIban(IBAN).getUserId() == u.getId()) canPerform = true;
+            else canPerform = false;
         }
+
+        if(canPerform) {
+            BankAccount ba = bankAccountService.GetBankAccountByIban(IBAN);
+
+            if (ba != null) {
+                return new ResponseEntity<BankAccount>(ba, HttpStatus.FOUND);
+            } else {
+                return ResponseEntity.status(400).body("Bad Request");
+            }
+        }
+        else return ResponseEntity.status(400).body("Bad Request");
     }
 
     //Nicky
