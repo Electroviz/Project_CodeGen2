@@ -1,7 +1,7 @@
 package io.swagger.controller;
 
         import io.swagger.api.ApiException;
-        import io.swagger.api.TransactionsApiController;
+        //import io.swagger.api.TransactionsApiController;
         import io.swagger.jwt.JwtTokenProvider;
         import io.swagger.model.ApiResponse;
         import io.swagger.model.BankAccount;
@@ -44,7 +44,7 @@ public class TransactionController {
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
 
-    private static final Logger log = LoggerFactory.getLogger(TransactionsApiController.class);
+//    private static final Logger log = LoggerFactory.getLogger(TransactionsApiController.class);
 
 
 //    @RequestMapping("/TestTransfer/{userId}")
@@ -76,24 +76,22 @@ public class TransactionController {
     @RequestMapping(value = "/transferMoneyTest", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity transferMoneyTest(@RequestBody TransactionRequest body){
         try {
+            System.out.println("CHECK!!!");
             // require user to be authenticated
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
             Long userid = userService.getUserIdByUsername(authentication.getName());
 
             User currentUser = userService.getUserById(userid);
-
+            System.out.println(currentUser.getUsername() + userid);
             // do the transaction
             transactionService.transferMoney(currentUser, body.toTransaction());
 
             return new ResponseEntity<>(new io.swagger.model.ApiResponse<>("Success"), HttpStatus.OK);
         } catch (ApiException e) {
-            log.error("Error", e);
+            System.out.println("Niet gevonden!!!");
             return new ResponseEntity<>(new io.swagger.model.ApiResponse<>(e.getMessage()), HttpStatus.valueOf(e.getCode()));
-        } catch (Exception e) {
-            log.error("Error", e);
-            return new ResponseEntity<>(new ApiResponse<>("Server Error"), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
     }
+}
 }
 

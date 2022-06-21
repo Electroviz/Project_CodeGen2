@@ -139,7 +139,7 @@ public class TransactionService {
 
         // if the user is a customer, ensure the account belongs to them
         //authenticationService.requireEmployeeOrOwner(currentUser, fromBankAccount.getUserId());
-
+        System.out.println("1");
         // Prevent transfers from a savings account to an account that is not of the same customer.
         if (fromBankAccount.getAccountType().equals(BankAccount.AccountTypeEnum.SAVINGS)) {
             if (!Objects.equals(fromBankAccount.getUserId(), toBankAccount.getUserId())) {
@@ -159,7 +159,7 @@ public class TransactionService {
         if (fromUser == null){
             ApiException.badRequest("No such from user");
         }
-
+        System.out.println("2");
         // check the transaction limit for the from user
         if (transaction.getAmount().doubleValue() > fromUser.getTransactionLimit().doubleValue()) {
             throw ApiException.badRequest("The transaction amount exceeds the transaction limit");
@@ -173,7 +173,7 @@ public class TransactionService {
         if (fromAccountBalance.doubleValue() < fromBankAccount.getAbsoluteLimit().doubleValue()) {
             throw ApiException.badRequest("Transaction failed. Balance in the from account will be less than the absolute limit");
         }
-
+        System.out.println("3");
         // ensure the total value of transactions for this person as of today does not exceed the
         // daily limit
         BigDecimal totalDayTransactions = getTotalDayTransactions(fromUser);
@@ -203,13 +203,16 @@ public class TransactionService {
     }
 
     public TransactionEntity toEntity(Transaction transaction) {
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+
+
         TransactionEntity entity = new TransactionEntity();
         entity.setAmount(transaction.getAmount());
         entity.setToAccount(transaction.getTo());
         entity.setFromAccount(transaction.getFrom());
         entity.setUserIDPerforming(new Long(transaction.getUserIDPerforming()));
         entity.setDescription(transaction.getDescription());
-        entity.setTimestamp(Timestamp.valueOf(LocalDateTime.now()));
+        entity.setTimestamp(timestamp);
         return entity;
     }
 }
