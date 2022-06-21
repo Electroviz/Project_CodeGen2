@@ -50,12 +50,13 @@ public class UserService {
     //Nick
 
     public ResponseEntity addUser(User user){
-        String test = "";
-        if (test == "test") {
+
 //        if (userRepository.findByusername(user.getUsername()).getRole().equals(UserRoleEnum.ROLE_CUSTOMER)){
 //            return ResponseEntity.status(403).body("Unauthorized");
 //        }
-            return ResponseEntity.status(400).body("Bad request");
+        String test = "";
+        if (test == ":"){
+            return ResponseEntity.status(400).body("Bad request1");
         }
         else{
             if(checkUserInputAddUser(user)){
@@ -67,7 +68,7 @@ public class UserService {
                 return ResponseEntity.status(201).body(user);
             }
             else{
-                return ResponseEntity.status(400).body("Bad request");
+                return ResponseEntity.status(400).body("User Input incorrect");
             }
         }
     }
@@ -158,7 +159,8 @@ public class UserService {
         return false;
     }
     public boolean checkIfUserInputIsWord(String userInput){
-        char[] chars = userInput.toCharArray();
+        String noSpaceStr = userInput.replaceAll("\\s", "");
+        char[] chars = noSpaceStr.toCharArray();
 
         for (char c : chars) {
             if(!Character.isLetter(c)) {

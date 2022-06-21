@@ -65,10 +65,10 @@ public class Swagger2SpringBoot implements CommandLineRunner {
         //Nick
 //        create fake users and transactions
           User firstUser = new User();
-          firstUser.setUsername("test");
+          firstUser.setUsername("test123");
           firstUser.setFullname("Jantje Egberts");
           firstUser.setEmail("jantje@live.nl");
-          firstUser.setPassword("geheim");
+          firstUser.setPassword("geheim123");
           firstUser.setPhone("+310628495028");
           firstUser.setDateOfBirth("12-03-1997");
           firstUser.setRole(UserRoleEnum.ROLE_EMPLOYEE);
@@ -76,6 +76,7 @@ public class Swagger2SpringBoot implements CommandLineRunner {
           firstUser.setDayLimit(BigDecimal.valueOf(3000.0));
 
           userService.addUser(firstUser);
+
 
         User second = new User();
         second.setUsername("Eland");
