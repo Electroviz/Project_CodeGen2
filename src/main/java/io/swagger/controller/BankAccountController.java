@@ -1,9 +1,12 @@
 package io.swagger.controller;
 
+import io.swagger.enums.UserRoleEnum;
 import io.swagger.model.BankAccount;
 import io.swagger.model.Transaction;
 import io.swagger.model.TransactionInfo;
+import io.swagger.model.entity.User;
 import io.swagger.service.BankAccountService;
+import io.swagger.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -23,6 +26,9 @@ public class BankAccountController {
     @Autowired
     private BankAccountService bankAccountService;
 
+    @Autowired
+    private UserService userService;
+
     //melle
     @CrossOrigin
     @RequestMapping(method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE, value= "/putBankAccountType/{type}/{IBAN}")
@@ -38,12 +44,27 @@ public class BankAccountController {
 
     //Melle
     @CrossOrigin
+    @RequestMapping(method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE, value= "/putAbsoluteLimit/{value}/{IBAN}")
+    public ResponseEntity putBankAccountAbsoluteLimit(@PathVariable("value") String value, @PathVariable("IBAN") String IBAN) {
+        Double newAbsoluteLimit = null;
+        try {
+            newAbsoluteLimit = Double.valueOf(value);
+        }
+        catch(Exception e) {
+            return ResponseEntity.status(400).body("Bad Request");
+        }
+
+        return bankAccountService.PutBankAccountAbsoluteLimit(newAbsoluteLimit,bankAccountService.GetBankAccountByIban(IBAN));
+    }
+
+    //Melle
+    @CrossOrigin
     @RequestMapping(method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE, value = "/putBankAccountStatus/{status}/{IBAN}")
     public ResponseEntity putBankAccountStatusByIban(@PathVariable("status") String status, @PathVariable("IBAN") String IBAN) {
         BankAccount.AccountStatusEnum bankAccountStatus = BankAccount.AccountStatusEnum.valueOf(status);
         BankAccount bankAccountByIban = bankAccountService.GetBankAccountByIban(IBAN);
 
-        if(bankAccountByIban == null || bankAccountStatus == null) return ResponseEntity.status(400).body("");
+        if(bankAccountByIban == null || bankAccountStatus == null) return ResponseEntity.status(400).body("Bad Request");
         else {
             return bankAccountService.PutBankAccountStatus(bankAccountStatus,bankAccountByIban);
         }
@@ -68,7 +89,7 @@ public class BankAccountController {
     public ResponseEntity testFunc(@PathVariable("userId") long userId) {
         List<BankAccount> bankAccounts = bankAccountService.GetBankAccountsByUserId(userId);
         
-        if(bankAccounts.stream().count() == 0 || bankAccounts == null) return ResponseEntity.status(400).body("Not found");
+        if(bankAccounts.stream().count() == 0 || bankAccounts == null) return ResponseEntity.status(400).body("Bad Request");
         else return ResponseEntity.status(200).body(bankAccounts);
     }
 
@@ -97,14 +118,29 @@ public class BankAccountController {
     @CrossOrigin
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE,value="/getBankAccount/{IBAN}")
     public ResponseEntity getBankAccountInfoByIbanController(@PathVariable("IBAN") String IBAN) {
-        BankAccount ba = bankAccountService.GetBankAccountByIban(IBAN);
+        //protection for requesting bankaccount info
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User u = userService.getUserById(userService.getUserIdByUsername(authentication.getName()));
 
-        if(ba != null) {
-            return new ResponseEntity<BankAccount>(ba,HttpStatus.FOUND);
-        }
+        boolean canPerform = false;
+
+        if(u.getRole() == UserRoleEnum.ROLE_EMPLOYEE || u.getRole() == UserRoleEnum.ROLE_BANK) canPerform = true;
         else {
-            return ResponseEntity.status(400).body(ba);
+            //check if the asked iban is the users iban
+            if(bankAccountService.GetBankAccountByIban(IBAN).getUserId() == u.getId()) canPerform = true;
+            else canPerform = false;
         }
+
+        if(canPerform) {
+            BankAccount ba = bankAccountService.GetBankAccountByIban(IBAN);
+
+            if (ba != null) {
+                return new ResponseEntity<BankAccount>(ba, HttpStatus.FOUND);
+            } else {
+                return ResponseEntity.status(400).body("Bad Request");
+            }
+        }
+        else return ResponseEntity.status(400).body("Bad Request");
     }
 
     //Nicky
@@ -118,7 +154,7 @@ public class BankAccountController {
             return new ResponseEntity<List>(ibansToReturn,HttpStatus.ACCEPTED);
         }
         else {
-            return ResponseEntity.status(400).body("No ibans could be found that belong to the given name");
+            return ResponseEntity.status(400).body("Bad Request");
         }
     }
 
@@ -132,7 +168,7 @@ public class BankAccountController {
             return new ResponseEntity<TransactionInfo>(transactionInfo,HttpStatus.FOUND);
         }
         else {
-            return ResponseEntity.status(400).body("Deposit failed");
+            return ResponseEntity.status(400).body("Bad Request");
         }
     }
 
@@ -146,7 +182,7 @@ public class BankAccountController {
             return new ResponseEntity<BankAccount>(bankAccount,HttpStatus.OK);
         }
         else {
-            return ResponseEntity.status(400).body("Request failed");
+            return ResponseEntity.status(400).body("Bad Request");
         }
     }
 
@@ -160,7 +196,7 @@ public class BankAccountController {
             return new ResponseEntity<TransactionInfo>(transactionInfo,HttpStatus.FOUND);
         }
         else {
-            return ResponseEntity.status(400).body("Deposit failed");
+            return ResponseEntity.status(400).body("Bad Request");
         }
     }
 }
