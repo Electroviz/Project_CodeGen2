@@ -40,7 +40,7 @@ public class BankAccountService {
             bankAccountRepository.save(bankAccount);
             return ResponseEntity.status(200).body(bankAccount);
         }
-        else return ResponseEntity.status(400).body("bad request");
+        else return ResponseEntity.status(400).body("Bad Request");
     }
 
     //Melle
@@ -50,7 +50,7 @@ public class BankAccountService {
             bankAccountRepository.save(bankAccount);
             return ResponseEntity.status(200).body(bankAccount);
         }
-        else return ResponseEntity.status(400).body("");
+        else return ResponseEntity.status(400).body("Bad Request");
     }
 
     //melle
@@ -60,7 +60,7 @@ public class BankAccountService {
             bankAccountRepository.save(bankAccount);
             return ResponseEntity.status(200).body(bankAccount);
         }
-        else return ResponseEntity.status(400).body("");
+        else return ResponseEntity.status(400).body("Bad Request");
     }
 
     //melle
@@ -69,7 +69,7 @@ public class BankAccountService {
         double totalAmount = 0;
         for(int i = 0; i < bankAccounts.size(); i++) totalAmount += bankAccounts.get(i).getBalance();
 
-        if(bankAccounts.stream().count() < 2) return ResponseEntity.status(400).body(null);
+        if(bankAccounts.stream().count() < 2) return ResponseEntity.status(400).body("Bad Request");
         else return ResponseEntity.status(200).body(totalAmount);
     }
 
@@ -91,7 +91,7 @@ public class BankAccountService {
                 return ResponseEntity.status(400).body("user already has bank accounts");
         }
         else {
-            return ResponseEntity.status(404).body("No user account found for this user id");
+            return ResponseEntity.status(404).body("Bad Request");
         }
     }
 
@@ -189,7 +189,7 @@ public class BankAccountService {
         newBankAccount.setIban(generateRandomIban());
 
         //!!create a check for if the user being connected to this bank account does not already have a current and savings account!!
-        return ResponseEntity.status(400).body(newBankAccount);
+        return ResponseEntity.status(400).body("Bad Request");
     }
 
     public void SaveBankAccount(BankAccount bankAccount) {
@@ -242,7 +242,7 @@ public class BankAccountService {
         //bankAccountRepository.save(account);
 
         if(account.getAccountType() != BankAccount.AccountTypeEnum.CURRENT && account.getAccountType() != BankAccount.AccountTypeEnum.SAVINGS) {
-            return ResponseEntity.status(400).body(account);
+            return ResponseEntity.status(400).body("Bad Request");
         }
         else {
             return ResponseEntity.status(201).body(account);

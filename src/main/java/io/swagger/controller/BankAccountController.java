@@ -45,7 +45,7 @@ public class BankAccountController {
             newAbsoluteLimit = Double.valueOf(value);
         }
         catch(Exception e) {
-            return ResponseEntity.status(400).body("invalid value");
+            return ResponseEntity.status(400).body("Bad Request");
         }
 
         return bankAccountService.PutBankAccountAbsoluteLimit(newAbsoluteLimit,bankAccountService.GetBankAccountByIban(IBAN));
@@ -58,7 +58,7 @@ public class BankAccountController {
         BankAccount.AccountStatusEnum bankAccountStatus = BankAccount.AccountStatusEnum.valueOf(status);
         BankAccount bankAccountByIban = bankAccountService.GetBankAccountByIban(IBAN);
 
-        if(bankAccountByIban == null || bankAccountStatus == null) return ResponseEntity.status(400).body("");
+        if(bankAccountByIban == null || bankAccountStatus == null) return ResponseEntity.status(400).body("Bad Request");
         else {
             return bankAccountService.PutBankAccountStatus(bankAccountStatus,bankAccountByIban);
         }
@@ -83,7 +83,7 @@ public class BankAccountController {
     public ResponseEntity testFunc(@PathVariable("userId") long userId) {
         List<BankAccount> bankAccounts = bankAccountService.GetBankAccountsByUserId(userId);
         
-        if(bankAccounts.stream().count() == 0 || bankAccounts == null) return ResponseEntity.status(400).body("Not found");
+        if(bankAccounts.stream().count() == 0 || bankAccounts == null) return ResponseEntity.status(400).body("Bad Request");
         else return ResponseEntity.status(200).body(bankAccounts);
     }
 
@@ -118,7 +118,7 @@ public class BankAccountController {
             return new ResponseEntity<BankAccount>(ba,HttpStatus.FOUND);
         }
         else {
-            return ResponseEntity.status(400).body(ba);
+            return ResponseEntity.status(400).body("Bad Request");
         }
     }
 
@@ -133,7 +133,7 @@ public class BankAccountController {
             return new ResponseEntity<List>(ibansToReturn,HttpStatus.ACCEPTED);
         }
         else {
-            return ResponseEntity.status(400).body("No ibans could be found that belong to the given name");
+            return ResponseEntity.status(400).body("Bad Request");
         }
     }
 
@@ -147,7 +147,7 @@ public class BankAccountController {
             return new ResponseEntity<TransactionInfo>(transactionInfo,HttpStatus.FOUND);
         }
         else {
-            return ResponseEntity.status(400).body("Deposit failed");
+            return ResponseEntity.status(400).body("Bad Request");
         }
     }
 
@@ -161,7 +161,7 @@ public class BankAccountController {
             return new ResponseEntity<BankAccount>(bankAccount,HttpStatus.OK);
         }
         else {
-            return ResponseEntity.status(400).body("Request failed");
+            return ResponseEntity.status(400).body("Bad Request");
         }
     }
 
@@ -175,7 +175,7 @@ public class BankAccountController {
             return new ResponseEntity<TransactionInfo>(transactionInfo,HttpStatus.FOUND);
         }
         else {
-            return ResponseEntity.status(400).body("Deposit failed");
+            return ResponseEntity.status(400).body("Bad Request");
         }
     }
 }

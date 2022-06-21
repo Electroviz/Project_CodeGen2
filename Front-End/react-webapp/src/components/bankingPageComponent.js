@@ -147,12 +147,15 @@ const bankingPageComponent = () => {
                     .then(res => { 
                         if(res.status >= 200 && res.status <= 300) {
                             document.getElementById("currentUserFullName").innerHTML = "Welcome " + res.data["fullname"];
+                            document.getElementById("displayTransactionLimit").innerHTML = res.data["transactionLimit"];
+                            document.getElementById("displayDailyLimit").innerHTML = res.data["dailyLimit"];
                             userRights = res.data["role"];
                             if(userRights != "employee") document.getElementById("EmployeeContainer").remove();
                             else {
                                 //load all info for the employee
                                 loadAllUsersWithoutBankAccounts();
                                 loadAllBankAccountInfo();
+                                loadAllUsersInfo();
                             }
                         }
                     });
@@ -226,6 +229,48 @@ const bankingPageComponent = () => {
                     alert("Failed to change the status");
                 });
     }
+    
+    function loadAllUsersInfo() {
+            // getall 
+            instance.get('http://localhost:8080/api/user/getall', {
+                headers: {
+                    'Content-Type': null,
+                    Authorization: "Bearer " + jwtToken,
+                }
+                })
+                .then(res => { 
+                    if(res.status >= 200 && res.status <= 300) {
+                        var container = document.getElementById("allUsersList");
+                        container.innerHTML = "";
+                        if(res.data.length > 0) {
+                            for(let i = 0; i < res.data.length; i++) {
+                                var userAccInfoElm = document.createElement("p");
+                                userAccInfoElm.style.textAlign = "center";
+                                userAccInfoElm.style.marginBottom = "0.8rem";
+                                userAccInfoElm.style.borderBottom = "0.1rem solid black";
+                                userAccInfoElm.innerHTML = 
+                                "<b>Id:</b> " + res.data[i]["id"] + ", " +
+                                "<b>Fullname:</b> " + res.data[i]["fullname"] + ", " +
+                                "<b>Email:</b> " + res.data[i]["email"] + ", " +
+                                "<b>Phone:</b> " + res.data[i]["phone"] + ", " +
+                                "<b>Role:</b> " + res.data[i]["role"] + ", " +
+                                "<b>Day limit:</b> " + res.data[i]["dayLimit"] + ", " +
+                                "<b>Transaction limit:</b> " + res.data[i]["transactionLimit"];
+    
+                                container.append(userAccInfoElm);
+                            }
+                        }
+                        else {
+                            var emptyTextElm = document.createElement("p");
+                            emptyTextElm.innerHTML = "No users exists without a bank account";
+                            container.append(emptyTextElm);
+                        }
+                    }
+                    else {
+                        
+                    }
+                });
+    }
 
     function loadAllUsersWithoutBankAccounts() {
         instance.get('http://localhost:8080/api/user/getAllUsersWithoutBankAccounts', {
@@ -245,11 +290,11 @@ const bankingPageComponent = () => {
                             userAccInfoElm.style.marginBottom = "0.8rem";
                             userAccInfoElm.style.borderBottom = "0.1rem solid black";
                             userAccInfoElm.innerHTML = 
-                            "Id: " + res.data[i]["id"] + ", " +
-                            "Fullname: " + res.data[i]["fullname"] + ", " +
-                            "Email: " + res.data[i]["email"] + ", " +
-                            "Phone: " + res.data[i]["phone"] + ", " +
-                            "Role: " + res.data[i]["role"];
+                            "<b>Id:</b> " + res.data[i]["id"] + ", " +
+                            "<b>Fullname:</b> " + res.data[i]["fullname"] + ", " +
+                            "<b>Email:</b> " + res.data[i]["email"] + ", " +
+                            "<b>Phone:</b> " + res.data[i]["phone"] + ", " +
+                            "<b>Role:</b> " + res.data[i]["role"];
 
                             container.append(userAccInfoElm);
                         }
@@ -283,14 +328,14 @@ const bankingPageComponent = () => {
                         bankAccInfoElm.style.marginBottom = "0.8rem";
                         bankAccInfoElm.style.borderBottom = "0.1rem solid black";
                         bankAccInfoElm.innerHTML = 
-                        "Id: " + res.data[i]["id"] + ", " +
-                        "Account type: " + res.data[i]["accountType"] + ", " +
-                        "iban: " + res.data[i]["iban"] + ", " +
-                        "balance: " + res.data[i]["balance"] + ", " +
-                        "Creation date: " + res.data[i]["creationDate"] + ", " +
-                        "Status: " + res.data[i]["status"] + ", " +
-                        "Owner id: " + res.data[i]["userId"] + ", " +
-                        "absolute limit: " + res.data[i]["absolute limit"];
+                        "<b>Id:</b> " + res.data[i]["id"] + ", " +
+                        "<b>Account type:</b> " + res.data[i]["accountType"] + ", " +
+                        "<b>iban:</b> " + res.data[i]["iban"] + ", " +
+                        "<b>balance:</b> " + res.data[i]["balance"] + ", " +
+                        "<b>Creation date:</b> " + res.data[i]["creationDate"] + ", " +
+                        "<b>Status:</b> " + res.data[i]["status"] + ", " +
+                        "<b>Owner id:</b> " + res.data[i]["userId"] + ", " +
+                        "<b>absolute limit:</b> " + res.data[i]["absolute limit"];
                         
                         
                         container.append(bankAccInfoElm);
@@ -308,9 +353,17 @@ const bankingPageComponent = () => {
                 </div>
 
                 <div id="currentUsersBankingInfo">
-                    <div style={{ display: "block" }}>
+                    <div style={{ display: "block", marginBottom: "-1.2rem" }}>
                         <p style={{ display: "inline-block"}}>Total Balance: </p>
                         <p id="displayTotalBalance" style={{ display: "inline-block", paddingLeft: "0.3rem"}}></p>
+                    </div>
+                    <div style={{ display: "block", marginBottom: "-1rem" }}>
+                        <p style={{ display: "inline-block"}}>Your daily limit: </p>
+                        <p id="displayDailyLimit" style={{ display: "inline-block", paddingLeft: "0.3rem"}}></p>
+                    </div>
+                    <div style={{ display: "block" }}>
+                        <p style={{ display: "inline-block"}}>Your transaction limit: </p>
+                        <p id="displayTransactionLimit" style={{ display: "inline-block", paddingLeft: "0.3rem"}}></p>
                     </div>
                     <h2>Current account:</h2>
                     <div style={{ display: "block", marginTop: "-0.8rem" }}>
@@ -374,7 +427,7 @@ const bankingPageComponent = () => {
                         <button onClick={ ChangeBankAccountStatus } style={{ display: "inline-block", fontSize: "1.15rem", marginLeft: "0.2rem"}}>Confirm</button>
                     </div>
                     <div style={{ display: "block"}}>
-                        <p style={{ fontSize: "1.15rem", marginBottom: "0rem", display: "inline-block"}}>Set absolute limit for iban: </p>
+                        <p style={{ fontSize: "1.15rem", marginBottom: "0rem", display: "inline-block"}}>Change absolute limit for iban: </p>
                         <input id="changeAbsoluteLimitIban" style={{ display: "inline-block", fontSize: "1.15rem", marginLeft: "0.2rem", marginRight: "0.2rem"}} />
                         <p style={{ fontSize: "1.15rem", marginBottom: "0rem", display: "inline-block"}}> to </p>
                         <input id="changeAbsoluteLimitValue" style={{ display: "inline-block", fontSize: "1.15rem", marginLeft: "0.2rem", marginRight: "0.2rem", width: "7rem"}} />
@@ -390,7 +443,27 @@ const bankingPageComponent = () => {
                     <p style={{ fontSize: "1.15rem", marginBottom: "0rem", display: "inline-block"}}>Create bank accounts for user id: </p>
                     <input id="inputCreateBankAccUserId" defaultValue="0" style={{ fontSize: "1.15rem", marginBottom: "0rem", display: "inline-block", marginLeft: "0.2rem", marginRight: "0.2rem", width: "5rem", textAlign: "center" }} placeholder="user id" />
                     <button onClick={ EmployeeCreateBankAccountForUser } style={{ display: "inline-block", fontSize: "1.15rem", marginLeft: "0.2rem"}}>Confirm</button>
+                </div>
 
+                <div>
+                    <p style={{ fontSize: "1.4rem", fontWeight: "bold", marginBottom: "0rem"}}>All users accounts info:</p>
+                    <div id="allUsersList" style={{height: "auto", maxHeight: "20rem", width: "50%", marginLeft: "25%", overflow: "auto", display: "block"}}>
+                        
+                    </div>
+                    <div style={{ display: "block"}}>
+                        <p style={{ fontSize: "1.15rem", marginBottom: "0rem", display: "inline-block"}}>Change the <b>daily limit</b> for user id: </p>
+                        <input id="changeDailyLimitUserId" style={{ display: "inline-block", fontSize: "1.15rem", marginLeft: "0.2rem", marginRight: "0.2rem", width: "3rem"}} />
+                        <p style={{ fontSize: "1.15rem", marginBottom: "0rem", display: "inline-block"}}> to value </p>
+                        <input id="changeDailyLimitUserValue" style={{ display: "inline-block", fontSize: "1.15rem", marginLeft: "0.2rem", marginRight: "0.2rem", width: "7rem"}} />
+                        <button  style={{ display: "inline-block", fontSize: "1.15rem", marginLeft: "0.2rem"}}>Confirm</button>
+                    </div>
+                    <div style={{ display: "block"}}>
+                        <p style={{ fontSize: "1.15rem", marginBottom: "0rem", display: "inline-block"}}>Change <b>transaction limit</b> for user id: </p>
+                        <input id="changeTransactionLimitUserId" style={{ display: "inline-block", fontSize: "1.15rem", marginLeft: "0.2rem", marginRight: "0.2rem", width: "3rem"}} />
+                        <p style={{ fontSize: "1.15rem", marginBottom: "0rem", display: "inline-block"}}> to value </p>
+                        <input id="changeTransactionLimitUserValue" style={{ display: "inline-block", fontSize: "1.15rem", marginLeft: "0.2rem", marginRight: "0.2rem", width: "7rem"}} />
+                        <button  style={{ display: "inline-block", fontSize: "1.15rem", marginLeft: "0.2rem"}}>Confirm</button>
+                    </div>
                 </div>
             </div>
 
