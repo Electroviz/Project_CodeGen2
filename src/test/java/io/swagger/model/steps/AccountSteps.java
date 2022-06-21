@@ -100,20 +100,36 @@ public class AccountSteps {
     }
 
     @When("the customer gives an existing current account iban and a valid ammount to deposit")
-    public void the_customer_gives_an_existing_current_account_iban_and_a_valid_ammount_to_deposit() {
+    public void the_customer_gives_an_existing_current_account_iban_and_a_valid_ammount_to_deposit(String iban, Double ammount) {
+        headers.add("Content-type", "application/json");
+        HttpEntity<String> entity = new HttpEntity<>("{\""+ammount+"\": \"20.00\"}", headers);
 
+        responseEntity = template.exchange(
+                createUrl("getBankAccount/"+iban+"/Deposit"),
+                HttpMethod.POST, entity, BankAccount.class
+        );
     }
 
     @When("the customer gives an existing current account iban and a valid ammount to withdraw")
-    public void the_customer_gives_an_existing_current_account_iban_and_a_valid_ammount_to_withdraw() {
-        // Write code here that turns the phrase above into concrete actions
-        throw new io.cucumber.java.PendingException();
+    public void the_customer_gives_an_existing_current_account_iban_and_a_valid_ammount_to_withdraw(String iban, Double ammount) {
+        headers.add("Content-type", "application/json");
+        HttpEntity<String> entity = new HttpEntity<>("{\""+ammount+"\": \"20.00\"}", headers);
+
+        responseEntity = template.exchange(
+                createUrl("getBankAccount/"+iban+"/Deposit"),
+                HttpMethod.POST, entity, BankAccount.class
+        );
     }
 
     @When("the customer enters a valid iban to delete")
-    public void the_customer_enters_a_valid_iban_to_delete() {
-        // Write code here that turns the phrase above into concrete actions
-        throw new io.cucumber.java.PendingException();
+    public void the_customer_enters_a_valid_iban_to_delete(String iban) {
+        headers.add("Content-type", "application/json");
+        HttpEntity<?> entity = new HttpEntity<>("{\"iban\": \"NL28INGB00011122334\",\"accountType\": \"CURRENT\", \"balance\": \"0.0\", \"userId\": \"12\",\"accountStatus\": \"Active\"}", headers);
+
+        responseEntity = template.exchange(
+                createUrl("deleteAccount/"+iban),
+                HttpMethod.DELETE, entity, BankAccount.class
+        );
     }
 
     @Then("Requeststatus should return 202")
