@@ -111,6 +111,7 @@ public class BankAccountService {
             newBankAccount.setIban(this.generateRandomIban());
             newBankAccount.setBalance(0.0);
             newBankAccount.setAbsoluteLimit(0.0);
+            newBankAccount.SetAccountStatus(BankAccount.AccountStatusEnum.ACTIVE);
             if(i == 0) newBankAccount.accountType(BankAccount.AccountTypeEnum.CURRENT);
             else if(i == 1) newBankAccount.accountType(BankAccount.AccountTypeEnum.SAVINGS);
 
