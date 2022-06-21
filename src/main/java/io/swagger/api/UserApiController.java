@@ -60,14 +60,14 @@ public class UserApiController implements UserApi {
 
     public ResponseEntity<UserDTO> createUser(@Parameter(in = ParameterIn.DEFAULT, description = "Get user information", required=true, schema=@Schema()) @Valid @RequestBody UserDTO body) {
 
+
         ModelMapper modelMapper = new ModelMapper();
         User user = modelMapper.map(body, User.class);
 
-        user = userService.addUser(user);
+        ResponseEntity response = userService.addUser(user);
 
-        UserDTO response = modelMapper.map(user, UserDTO.class);
 
-        return new ResponseEntity<UserDTO>(response, HttpStatus.CREATED);
+        return new ResponseEntity(response, HttpStatus.CREATED);
     }
 
     public ResponseEntity<Void> deleteUser(@Parameter(in = ParameterIn.PATH, description = "UserId to delete a user", required=true, schema=@Schema()) @PathVariable("userid") String userid) {

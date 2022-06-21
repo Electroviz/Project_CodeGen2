@@ -35,19 +35,32 @@ public class BankAccountService {
 
     //melle
     public ResponseEntity PutBankAccountType(BankAccount.AccountTypeEnum type, BankAccount bankAccount) {
-        if(bankAccount != null) {
+        if(bankAccount != null && !"NL01INHO0000000001".equals(bankAccount.getIban())) {
             bankAccount.setAccountType(type);
             bankAccountRepository.save(bankAccount);
             return ResponseEntity.status(200).body(bankAccount);
         }
-        else return ResponseEntity.status(400).body("bad request");
+        else return ResponseEntity.status(400).body("Bad Request");
+    }
+
+    //Melle
+    public ResponseEntity PutBankAccountAbsoluteLimit(Double newLimit, BankAccount bankAccount) {
+        if(bankAccount != null) {
+            bankAccount.setAbsoluteLimit(newLimit);
+            bankAccountRepository.save(bankAccount);
+            return ResponseEntity.status(200).body(bankAccount);
+        }
+        else return ResponseEntity.status(400).body("Bad Request");
     }
 
     //melle
     public ResponseEntity PutBankAccountStatus(BankAccount.AccountStatusEnum status, BankAccount bankAccount) {
-        bankAccount.SetAccountStatus(status);
-        bankAccountRepository.save(bankAccount);
-        return ResponseEntity.status(200).body(bankAccount);
+        if(!"NL01INHO0000000001".equals(bankAccount.getIban())) {
+            bankAccount.SetAccountStatus(status);
+            bankAccountRepository.save(bankAccount);
+            return ResponseEntity.status(200).body(bankAccount);
+        }
+        else return ResponseEntity.status(400).body("Bad Request");
     }
 
     //melle
@@ -56,7 +69,7 @@ public class BankAccountService {
         double totalAmount = 0;
         for(int i = 0; i < bankAccounts.size(); i++) totalAmount += bankAccounts.get(i).getBalance();
 
-        if(bankAccounts.stream().count() < 2) return ResponseEntity.status(400).body(null);
+        if(bankAccounts.stream().count() < 2) return ResponseEntity.status(400).body("Bad Request");
         else return ResponseEntity.status(200).body(totalAmount);
     }
 
@@ -78,7 +91,7 @@ public class BankAccountService {
                 return ResponseEntity.status(400).body("user already has bank accounts");
         }
         else {
-            return ResponseEntity.status(404).body("No user account found for this user id");
+            return ResponseEntity.status(404).body("Bad Request");
         }
     }
 
@@ -112,6 +125,10 @@ public class BankAccountService {
     //melle
     public ResponseEntity GetAllBankAccounts() {
         List<BankAccount> allBankAccounts = bankAccountRepository.findAll();
+        for(BankAccount ba : allBankAccounts) {
+            if("NL01INHO0000000001".equals(ba.getIban())) allBankAccounts.remove(ba);
+            break;
+        }
 
         if(bankAccountRepository.count() == 0) {
             return ResponseEntity.status(404).body(allBankAccounts);
@@ -172,7 +189,7 @@ public class BankAccountService {
         newBankAccount.setIban(generateRandomIban());
 
         //!!create a check for if the user being connected to this bank account does not already have a current and savings account!!
-        return ResponseEntity.status(400).body(newBankAccount);
+        return ResponseEntity.status(400).body("Bad Request");
     }
 
     public void SaveBankAccount(BankAccount bankAccount) {
@@ -180,6 +197,7 @@ public class BankAccountService {
     }
 
     //melle
+
     private String generateRandomIban() {
         boolean succes = true;
         String newIban = "";
@@ -225,7 +243,7 @@ public class BankAccountService {
         //bankAccountRepository.save(account);
 
         if(account.getAccountType() != BankAccount.AccountTypeEnum.CURRENT && account.getAccountType() != BankAccount.AccountTypeEnum.SAVINGS) {
-            return ResponseEntity.status(400).body(account);
+            return ResponseEntity.status(400).body("Bad Request");
         }
         else {
             return ResponseEntity.status(201).body(account);
@@ -240,7 +258,7 @@ public class BankAccountService {
         boolean canDel = false;
         Long deleteId = Long.valueOf(0);
         for (BankAccount bankAccount : allBankAccounts) {
-            if(bankAccount.getIban().equals(iban)){
+            if(bankAccount.getIban().equals(iban) && !"NL01INHO0000000001".equals(bankAccount.getIban())){
                 deleteId = bankAccount.getId();
                 canDel = true;
                 deletedAccount = bankAccount;

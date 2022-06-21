@@ -1,5 +1,6 @@
 package io.swagger.service;
 
+import io.swagger.enums.UserRoleEnum;
 import io.swagger.jwt.JwtTokenProvider;
 import io.swagger.model.entity.User;
 import io.swagger.repository.UserRepository;
@@ -18,10 +19,13 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.server.ResponseStatusException;
+import org.threeten.bp.OffsetDateTime;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class UserService {
@@ -44,12 +48,28 @@ public class UserService {
     private List<User> userList = new ArrayList<>();
 
     //Nick
-    public User addUser(User user){
 
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+    public ResponseEntity addUser(User user){
+        String test = "";
+        if (test == "test") {
+//        if (userRepository.findByusername(user.getUsername()).getRole().equals(UserRoleEnum.ROLE_CUSTOMER)){
+//            return ResponseEntity.status(403).body("Unauthorized");
+//        }
+            return ResponseEntity.status(400).body("Bad request");
+        }
+        else{
+            if(checkUserInputAddUser(user)){
 
-        user = userRepository.save(user);
-        return user;
+                user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+                user = userRepository.save(user);
+
+                return ResponseEntity.status(201).body(user);
+            }
+            else{
+                return ResponseEntity.status(400).body("Bad request");
+            }
+        }
     }
 
     //melle
@@ -118,5 +138,40 @@ public class UserService {
         }
 
         return token;
+    }
+    public boolean checkUserInputAddUser(User user){
+        if(user.getFullname().length() < 50 && user.getFullname().length() > 1 && checkIfUserInputIsWord(user.getFullname())){
+            if(user.getUsername().length() < 20 && user.getUsername().length() > 3){
+                if(user.getEmail().length() < 50 && user.getEmail().length() > 5 && checkIfStringIsEmail(user.getEmail())){
+                    if(user.getDayLimit().doubleValue() >= 0 && user.getDayLimit().doubleValue() <= 10000){
+                        if(user.getTransactionLimit().doubleValue() >= 0 && user.getTransactionLimit().doubleValue() <= 10000){
+                            if(user.getRole().equals(UserRoleEnum.ROLE_BANK) || user.getRole().equals(UserRoleEnum.ROLE_CUSTOMER) || user.getRole().equals(UserRoleEnum.ROLE_EMPLOYEE)){
+                                if(user.getPassword().length() >= 6 && user.getPassword().length() <= 32){
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    public boolean checkIfUserInputIsWord(String userInput){
+        char[] chars = userInput.toCharArray();
+
+        for (char c : chars) {
+            if(!Character.isLetter(c)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public boolean checkIfStringIsEmail(String userInput){
+        Pattern emailPattern = Pattern.compile("[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}");
+        Matcher mat = emailPattern.matcher(userInput);
+        return mat.matches();
     }
 }

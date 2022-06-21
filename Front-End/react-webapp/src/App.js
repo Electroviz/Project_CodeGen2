@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Route,Routes, Link} from 'react-router-dom';
 
 import LoginComp from './components/loginComponent';
 import BankingPage from './components/bankingPageComponent';
+import RegisterComp from './components/registerComponent';
 
 function App() {
   return (
@@ -17,6 +18,10 @@ function App() {
 
         <Routes>
           <Route path="/login" element={ LoginComp() } />
+        </Routes>
+
+        <Routes>
+          <Route path="/register" element={ RegisterComp() } />
         </Routes>
 
         <Routes>

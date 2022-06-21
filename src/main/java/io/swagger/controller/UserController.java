@@ -24,6 +24,7 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    @CrossOrigin
     @RequestMapping(value = "/getall", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity getAll(){
 
@@ -50,13 +51,13 @@ public class UserController {
                 if(uname.length() > 0) {
                     Long uId = userService.getUserIdByUsername(uname);
                     if(uId != -1) return ResponseEntity.status(200).body(uId);
-                    else return ResponseEntity.status(400).body("");
+                    else return ResponseEntity.status(400).body("Bad Request");
                 }
             }
 
-            return ResponseEntity.status(400).body("");
+            return ResponseEntity.status(400).body("Bad Request");
         } catch (Exception e) {
-            return ResponseEntity.status(400).body("");
+            return ResponseEntity.status(400).body("Bad Request");
         }
     }
 
@@ -76,7 +77,7 @@ public class UserController {
 
         User u = this.userService.TestLoginAttempt(username, password);
 
-        if(u == null) return ResponseEntity.status(400).body(null);
+        if(u == null) return ResponseEntity.status(400).body("Bad Request");
         else return ResponseEntity.status(200).body(u);
 
     }
@@ -89,15 +90,14 @@ public class UserController {
 //        return ResponseEntity.status(200).body()
 //    }
 
+    @CrossOrigin
     @RequestMapping(value = "/registeruser", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity add(@RequestBody UserDTO userDTO){
 
         ModelMapper modelMapper = new ModelMapper();
         User user = modelMapper.map(userDTO, User.class);
 
-        user = userService.addUser(user);
-
-        UserDTO response = modelMapper.map(user, UserDTO.class);
+        ResponseEntity response = userService.addUser(user);
 
         return ResponseEntity.status(201).body(response);
     }
