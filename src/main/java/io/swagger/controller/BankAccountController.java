@@ -38,6 +38,21 @@ public class BankAccountController {
 
     //Melle
     @CrossOrigin
+    @RequestMapping(method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE, value= "/putAbsoluteLimit/{value}/{IBAN}")
+    public ResponseEntity putBankAccountAbsoluteLimit(@PathVariable("value") String value, @PathVariable("IBAN") String IBAN) {
+        Double newAbsoluteLimit = null;
+        try {
+            newAbsoluteLimit = Double.valueOf(value);
+        }
+        catch(Exception e) {
+            return ResponseEntity.status(400).body("invalid value");
+        }
+
+        return bankAccountService.PutBankAccountAbsoluteLimit(newAbsoluteLimit,bankAccountService.GetBankAccountByIban(IBAN));
+    }
+
+    //Melle
+    @CrossOrigin
     @RequestMapping(method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE, value = "/putBankAccountStatus/{status}/{IBAN}")
     public ResponseEntity putBankAccountStatusByIban(@PathVariable("status") String status, @PathVariable("IBAN") String IBAN) {
         BankAccount.AccountStatusEnum bankAccountStatus = BankAccount.AccountStatusEnum.valueOf(status);

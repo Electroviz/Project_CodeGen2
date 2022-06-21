@@ -189,6 +189,26 @@ const bankingPageComponent = () => {
                 });
     }
 
+    const ChangeBankAccountAbsoluteLimit = (e) => {
+        var iban = document.getElementById("changeAbsoluteLimitIban").value;
+        var value = document.getElementById("changeAbsoluteLimitValue").value;
+
+        instance.put('http://localhost:8080/api/putAbsoluteLimit/' + value + '/' + iban, {
+                headers: {
+                    'Content-Type': null,
+                    Authorization: "Bearer " + jwtToken,
+                }
+                })
+                .then(res => { 
+                    if(res.status >= 200 && res.status <= 300) {
+                        alert("Succes");
+                        loadAllBankAccountInfo();
+                    }
+                }).catch((error) => {
+                    alert("Failed to change the status");
+                });
+    }
+
     const EmployeeCreateBankAccountForUser = (e) => {
         // /initBankAccounts/{userId}
         instance.post('http://localhost:8080/api/initBankAccounts/' + document.getElementById("inputCreateBankAccUserId").value, {
@@ -343,15 +363,23 @@ const bankingPageComponent = () => {
                         
                     </div>
 
-                    <p style={{ fontSize: "1.15rem", marginBottom: "0rem", display: "inline-block"}}>Change status of iban: </p>
-                    <input id="changeStatusIban" style={{ display: "inline-block", fontSize: "1.15rem", marginLeft: "0.2rem", marginRight: "0.2rem"}} />
-                    <select id="changeStatus" style={{ display: "inline-block"}}>
-                        <option>Active</option>
-                        <option>Inactive</option>
-                        <option>Closed</option>
-                    </select>
-                    <button onClick={ ChangeBankAccountStatus } style={{ display: "inline-block", fontSize: "1.15rem", marginLeft: "0.2rem"}}>Confirm</button>
-
+                    <div style={{ display: "block"}}>
+                        <p style={{ fontSize: "1.15rem", marginBottom: "0rem", display: "inline-block"}}>Change status of iban: </p>
+                        <input id="changeStatusIban" style={{ display: "inline-block", fontSize: "1.15rem", marginLeft: "0.2rem", marginRight: "0.2rem"}} />
+                        <select id="changeStatus" style={{ display: "inline-block"}}>
+                            <option>Active</option>
+                            <option>Inactive</option>
+                            <option>Closed</option>
+                        </select>
+                        <button onClick={ ChangeBankAccountStatus } style={{ display: "inline-block", fontSize: "1.15rem", marginLeft: "0.2rem"}}>Confirm</button>
+                    </div>
+                    <div style={{ display: "block"}}>
+                        <p style={{ fontSize: "1.15rem", marginBottom: "0rem", display: "inline-block"}}>Set absolute limit for iban: </p>
+                        <input id="changeAbsoluteLimitIban" style={{ display: "inline-block", fontSize: "1.15rem", marginLeft: "0.2rem", marginRight: "0.2rem"}} />
+                        <p style={{ fontSize: "1.15rem", marginBottom: "0rem", display: "inline-block"}}> to </p>
+                        <input id="changeAbsoluteLimitValue" style={{ display: "inline-block", fontSize: "1.15rem", marginLeft: "0.2rem", marginRight: "0.2rem", width: "7rem"}} />
+                        <button onClick={ ChangeBankAccountAbsoluteLimit } style={{ display: "inline-block", fontSize: "1.15rem", marginLeft: "0.2rem"}}>Confirm</button>
+                    </div>
                 </div>
 
                 <div>
