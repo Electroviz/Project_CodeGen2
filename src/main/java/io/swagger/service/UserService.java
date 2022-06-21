@@ -132,14 +132,18 @@ public class UserService {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
             User user = userRepository.findByusername(username);
+            if (user == null) {
+                throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Username/Password is incorrect");
+            }
             token = jwtTokenProvider.createToken(username, user.getRoles());
 
         } catch(AuthenticationException ex){
-            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Invalid Username/Password");
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Login Failed");
         }
 
         return token;
     }
+    //Nick
     public boolean checkUserInputAddUser(User user){
         if(user.getFullname().length() < 50 && user.getFullname().length() > 1 && checkIfUserInputIsWord(user.getFullname())){
             if(user.getUsername().length() < 20 && user.getUsername().length() > 3){
@@ -158,6 +162,7 @@ public class UserService {
         }
         return false;
     }
+    //Nick
     public boolean checkIfUserInputIsWord(String userInput){
         String noSpaceStr = userInput.replaceAll("\\s", "");
         char[] chars = noSpaceStr.toCharArray();
@@ -171,6 +176,7 @@ public class UserService {
         return true;
     }
 
+    //Nick
     public boolean checkIfStringIsEmail(String userInput){
         Pattern emailPattern = Pattern.compile("[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}");
         Matcher mat = emailPattern.matcher(userInput);
