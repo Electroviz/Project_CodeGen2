@@ -198,6 +198,7 @@ public class BankAccountService {
     }
 
     //melle
+
     private String generateRandomIban() {
         boolean succes = true;
         String newIban = "";
@@ -277,7 +278,7 @@ public class BankAccountService {
         TransactionInfo transactionInfo = new TransactionInfo();
         Transaction depositTrans = new Transaction(); //make object with transaction entity
 
-        if(GetBankAccountByIban(iban) != null && GetBankAccountByIban(iban).getAccountType() == BankAccount.AccountTypeEnum.CURRENT){
+        if(GetBankAccountByIban(iban) != null && GetBankAccountByIban(iban).getAccountType() == BankAccount.AccountTypeEnum.CURRENT && GetBankAccountByIban(iban).getAccountStatus() == BankAccount.AccountStatusEnum.ACTIVE){
             BankAccount account = GetBankAccountByIban(iban);
             User user = userService.getUserById(account.getUserId());
 
@@ -329,7 +330,7 @@ public class BankAccountService {
         TransactionInfo transactionInfo = new TransactionInfo();
         Transaction withdrawTrans = new Transaction();
 
-        if(GetBankAccountByIban(iban) != null && GetBankAccountByIban(iban).getAccountType() == BankAccount.AccountTypeEnum.CURRENT){
+        if(GetBankAccountByIban(iban) != null && GetBankAccountByIban(iban).getAccountType() == BankAccount.AccountTypeEnum.CURRENT && GetBankAccountByIban(iban).getAccountStatus() == BankAccount.AccountStatusEnum.ACTIVE){
             BankAccount account = GetBankAccountByIban(iban);
             User user = userService.getUserById(account.getUserId());
 

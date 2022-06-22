@@ -97,9 +97,7 @@ public class UserController {
         ModelMapper modelMapper = new ModelMapper();
         User user = modelMapper.map(userDTO, User.class);
 
-        user = userService.addUser(user);
-
-        UserDTO response = modelMapper.map(user, UserDTO.class);
+        ResponseEntity response = userService.addUser(user);
 
         return ResponseEntity.status(201).body(response);
     }
