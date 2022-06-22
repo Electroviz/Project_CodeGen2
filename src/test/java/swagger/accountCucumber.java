@@ -1,4 +1,4 @@
-package cucumber;
+package swagger;
 
 import io.cucumber.junit.Cucumber;
 import io.cucumber.junit.CucumberOptions;
