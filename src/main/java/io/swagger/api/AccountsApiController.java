@@ -1,5 +1,6 @@
 package io.swagger.api;
 
+import io.swagger.annotations.Api;
 import io.swagger.controller.BankAccountController;
 import io.swagger.model.BankAccount;
 import io.swagger.model.TransactionInfo;
@@ -41,6 +42,7 @@ import java.util.Random;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-05-12T15:22:53.754Z[GMT]")
 @RestController
+@Api(tags= {"Accounts"})
 public class AccountsApiController implements AccountsApi {
 
     private static final Logger log = LoggerFactory.getLogger(AccountsApiController.class);

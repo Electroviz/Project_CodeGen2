@@ -50,12 +50,13 @@ public class UserService {
     //Nick
 
     public ResponseEntity addUser(User user){
-        String test = "";
-        if (test == "test") {
+
 //        if (userRepository.findByusername(user.getUsername()).getRole().equals(UserRoleEnum.ROLE_CUSTOMER)){
 //            return ResponseEntity.status(403).body("Unauthorized");
 //        }
-            return ResponseEntity.status(400).body("Bad request");
+        String test = "";
+        if (test == ":"){
+            return ResponseEntity.status(400).body("Bad request1");
         }
         else{
             if(checkUserInputAddUser(user)){
@@ -67,7 +68,7 @@ public class UserService {
                 return ResponseEntity.status(201).body(user);
             }
             else{
-                return ResponseEntity.status(400).body("Bad request");
+                return ResponseEntity.status(400).body("User Input incorrect");
             }
         }
     }
@@ -131,14 +132,18 @@ public class UserService {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
             User user = userRepository.findByusername(username);
+            if (user == null) {
+                throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Username/Password is incorrect");
+            }
             token = jwtTokenProvider.createToken(username, user.getRoles());
 
         } catch(AuthenticationException ex){
-            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Invalid Username/Password");
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Login Failed");
         }
 
         return token;
     }
+    //Nick
     public boolean checkUserInputAddUser(User user){
         if(user.getFullname().length() < 50 && user.getFullname().length() > 1 && checkIfUserInputIsWord(user.getFullname())){
             if(user.getUsername().length() < 20 && user.getUsername().length() > 3){
@@ -157,8 +162,10 @@ public class UserService {
         }
         return false;
     }
+    //Nick
     public boolean checkIfUserInputIsWord(String userInput){
-        char[] chars = userInput.toCharArray();
+        String noSpaceStr = userInput.replaceAll("\\s", "");
+        char[] chars = noSpaceStr.toCharArray();
 
         for (char c : chars) {
             if(!Character.isLetter(c)) {
@@ -169,6 +176,7 @@ public class UserService {
         return true;
     }
 
+    //Nick
     public boolean checkIfStringIsEmail(String userInput){
         Pattern emailPattern = Pattern.compile("[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}");
         Matcher mat = emailPattern.matcher(userInput);
