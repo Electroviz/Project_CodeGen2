@@ -22,4 +22,15 @@ class UserServiceTest {
 
         Assertions.assertFalse(userService.checkIfStringIsEmail("test.com"));
     }
+
+    @Test
+    void checkIfUserInputIsWordReturnsFalseIfNotWord() {
+        UserService userService = new UserService();
+
+        Assertions.assertFalse(userService.checkIfUserInputIsWord("test123123"));
+    }
+
+    @Test
+    void login() {
+    }
 }
