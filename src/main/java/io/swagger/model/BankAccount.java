@@ -131,7 +131,7 @@ public class BankAccount   {
    **/
   @Schema(example = "1", required = true, description = "")
 
-  public Long getUserId() {
+  public long getUserId() {
     return userId;
   }
 

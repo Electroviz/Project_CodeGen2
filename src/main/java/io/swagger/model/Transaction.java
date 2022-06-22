@@ -1,15 +1,12 @@
 package io.swagger.model;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
-import org.threeten.bp.OffsetDateTime;
-import org.springframework.validation.annotation.Validated;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import org.springframework.validation.annotation.Validated;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 
@@ -17,15 +14,12 @@ import javax.validation.constraints.*;
  * Transaction
  */
 @Validated
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-05-12T15:22:53.754Z[GMT]")
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-05-14T17:26:10.419Z[GMT]")
 
-@Entity
+
 public class Transaction   {
-
-  @Id
-  @GeneratedValue
-  @JsonProperty("id")
-  private Long id;
+  @JsonProperty("transactionID")
+  private Integer transactionID = null;
 
   @JsonProperty("from")
   private String from = null;
@@ -37,20 +31,32 @@ public class Transaction   {
   private Integer userIDPerforming = null;
 
   @JsonProperty("amount")
-  private Double amount = null;
+  private BigDecimal amount = null;
 
   @JsonProperty("timestamp")
-  private OffsetDateTime timestamp = null;
+  private String timestamp = null;
 
   @JsonProperty("description")
   private String description = null;
 
+  public Transaction transactionID(Integer transactionID) {
+    this.transactionID = transactionID;
+    return this;
+  }
 
   /**
    * Get transactionID
    * @return transactionID
    **/
+  @Schema(example = "123", description = "")
 
+  public Integer getTransactionID() {
+    return transactionID;
+  }
+
+  public void setTransactionID(Integer transactionID) {
+    this.transactionID = transactionID;
+  }
 
   public Transaction from(String from) {
     this.from = from;
@@ -62,9 +68,9 @@ public class Transaction   {
    * @return from
    **/
   @Schema(example = "NLxxINHO0xxxxxxxxx", required = true, description = "")
-      @NotNull
+  @NotNull
 
-    public String getFrom() {
+  public String getFrom() {
     return from;
   }
 
@@ -82,9 +88,9 @@ public class Transaction   {
    * @return to
    **/
   @Schema(example = "NLxxINHO0xxxxxxxxx", required = true, description = "")
-      @NotNull
+  @NotNull
 
-    public String getTo() {
+  public String getTo() {
     return to;
   }
 
@@ -102,9 +108,9 @@ public class Transaction   {
    * @return userIDPerforming
    **/
   @Schema(example = "1234", required = true, description = "")
-      @NotNull
+  @NotNull
 
-    public Integer getUserIDPerforming() {
+  public Integer getUserIDPerforming() {
     return userIDPerforming;
   }
 
@@ -112,7 +118,7 @@ public class Transaction   {
     this.userIDPerforming = userIDPerforming;
   }
 
-  public Transaction amount(Double amount) {
+  public Transaction amount(BigDecimal amount) {
     this.amount = amount;
     return this;
   }
@@ -123,15 +129,15 @@ public class Transaction   {
    **/
   @Schema(example = "1", required = true, description = "")
 
-  public Double getAmount() {
+  public BigDecimal getAmount() {
     return amount;
   }
 
-  public void setAmount(Double amount) {
+  public void setAmount(BigDecimal amount) {
     this.amount = amount;
   }
 
-  public Transaction timestamp(OffsetDateTime timestamp) {
+  public Transaction timestamp(String timestamp) {
     this.timestamp = timestamp;
     return this;
   }
@@ -141,14 +147,18 @@ public class Transaction   {
    * @return timestamp
    **/
   @Schema(required = true, description = "")
-      @NotNull
+  @NotNull
 
-    @Valid
-    public OffsetDateTime getTimestamp() {
+  @Valid
+  public String getTimestamp() {
     return timestamp;
   }
 
-  public void setTimestamp(OffsetDateTime timestamp) {
+  public LocalDateTime getParsedTimestamp() {
+    return LocalDateTime.parse(timestamp);
+  }
+
+  public void setTimestamp(String timestamp) {
     this.timestamp = timestamp;
   }
 
@@ -162,9 +172,9 @@ public class Transaction   {
    * @return description
    **/
   @Schema(example = "Payment request Anna", required = true, description = "")
-      @NotNull
+  @NotNull
 
-    public String getDescription() {
+  public String getDescription() {
     return description;
   }
 
@@ -182,18 +192,18 @@ public class Transaction   {
       return false;
     }
     Transaction transaction = (Transaction) o;
-    return
-        Objects.equals(this.from, transaction.from) &&
-        Objects.equals(this.to, transaction.to) &&
-        Objects.equals(this.userIDPerforming, transaction.userIDPerforming) &&
-        Objects.equals(this.amount, transaction.amount) &&
-        Objects.equals(this.timestamp, transaction.timestamp) &&
-        Objects.equals(this.description, transaction.description);
+    return Objects.equals(this.transactionID, transaction.transactionID) &&
+            Objects.equals(this.from, transaction.from) &&
+            Objects.equals(this.to, transaction.to) &&
+            Objects.equals(this.userIDPerforming, transaction.userIDPerforming) &&
+            Objects.equals(this.amount, transaction.amount) &&
+            Objects.equals(this.timestamp, transaction.timestamp) &&
+            Objects.equals(this.description, transaction.description);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(from, to, userIDPerforming, amount, timestamp, description);
+    return Objects.hash(transactionID, from, to, userIDPerforming, amount, timestamp, description);
   }
 
   @Override
@@ -201,6 +211,7 @@ public class Transaction   {
     StringBuilder sb = new StringBuilder();
     sb.append("class Transaction {\n");
 
+    sb.append("    transactionID: ").append(toIndentedString(transactionID)).append("\n");
     sb.append("    from: ").append(toIndentedString(from)).append("\n");
     sb.append("    to: ").append(toIndentedString(to)).append("\n");
     sb.append("    userIDPerforming: ").append(toIndentedString(userIDPerforming)).append("\n");

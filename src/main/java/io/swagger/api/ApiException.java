@@ -1,11 +1,16 @@
 package io.swagger.api;
 
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-05-12T15:22:53.754Z[GMT]")
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-05-14T17:26:10.419Z[GMT]")
 public class ApiException extends Exception {
     private int code;
     public ApiException (int code, String msg) {
         super(msg);
         this.code = code;
+    }
+
+
+    public int getCode() {
+        return code;
     }
 
     @Override
@@ -23,5 +28,9 @@ public class ApiException extends Exception {
 
     public static ApiException badRequest(String message) {
         return new ApiException(400, message);
+    }
+
+    public static ApiException forbidden() {
+        return new ApiException(403, "Forbidden");
     }
 }

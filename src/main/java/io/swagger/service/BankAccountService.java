@@ -1,8 +1,11 @@
 package io.swagger.service;
 
+import io.swagger.api.ApiException;
 import io.swagger.model.BankAccount;
 import io.swagger.model.Transaction;
 import io.swagger.model.TransactionInfo;
+import io.swagger.model.entity.BankAccountEntity;
+import io.swagger.model.entity.TransactionEntity;
 import io.swagger.model.entity.TransactionTest;
 import io.swagger.model.entity.User;
 import io.swagger.repository.BankAccountRepository;
@@ -15,6 +18,8 @@ import org.springframework.stereotype.Service;
 import org.threeten.bp.OffsetDateTime;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -275,7 +280,7 @@ public class BankAccountService {
     //Nicky
     public TransactionInfo AccountDeposit(String iban, Double amount){
         TransactionInfo transactionInfo = new TransactionInfo();
-        Transaction depositTrans = new Transaction(); //make object with transaction entity
+        TransactionEntity depositTrans = new TransactionEntity(); //make object with transaction entity
 
         if(GetBankAccountByIban(iban) != null && GetBankAccountByIban(iban).getAccountType() == BankAccount.AccountTypeEnum.CURRENT && GetBankAccountByIban(iban).getAccountStatus() == BankAccount.AccountStatusEnum.ACTIVE){
             BankAccount account = GetBankAccountByIban(iban);
@@ -300,12 +305,12 @@ public class BankAccountService {
             }
 
             //maak nieuwe transaction aan
-            depositTrans.setAmount(amount);
+            depositTrans.setAmount(BigDecimal.valueOf(amount));
             depositTrans.setDescription("Deposit");
-            depositTrans.setTimestamp(OffsetDateTime.now());
-            depositTrans.setFrom("NL01INHO0000000001");
-            depositTrans.setTo(iban);
-            depositTrans.setUserIDPerforming(Math.toIntExact(Long.valueOf(account.getUserId())));
+            depositTrans.setTimestamp(Timestamp.valueOf(LocalDateTime.now()));
+            depositTrans.setFromAccount("NL01INHO0000000001");
+            depositTrans.setToAccount(iban);
+            depositTrans.setUserIDPerforming(account.getUserId());
 
             //sla de transaction op en update het account en de user
             transactionRepository.save(depositTrans);
@@ -327,7 +332,7 @@ public class BankAccountService {
     //Nicky
     public TransactionInfo AccountWithdraw(String iban, Double amount){
         TransactionInfo transactionInfo = new TransactionInfo();
-        Transaction withdrawTrans = new Transaction();
+        TransactionEntity withdrawTrans = new TransactionEntity();
 
         if(GetBankAccountByIban(iban) != null && GetBankAccountByIban(iban).getAccountType() == BankAccount.AccountTypeEnum.CURRENT && GetBankAccountByIban(iban).getAccountStatus() == BankAccount.AccountStatusEnum.ACTIVE){
             BankAccount account = GetBankAccountByIban(iban);
@@ -354,12 +359,12 @@ public class BankAccountService {
                 return null;
             }
 
-            withdrawTrans.setAmount(amount);
+            withdrawTrans.setAmount(BigDecimal.valueOf(amount));
             withdrawTrans.setDescription("Withdraw");
-            withdrawTrans.setTimestamp(OffsetDateTime.now());
-            withdrawTrans.setTo("NL01INHO0000000001");
-            withdrawTrans.setFrom(iban);
-            withdrawTrans.setUserIDPerforming(Math.toIntExact(Long.valueOf(account.getUserId())));
+            withdrawTrans.setTimestamp(Timestamp.valueOf(LocalDateTime.now()));
+            withdrawTrans.setToAccount("NL01INHO0000000001");
+            withdrawTrans.setFromAccount(iban);
+            withdrawTrans.setUserIDPerforming(account.getUserId());
 
             //sla de transaction op en update het account
             transactionRepository.save(withdrawTrans);
@@ -430,6 +435,58 @@ public class BankAccountService {
             id += Integer.toString(n);
         }
         return Integer.parseInt(id);
+    }
+
+    //Murat
+    public BankAccount updateBankAccount(User currentUser, String iban, BankAccount bankAccount) throws ApiException {
+        return updateBankAccount(currentUser, iban, bankAccount, true);
+    }
+    //Murat
+    public BankAccount updateBankAccount(User currentUser, String iban, BankAccount bankAccount, boolean shouldCheckEmployeeOrOwner) {
+
+        // find account by iban. If not found, throw an exception
+        BankAccountEntity accountEntity = (BankAccountEntity) bankAccountRepository.findByiban(iban);
+        BankAccount account = toModel(accountEntity);
+
+//        if(shouldCheckEmployeeOrOwner) {
+//            // ensure it is either an employee or owner of account updating the account
+//            //authenticationService.requireEmployeeOrOwner(currentUser, account.getUserId());
+//        }
+
+        // we only update the balance, absolute limit and account type
+        account.setBalance(bankAccount.getBalance());
+        account.setAbsoluteLimit(bankAccount.getAbsoluteLimit());
+        account.setAccountType(bankAccount.getAccountType());
+
+        // convert the bank account to an entity
+        BankAccountEntity entity = toEntity(account);
+        BankAccount accountFromEntity = toModel(entity);
+        // update the account in the db
+        BankAccount savedEntity = bankAccountRepository.save(accountFromEntity);
+
+        return savedEntity;
+    }
+    //Murat
+    BankAccount toModel(BankAccountEntity entity) {
+        BankAccount account = new BankAccount();
+        account.setUserId(entity.getUserId());
+        account.setIban(entity.getIban());
+        account.setBalance(entity.getBalance().doubleValue());
+        account.setAbsoluteLimit(entity.getAbsoluteLimit().doubleValue());
+        account.setCreationDate(entity.getCreationDate());
+        account.setAccountType(BankAccount.AccountTypeEnum.fromValue(entity.getAccountType()));
+        return account;
+    }
+    //Murat
+    BankAccountEntity toEntity(BankAccount bankAccount) {
+        BankAccountEntity entity = new BankAccountEntity();
+        entity.setUserId(bankAccount.getUserId());
+        entity.setIban(bankAccount.getIban());
+        entity.setBalance(BigDecimal.valueOf(bankAccount.getBalance()));
+        entity.setAbsoluteLimit(BigDecimal.valueOf(bankAccount.getAbsoluteLimit()));
+        entity.setAccountType(bankAccount.getAccountType().toString());
+        entity.setCreationDate(bankAccount.getCreationDate());
+        return entity;
     }
 
 
