@@ -77,6 +77,17 @@ public class Swagger2SpringBoot implements CommandLineRunner {
 
           userService.addUser(firstUser);
 
+          BankAccount bank1 = new BankAccount();
+          bank1.setBalance(500.0);
+          bank1.setUserId(firstUser.getId());
+          bank1.setIban("NL01INHO0000000002");
+          bank1.setAbsoluteLimit(800.0);
+          bank1.setAccountType(BankAccount.AccountTypeEnum.CURRENT);
+          bank1.setCreationDate("2022-21-06");
+          bank1.setAccountStatus(BankAccount.AccountStatusEnum.ACTIVE);
+
+          bankAccountService.SaveBankAccount(bank1);
+
         User second = new User();
         second.setUsername("Eland");
         second.setFullname("Eland Egberts");
@@ -89,6 +100,17 @@ public class Swagger2SpringBoot implements CommandLineRunner {
         second.setDayLimit(BigDecimal.valueOf(30000.0));
 
         userService.addUser(second);
+
+        BankAccount bank2 = new BankAccount();
+        bank2.setBalance(10000.0);
+        bank2.setUserId(second.getId());
+        bank2.setIban("NL01INHO0000000003");
+        bank2.setAbsoluteLimit(9900.0);
+        bank2.setAccountType(BankAccount.AccountTypeEnum.CURRENT);
+        bank2.setCreationDate("2022-21-06");
+        bank2.setAccountStatus(BankAccount.AccountStatusEnum.ACTIVE);
+
+        bankAccountService.SaveBankAccount(bank2);
 //          bankAccountService.CreateDummyDataBankAccount(firstUser.getId(), BankAccount.AccountTypeEnum.CURRENT);
 //          bankAccountService.CreateDummyDataBankAccount(firstUser.getId(), BankAccount.AccountTypeEnum.SAVINGS);
 

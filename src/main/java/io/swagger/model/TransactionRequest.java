@@ -193,7 +193,7 @@ public class TransactionRequest {
         transaction.setTo(to);
         transaction.setUserIDPerforming(userIDPerforming);
         transaction.setAmount(BigDecimal.valueOf(amount.doubleValue()));
-        transaction.setTimestamp(String.valueOf(OffsetDateTime.parse(LocalDateTime.now().toString())));
+        transaction.setTimestamp(String.valueOf(LocalDateTime.now()));
         transaction.setDescription(description);
         return transaction;
     }

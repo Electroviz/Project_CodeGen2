@@ -29,101 +29,12 @@ public class TransactionService {
     @Autowired
     private UserService userService;
 
-
-    public void createTransaction(User currentUser, TransactionEntity transaction) throws ApiException {
-
-        //Check if amount is valid
-        if (transaction.getAmount().doubleValue() <=0)
-            throw ApiException.badRequest("Invalid amount");
-
-        //Check the iban from the sender + receiver
-        BankAccount fromBankAccount = bankAccountService.GetBankAccountByIban(transaction.getFromAccount());
-        BankAccount toBankAccount = bankAccountService.GetBankAccountByIban(transaction.getToAccount());
-
-        //Prevent transfers from a savings account to an account of not the same customer
-        if(fromBankAccount.getAccountType().equals(BankAccount.AccountTypeEnum.SAVINGS)){
-            if (!Objects.equals(fromBankAccount.getUserId(), toBankAccount.getUserId())){
-                throw ApiException.badRequest("Transactions from a savings account should be to an account of the same customer");
-            }
-        }
-
-        //Prevent transfers from an account to a savings account of not the same customer
-        if (toBankAccount.getAccountType().equals(BankAccount.AccountTypeEnum.SAVINGS)) {
-            if (!Objects.equals(fromBankAccount.getUserId(), toBankAccount.getUserId())) {
-                throw ApiException.badRequest("Transactions to a savings account should be to an account of the same customer");
-            }
-        }
-
-        //Get the from user (the sender)
-        User fromUser = userService.findById(fromBankAccount.getUserId());
-
-        if (fromUser == null){
-            ApiException.badRequest("No such from user");
-        }
-
-
-        // check the transaction limit for the from user
-        if (transaction.getAmount().doubleValue() > fromUser.getTransactionLimit().doubleValue()) {
-            throw ApiException.badRequest("The transaction amount exceeds the transaction limit");
-        }
-
-        // get the from/to bank accounts
-        // compute the from account balance
-        BigDecimal fromAccountBalance = BigDecimal.valueOf(fromBankAccount.getBalance()).subtract(transaction.getAmount());
-
-        // ensure the new balance is not less than the absolute limit
-        if (fromAccountBalance.doubleValue() < fromBankAccount.getAbsoluteLimit().doubleValue()) {
-            throw ApiException.badRequest("Transaction failed. Balance in the from account will be less than the absolute limit");
-        }
-
-        // ensure the total value of transactions for this person as of today does not exceed the
-        // daily limit
-        BigDecimal totalDayTransactions = getTotalDayTransactions(fromUser);
-
-        // compute the total day transactions if this transaction were to go through
-        BigDecimal newDayTotal = totalDayTransactions.add(transaction.getAmount());
-        if (newDayTotal.longValue() > fromUser.getDayLimit().longValue()) {
-            throw ApiException.badRequest("Transaction failed. This transaction will exceed your day limit.");
-        }
-
-
-        //Update the senders bank account
-        //UPdate the receivers bank account
-        //Save the transaction
-
-
-    }
-
-
-    public BigDecimal getTotalDayTransactions(User user) {
-        BigDecimal total = BigDecimal.valueOf(0);
-
-        // get all the transactions
-        List<TransactionEntity> alltransaction = transactionRepository.findAll();
-        List<TransactionEntity> allTransactions = transactionRepository.findAll();
-        for (TransactionEntity transaction : allTransactions) {
-            // check if the current transaction belongs to the given user.
-            if (!Objects.equals(transaction.getUserIDPerforming(), user.getId())) {
-                continue;
-            }
-            // check if the current transaction belongs to current date
-            LocalDate transactionDate = transaction.getTimestamp().toLocalDateTime().toLocalDate();
-            LocalDate today = LocalDate.now();
-            if (!transactionDate.equals(today)) {
-                continue;
-            }
-
-            // this transaction is of today and was initiated by this user, add the amount to
-            // the current totals
-            total = total.add(transaction.getAmount());
-        }
-
-        return total;
-    }
-
     public void transferMoney(User currentUser, Transaction transaction) throws ApiException {
         // configure the transaction's user performing id
-        transaction.setUserIDPerforming(Math.toIntExact(currentUser.getId()));
+        System.out.println(currentUser.getUsername() + transaction.getAmount());
+        //transaction.setUserIDPerforming(Math.toIntExact(currentUser.getId()));
+
+
 
         // ensure the amount is valid
         if (transaction.getAmount().doubleValue() < 0) {
@@ -138,19 +49,18 @@ public class TransactionService {
         BankAccount toBankAccount = bankAccountService.GetBankAccountByIban(transaction.getTo());
 
         // if the user is a customer, ensure the account belongs to them
-        //authenticationService.requireEmployeeOrOwner(currentUser, fromBankAccount.getUserId());
-        System.out.println("1");
+
         // Prevent transfers from a savings account to an account that is not of the same customer.
         if (fromBankAccount.getAccountType().equals(BankAccount.AccountTypeEnum.SAVINGS)) {
             if (!Objects.equals(fromBankAccount.getUserId(), toBankAccount.getUserId())) {
-                throw ApiException.badRequest("Transactions from a savings account should be to an account of the same customer");
+                    ResponseEntity.status(400).body("Transactions from a savings account should be to an account of the same customer");
             }
         }
 
         // Prevent transfers to a savings account to an account that is not of the same customer
         if (toBankAccount.getAccountType().equals(BankAccount.AccountTypeEnum.SAVINGS)) {
             if (!Objects.equals(fromBankAccount.getUserId(), toBankAccount.getUserId())) {
-                throw ApiException.badRequest("Transactions to a savings account should be to an account of the same customer");
+                ResponseEntity.status(400).body("Transactions to a savings account should be to an account of the same customer");
             }
         }
 
@@ -159,48 +69,53 @@ public class TransactionService {
         if (fromUser == null){
             ApiException.badRequest("No such from user");
         }
-        System.out.println("2");
-        // check the transaction limit for the from user
-        if (transaction.getAmount().doubleValue() > fromUser.getTransactionLimit().doubleValue()) {
-            throw ApiException.badRequest("The transaction amount exceeds the transaction limit");
-        }
 
         // get the from/to bank accounts
         // compute the from account balance
         BigDecimal fromAccountBalance = BigDecimal.valueOf(fromBankAccount.getBalance()).subtract(transaction.getAmount());
-
-        // ensure the new balance is not less than the absolute limit
-        if (fromAccountBalance.doubleValue() < fromBankAccount.getAbsoluteLimit().doubleValue()) {
-            throw ApiException.badRequest("Transaction failed. Balance in the from account will be less than the absolute limit");
-        }
-        System.out.println("3");
-        // ensure the total value of transactions for this person as of today does not exceed the
-        // daily limit
-        BigDecimal totalDayTransactions = getTotalDayTransactions(fromUser);
-
-        // compute the total day transactions if this transaction were to go through
-        BigDecimal newDayTotal = totalDayTransactions.add(transaction.getAmount());
-        if (newDayTotal.longValue() > fromUser.getDayLimit().longValue()) {
-            throw ApiException.badRequest("Transaction failed. This transaction will exceed your day limit.");
-        }
-
         // ----  start the  transaction ----
 
         // update the "to" bank balance
         BigDecimal toBalance = BigDecimal.valueOf(toBankAccount.getBalance()).add(transaction.getAmount());
         toBankAccount.setBalance(toBalance.doubleValue());
         bankAccountService.updateBankAccount(currentUser, toBankAccount.getIban(), toBankAccount, false);
-
         // update the "from" balance
         fromBankAccount.setBalance(fromAccountBalance.doubleValue());
-        bankAccountService.updateBankAccount(currentUser, fromBankAccount.getIban(), fromBankAccount);
 
+        bankAccountService.updateBankAccount(currentUser, fromBankAccount.getIban(), fromBankAccount);
         // save the transaction
         TransactionEntity transactionEntity = toEntity(transaction);
         transactionRepository.save(transactionEntity);
-
         // ---- end the transaction ----
     }
+
+
+    public BigDecimal getTotalDayTransactions(User user) {
+        BigDecimal total = BigDecimal.valueOf(0);
+
+        // get all the transactions
+        List<TransactionEntity> allTransactions = transactionRepository.findAll();
+        for (TransactionEntity transaction : allTransactions) {
+            // check if the current transaction belongs to the given user.
+            if (!Objects.equals(transaction.getUserIDPerforming(), user.getId())) {
+                continue;
+            }
+            // check if the current transaction belongs to current date
+//            LocalDate transactionDate = transaction.getTimestamp().toLocalDateTime().toLocalDate();
+//            LocalDate today = LocalDate.now();
+//            if (!transactionDate.equals(today)) {
+//                continue;
+//            }
+
+            // this transaction is of today and was initiated by this user, add the amount to
+            // the current totals
+            total = total.add(transaction.getAmount());
+        }
+
+        return total;
+    }
+
+
 
     public TransactionEntity toEntity(Transaction transaction) {
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
