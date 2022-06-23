@@ -19,7 +19,7 @@ import org.springframework.web.client.RestTemplate;
 public class StepDefinitions {
 
     private HttpHeaders headers = new HttpHeaders();
-    private String baseUrl = "http://localhost:8080/bankapi/";
+    private String baseUrl = "http://localhost:8080/api/";
     private RestTemplate template = new RestTemplate();
     private ResponseEntity<?> responseEntity;
     private String response;
