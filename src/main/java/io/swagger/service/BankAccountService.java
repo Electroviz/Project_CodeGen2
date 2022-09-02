@@ -177,8 +177,10 @@ public class BankAccountService {
     }
 
     //melle
-    public boolean BankAccountIsSavings() {
-        return false;
+    public boolean BankAccountIsSavings(String Iban) {
+        BankAccount BaForIban = GetBankAccountByIban(Iban);
+        if(BaForIban.getAccountTypeEnum() == BankAccount.AccountTypeEnum.CURRENT) return true;
+        else return false;
     }
 
     //melle

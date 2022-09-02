@@ -26,8 +26,8 @@ public class TransactionController {
     public ResponseEntity transferMoney(@PathVariable("fromIban") String fromIban, @PathVariable("toIban") String toIban, @PathVariable("amount") Double amount) {
         //eigenlijk moet de fromIban opgehaald worden aan de hand van ingelogde user.
         if(transactionService.IbanHasSufficientMoney(fromIban,amount)) {
-            if(transactionService.TransferMoneyFromToIban(fromIban,toIban,amount)) return ResponseEntity.status(200).body(fromIban);
-            else return ResponseEntity.status(400).body(fromIban);
+            if(transactionService.TransferMoneyFromToIban(toIban,fromIban,amount)) return ResponseEntity.status(200).body(bankAccountService.GetBankAccountByIban(fromIban));
+            else return ResponseEntity.status(400).body(bankAccountService.GetBankAccountByIban(fromIban));
         }
         else return ResponseEntity.status(400).body(null);
     }
