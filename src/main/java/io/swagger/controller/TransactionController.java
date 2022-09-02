@@ -33,6 +33,12 @@ public class TransactionController {
         else return ResponseEntity.status(400).body(null);
     }
 
+    @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value="/transactions/all")
+    public ResponseEntity GetAllTransactions() {
+        return ResponseEntity.status(200).body(transactionService.GetAllTransactionsFromDatabase());
+    }
+
+
     //    @CrossOrigin
 //    @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value="/bankAccounts/{userId}")
 //    public ResponseEntity testFunc(@PathVariable("userId") long userId) {

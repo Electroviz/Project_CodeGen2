@@ -55,6 +55,11 @@ public class TransactionService {
         return false;
     }
 
+    //Melle
+    public List<Transaction> GetAllTransactionsFromDatabase() {
+        return this.transactionRepository.findAll();
+    }
+
 //    String from,
 //    String to,
 //    Int userIDPerforming,
