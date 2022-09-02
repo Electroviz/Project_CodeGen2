@@ -130,4 +130,20 @@ class BankAccountServiceTest {
         bankAccount.setAbsoluteLimit(0.0);
         assertTrue(bankAccount.getBalance() >= bankAccount.getAbsoluteLimit());
     }
+
+//    @Test
+//    public void DoesListContainIban(String iban){
+//        BankAccount bankAccount = new BankAccount();
+//        bankAccount.setIban("NL01INHO00000000100");
+//        List<BankAccount> bankAccountList = new ArrayList<>();
+//        bankAccountList.add(bankAccount);
+//        assertTrue(bankAccountList.contains(bankAccount));
+//    }
+
+    @Test
+    void generateIbanShouldBeValid() {
+        BankAccount account = new BankAccount();
+        account.setIban("NL01INHO0000000001");
+        assertTrue(account.getIban().matches("NL\\d{2}INHO0\\d{9}"));
+    }
 }

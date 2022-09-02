@@ -84,6 +84,7 @@ public class BankAccountController {
         return bankAccountService.PostOneSavingsAccountAndCurrentAccountForUser(userId);
     }
 
+    //melle
     @CrossOrigin
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value="/bankAccounts/{userId}")
     public ResponseEntity testFunc(@PathVariable("userId") long userId) {
