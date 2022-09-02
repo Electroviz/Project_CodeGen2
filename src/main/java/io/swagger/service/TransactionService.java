@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.threeten.bp.OffsetDateTime;
 
 import java.util.List;
 import java.util.Objects;
@@ -34,11 +35,13 @@ public class TransactionService {
     }
 
     //Melle
-    public boolean TransferMoneyFromToIban(String toIban, String fromIban, Double amount) {
+    public boolean TransferMoneyFromToIban(String toIban, String fromIban, Double amount, Integer userIdPerforming) {
         //check if the bankaccount is not a savings account or a closed account.
         if(bankAccountService.BankAccountsTransactionIsPossible(fromIban,toIban)) {
             BankAccount fromBankAccount = bankAccountService.GetBankAccountByIban(fromIban);
             BankAccount toBankAccount = bankAccountService.GetBankAccountByIban(toIban);
+            if(fromBankAccount == null || toBankAccount == null) return false;
+
 
             fromBankAccount.setBalance(fromBankAccount.getBalance() - amount);
             bankAccountService.SaveBankAccount(fromBankAccount);
@@ -46,9 +49,32 @@ public class TransactionService {
             toBankAccount.setBalance(toBankAccount.getBalance() + amount);
             bankAccountService.SaveBankAccount(toBankAccount);
 
+            SaveTransaction(createNewTransaction(fromIban,toIban,userIdPerforming,amount,""));
             return true;
         }
         return false;
+    }
+
+//    String from,
+//    String to,
+//    Int userIDPerforming,
+//    Double amount
+//    OffsetDateTime timestamp
+//    String description
+    public Transaction createNewTransaction(String fromIban, String toIban, Integer userPerformingId, Double amount, String description) {
+        Transaction newTrans = new Transaction();
+        newTrans.setFrom(fromIban);
+        newTrans.setTo(toIban);
+        newTrans.setUserIDPerforming(userPerformingId);
+        newTrans.setAmount(amount);
+        newTrans.setDescription(description);
+        newTrans.setTimestamp(OffsetDateTime.now()); //timestamp
+
+        return newTrans;
+    }
+
+    public void SaveTransaction(Transaction t) {
+        this.transactionRepository.save(t);
     }
 
 

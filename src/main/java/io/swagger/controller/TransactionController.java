@@ -25,8 +25,9 @@ public class TransactionController {
     @RequestMapping(method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE, value="/transactions/{fromIban}/{toIban}/{amount}")
     public ResponseEntity transferMoney(@PathVariable("fromIban") String fromIban, @PathVariable("toIban") String toIban, @PathVariable("amount") Double amount) {
         //eigenlijk moet de fromIban opgehaald worden aan de hand van ingelogde user.
+        //NOTTEEEE USERIDPERFORMING MOET NOG VAN 0 GEHAALD WORDEN EN ADHV JWT TOKEN GEFIXED WORDEN
         if(transactionService.IbanHasSufficientMoney(fromIban,amount)) {
-            if(transactionService.TransferMoneyFromToIban(toIban,fromIban,amount)) return ResponseEntity.status(200).body(bankAccountService.GetBankAccountByIban(fromIban));
+            if(transactionService.TransferMoneyFromToIban(toIban,fromIban,amount,0)) return ResponseEntity.status(200).body(bankAccountService.GetBankAccountByIban(fromIban));
             else return ResponseEntity.status(400).body("Sending Bank Account is invalid");
         }
         else return ResponseEntity.status(400).body(null);
