@@ -177,10 +177,40 @@ public class BankAccountService {
     }
 
     //melle
-    public boolean BankAccountIsSavings(String Iban) {
+    public boolean BankAccountIsValidForTransactions(String Iban) {
         BankAccount BaForIban = GetBankAccountByIban(Iban);
-        if(BaForIban.getAccountTypeEnum() == BankAccount.AccountTypeEnum.CURRENT) return true;
+        if(BaForIban.getAccountTypeEnum() == BankAccount.AccountTypeEnum.CURRENT && BaForIban.getAccountStatus() != BankAccount.AccountStatusEnum.CLOSED) return true;
         else return false;
+    }
+
+    //Melle
+    public boolean BankAccountsTransactionIsPossible(String IbanSender , String IbanReciever) {
+        BankAccount BaReciever = GetBankAccountByIban(IbanReciever);
+        BankAccount BaSender = GetBankAccountByIban(IbanSender);
+
+        if(BaReciever.getAccountStatus() == BankAccount.AccountStatusEnum.CLOSED || BaSender.getAccountStatus() == BankAccount.AccountStatusEnum.CLOSED) return false;
+
+        boolean transactionValid = false;
+
+        if(BaReciever.getAccountType() == BankAccount.AccountTypeEnum.SAVINGS &&
+            BaSender.getAccountType() == BankAccount.AccountTypeEnum.CURRENT &&
+                BaReciever.getUserId() == BaSender.getUserId()) {
+            //sender is sending money to its own savings account
+            transactionValid = true;
+        }
+        else if(BaSender.getAccountType() == BankAccount.AccountTypeEnum.SAVINGS &&
+                BaReciever.getAccountType() == BankAccount.AccountTypeEnum.CURRENT &&
+                BaReciever.getUserId() == BaSender.getUserId()) {
+            //sender is sending money from its own savings to its current account
+            transactionValid = true;
+        }
+        else if(BaSender.getAccountType() == BankAccount.AccountTypeEnum.CURRENT && BaReciever.getAccountType() == BankAccount.AccountTypeEnum.CURRENT){
+            //sending money from current to current account is allways possible
+            transactionValid = true;
+        }
+        //else default value = false
+
+        return transactionValid;
     }
 
     //melle

@@ -33,17 +33,22 @@ public class TransactionService {
         else return false;
     }
 
+    //Melle
     public boolean TransferMoneyFromToIban(String toIban, String fromIban, Double amount) {
-        BankAccount fromBankAccount = bankAccountService.GetBankAccountByIban(fromIban);
-        BankAccount toBankAccount = bankAccountService.GetBankAccountByIban(toIban);
+        //check if the bankaccount is not a savings account or a closed account.
+        if(bankAccountService.BankAccountsTransactionIsPossible(fromIban,toIban)) {
+            BankAccount fromBankAccount = bankAccountService.GetBankAccountByIban(fromIban);
+            BankAccount toBankAccount = bankAccountService.GetBankAccountByIban(toIban);
 
-        fromBankAccount.setBalance(fromBankAccount.getBalance() - amount);
-        bankAccountService.SaveBankAccount(fromBankAccount);
+            fromBankAccount.setBalance(fromBankAccount.getBalance() - amount);
+            bankAccountService.SaveBankAccount(fromBankAccount);
 
-        toBankAccount.setBalance(toBankAccount.getBalance() + amount);
-        bankAccountService.SaveBankAccount(toBankAccount);
+            toBankAccount.setBalance(toBankAccount.getBalance() + amount);
+            bankAccountService.SaveBankAccount(toBankAccount);
 
-        return true;
+            return true;
+        }
+        return false;
     }
 
 
