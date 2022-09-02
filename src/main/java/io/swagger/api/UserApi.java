@@ -53,7 +53,6 @@ public interface UserApi {
         method = RequestMethod.POST)
     ResponseEntity<UserDTO> createUser(@Parameter(in = ParameterIn.DEFAULT, description = "Get user information", required=true, schema=@Schema()) @Valid @RequestBody UserDTO body);
 
-
     @Operation(summary = "Deletes a user from the system", description = "", tags={ "Users" })
     @ApiResponses(value = { 
         @ApiResponse(responseCode = "200", description = "succesfully removed user from the system"),

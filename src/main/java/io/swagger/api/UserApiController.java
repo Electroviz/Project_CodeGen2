@@ -1,5 +1,6 @@
 package io.swagger.api;
 
+import io.swagger.annotations.Api;
 import io.swagger.model.Login;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.model.UserDTO;
@@ -41,6 +42,7 @@ import java.util.stream.Collectors;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-05-12T15:22:53.754Z[GMT]")
 @RestController
+@Api(tags= {"Users"})
 public class UserApiController implements UserApi {
 
     private static final Logger log = LoggerFactory.getLogger(UserApiController.class);
@@ -60,14 +62,14 @@ public class UserApiController implements UserApi {
 
     public ResponseEntity<UserDTO> createUser(@Parameter(in = ParameterIn.DEFAULT, description = "Get user information", required=true, schema=@Schema()) @Valid @RequestBody UserDTO body) {
 
+
         ModelMapper modelMapper = new ModelMapper();
         User user = modelMapper.map(body, User.class);
 
-        user = userService.addUser(user);
+        ResponseEntity response = userService.addUser(user);
 
-        UserDTO response = modelMapper.map(user, UserDTO.class);
 
-        return new ResponseEntity<UserDTO>(response, HttpStatus.CREATED);
+        return new ResponseEntity(response, HttpStatus.CREATED);
     }
 
     public ResponseEntity<Void> deleteUser(@Parameter(in = ParameterIn.PATH, description = "UserId to delete a user", required=true, schema=@Schema()) @PathVariable("userid") String userid) {

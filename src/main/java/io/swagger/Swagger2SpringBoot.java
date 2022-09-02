@@ -3,6 +3,7 @@ package io.swagger;
 import io.swagger.configuration.LocalDateConverter;
 import io.swagger.configuration.LocalDateTimeConverter;
 
+import io.swagger.enums.UserRoleEnum;
 import io.swagger.model.BankAccount;
 import io.swagger.model.entity.User;
 import io.swagger.service.BankAccountService;
@@ -20,7 +21,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
-import java.math.Double;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.concurrent.ThreadLocalRandom;
 
 @SpringBootApplication
@@ -32,8 +36,11 @@ public class Swagger2SpringBoot implements CommandLineRunner {
 
     @Autowired
     UserService userService;
+
+
     @Override
     public void run(String... arg0) throws Exception {
+
         if (arg0.length > 0 && arg0[0].equals("exitcode")) {
             throw new ExitException();
         }
@@ -58,17 +65,31 @@ public class Swagger2SpringBoot implements CommandLineRunner {
         //Nick
 //        create fake users and transactions
           User firstUser = new User();
-          firstUser.setUsername("Jantje");
+          firstUser.setUsername("test123");
           firstUser.setFullname("Jantje Egberts");
           firstUser.setEmail("jantje@live.nl");
-          firstUser.setPassword("jantje123");
+          firstUser.setPassword("geheim123");
           firstUser.setPhone("+310628495028");
           firstUser.setDateOfBirth("12-03-1997");
-          firstUser.setUserRole(User.UserRoleEnum.CUSTOMER);
-          firstUser.setTransactionLimit(3000.0);
-          firstUser.setDayLimit(30000.0);
+          firstUser.setRole(UserRoleEnum.ROLE_EMPLOYEE);
+          firstUser.setTransactionLimit(BigDecimal.valueOf(3000.0));
+          firstUser.setDayLimit(BigDecimal.valueOf(3000.0));
 
           userService.addUser(firstUser);
+
+
+        User second = new User();
+        second.setUsername("Eland");
+        second.setFullname("Eland Egberts");
+        second.setEmail("Eland@live.nl");
+        second.setPassword("jantje123");
+        second.setPhone("+310628495028");
+        second.setDateOfBirth("12-03-1997");
+        second.setRole(UserRoleEnum.ROLE_CUSTOMER);
+        second.setTransactionLimit(BigDecimal.valueOf(3000.0));
+        second.setDayLimit(BigDecimal.valueOf(3000.0));
+
+        userService.addUser(second);
 //          bankAccountService.CreateDummyDataBankAccount(firstUser.getId(), BankAccount.AccountTypeEnum.CURRENT);
 //          bankAccountService.CreateDummyDataBankAccount(firstUser.getId(), BankAccount.AccountTypeEnum.SAVINGS);
 
@@ -93,6 +114,7 @@ public class Swagger2SpringBoot implements CommandLineRunner {
     }
 
     public static void main(String[] args) throws Exception {
+        var lastUpdated = new Date().getTime();
         new SpringApplication(Swagger2SpringBoot.class).run(args);
     }
 

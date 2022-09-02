@@ -26,7 +26,7 @@ public class BankAccount   {
   @Id
   @GeneratedValue
   @JsonProperty("id")
-  private Integer id;
+  private Long id;
   @JsonProperty("userId")
   private Integer userId = null;
 
@@ -66,9 +66,52 @@ public class BankAccount   {
       return null;
     }
   }
+
+  public enum AccountStatusEnum {
+    ACTIVE("Active"),
+
+    INACTIVE("Inactive"),
+
+    CLOSED("Closed");
+
+    private String value;
+
+    AccountStatusEnum(String value) {
+      this.value = value;
+    }
+
+    @Override
+    @JsonValue
+    public String toString() {
+      return String.valueOf(value);
+    }
+
+    @JsonCreator
+    public static AccountStatusEnum fromValue(String text) {
+      for (AccountStatusEnum b : AccountStatusEnum.values()) {
+        if (String.valueOf(b.value).equals(text)) {
+          return b;
+        }
+      }
+      return null;
+    }
+  }
+
+  public AccountStatusEnum getAccountStatus() {
+    return accountStatus;
+  }
+
+  public void setAccountStatus(AccountStatusEnum accountStatus) {
+    this.accountStatus = accountStatus;
+  }
+
   @JsonProperty("accountType")
   private AccountTypeEnum accountType = null;
 
+
+  public AccountTypeEnum getAccountTypeEnum() {
+    return this.accountType;
+  }
   @JsonProperty("absolute limit")
   private BigDecimal absoluteLimit = null;
 
@@ -87,15 +130,15 @@ public class BankAccount   {
   @Schema(example = "1", required = true, description = "")
       @NotNull
 
-    public Integer getUserId() {
+  public long getUserId() {
     return userId;
   }
 
-  public Integer getId() {
+  public Long getId() {
     return id;
   }
 
-  public void setUserId(Integer userId) {
+  public void setUserId(long userId) {
     this.userId = userId;
   }
 

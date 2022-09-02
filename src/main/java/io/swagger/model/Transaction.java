@@ -1,12 +1,12 @@
 package io.swagger.model;
 
+import java.time.LocalDateTime;
+import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
-import org.springframework.validation.annotation.Validated;
-import org.threeten.bp.OffsetDateTime;
+import java.math.BigDecimal;
 
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import org.springframework.validation.annotation.Validated;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
@@ -16,7 +16,8 @@ import java.util.Objects;
  * Transaction
  */
 @Validated
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-05-12T15:22:53.754Z[GMT]")
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-05-14T17:26:10.419Z[GMT]")
+
 
 
 
@@ -29,7 +30,7 @@ public class Transaction   {
   private Long id;
   
   @JsonProperty("transactionID")
-  private Long transactionID = null;
+  private Integer transactionID = null;
 
   @JsonProperty("from")
   private String from = null;
@@ -44,12 +45,12 @@ public class Transaction   {
   private BigDecimal amount = null;
 
   @JsonProperty("timestamp")
-  private OffsetDateTime timestamp = null;
+  private String timestamp = null;
 
   @JsonProperty("description")
   private String description = null;
 
-  public Transaction transactionID(Long transactionID) {
+  public Transaction transactionID(Integer transactionID) {
     this.transactionID = transactionID;
     return this;
   }
@@ -59,12 +60,12 @@ public class Transaction   {
    * @return transactionID
    **/
   @Schema(example = "123", description = "")
-  
-    public Long getTransactionID() {
+
+  public Integer getTransactionID() {
     return transactionID;
   }
 
-  public void setTransactionID(Long transactionID) {
+  public void setTransactionID(Integer transactionID) {
     this.transactionID = transactionID;
   }
 
@@ -78,9 +79,9 @@ public class Transaction   {
    * @return from
    **/
   @Schema(example = "NLxxINHO0xxxxxxxxx", required = true, description = "")
-      @NotNull
+  @NotNull
 
-    public String getFrom() {
+  public String getFrom() {
     return from;
   }
 
@@ -98,9 +99,9 @@ public class Transaction   {
    * @return to
    **/
   @Schema(example = "NLxxINHO0xxxxxxxxx", required = true, description = "")
-      @NotNull
+  @NotNull
 
-    public String getTo() {
+  public String getTo() {
     return to;
   }
 
@@ -118,9 +119,9 @@ public class Transaction   {
    * @return userIDPerforming
    **/
   @Schema(example = "1234", required = true, description = "")
-      @NotNull
+  @NotNull
 
-    public Integer getUserIDPerforming() {
+  public Integer getUserIDPerforming() {
     return userIDPerforming;
   }
 
@@ -138,10 +139,8 @@ public class Transaction   {
    * @return amount
    **/
   @Schema(example = "1", required = true, description = "")
-      @NotNull
 
-    @Valid
-    public BigDecimal getAmount() {
+  public BigDecimal getAmount() {
     return amount;
   }
 
@@ -149,7 +148,7 @@ public class Transaction   {
     this.amount = amount;
   }
 
-  public Transaction timestamp(OffsetDateTime timestamp) {
+  public Transaction timestamp(String timestamp) {
     this.timestamp = timestamp;
     return this;
   }
@@ -159,14 +158,18 @@ public class Transaction   {
    * @return timestamp
    **/
   @Schema(required = true, description = "")
-      @NotNull
+  @NotNull
 
-    @Valid
-    public OffsetDateTime getTimestamp() {
+  @Valid
+  public String getTimestamp() {
     return timestamp;
   }
 
-  public void setTimestamp(OffsetDateTime timestamp) {
+  public LocalDateTime getParsedTimestamp() {
+    return LocalDateTime.parse(timestamp);
+  }
+
+  public void setTimestamp(String timestamp) {
     this.timestamp = timestamp;
   }
 
@@ -180,9 +183,9 @@ public class Transaction   {
    * @return description
    **/
   @Schema(example = "Payment request Anna", required = true, description = "")
-      @NotNull
+  @NotNull
 
-    public String getDescription() {
+  public String getDescription() {
     return description;
   }
 
@@ -201,12 +204,12 @@ public class Transaction   {
     }
     Transaction transaction = (Transaction) o;
     return Objects.equals(this.transactionID, transaction.transactionID) &&
-        Objects.equals(this.from, transaction.from) &&
-        Objects.equals(this.to, transaction.to) &&
-        Objects.equals(this.userIDPerforming, transaction.userIDPerforming) &&
-        Objects.equals(this.amount, transaction.amount) &&
-        Objects.equals(this.timestamp, transaction.timestamp) &&
-        Objects.equals(this.description, transaction.description);
+            Objects.equals(this.from, transaction.from) &&
+            Objects.equals(this.to, transaction.to) &&
+            Objects.equals(this.userIDPerforming, transaction.userIDPerforming) &&
+            Objects.equals(this.amount, transaction.amount) &&
+            Objects.equals(this.timestamp, transaction.timestamp) &&
+            Objects.equals(this.description, transaction.description);
   }
 
   @Override
@@ -218,7 +221,7 @@ public class Transaction   {
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class Transaction {\n");
-    
+
     sb.append("    transactionID: ").append(toIndentedString(transactionID)).append("\n");
     sb.append("    from: ").append(toIndentedString(from)).append("\n");
     sb.append("    to: ").append(toIndentedString(to)).append("\n");
