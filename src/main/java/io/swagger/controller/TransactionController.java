@@ -38,6 +38,26 @@ public class TransactionController {
         return ResponseEntity.status(200).body(transactionService.GetAllTransactionsFromDatabase());
     }
 
+    @RequestMapping(method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE, value="/transactions/withdraw/{iban}/{amount}")
+    public ResponseEntity Withdraw(@PathVariable("iban") String iban, @PathVariable("amount") Double amount) {
+        if(transactionService.WithdrawOrDepositMoney(iban,amount,true)) {
+            return ResponseEntity.status(200).body("Success");
+        }
+        else {
+            return ResponseEntity.status(400).body("Failed to withdraw");
+        }
+    }
+
+    @RequestMapping(method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE, value="/transactions/deposit/{iban}/{amount}")
+    public ResponseEntity Deposit(@PathVariable("iban") String iban, @PathVariable("amount") Double amount) {
+        if(transactionService.WithdrawOrDepositMoney(iban,amount,false)) {
+            return ResponseEntity.status(200).body("Success");
+        }
+        else {
+            return ResponseEntity.status(400).body("Failed to deposit");
+        }
+    }
+
 
     //    @CrossOrigin
 //    @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value="/bankAccounts/{userId}")

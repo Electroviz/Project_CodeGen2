@@ -49,7 +49,7 @@ public class TransactionService {
             toBankAccount.setBalance(toBankAccount.getBalance() + amount);
             bankAccountService.SaveBankAccount(toBankAccount);
 
-            SaveTransaction(createNewTransaction(fromIban,toIban,userIdPerforming,amount,""));
+            SaveTransaction(createNewTransaction(fromIban,toIban,userIdPerforming,amount,"TRANSACTION"));
             return true;
         }
         return false;
@@ -76,6 +76,32 @@ public class TransactionService {
         newTrans.setTimestamp(OffsetDateTime.now()); //timestamp
 
         return newTrans;
+    }
+
+    public boolean WithdrawOrDepositMoney(String iban, Double amount, boolean isWithdraw) {
+        BankAccount ba = bankAccountService.GetBankAccountByIban(iban);
+
+        if(ba != null) {
+            if(ba.getAccountType() != BankAccount.AccountTypeEnum.SAVINGS && ba.getAccountStatus() != BankAccount.AccountStatusEnum.CLOSED) {
+                if(isWithdraw == false) {
+                    //is depositing the amount
+                    ba.setBalance(ba.getBalance() + amount);
+                    bankAccountService.SaveBankAccount(ba);
+                }
+                else if(isWithdraw == true && ba.getBalance() >= amount) {
+                    //is withdrawing the money and has sufficient money to perform this transaction
+                    ba.setBalance(ba.getBalance() - amount);
+                    bankAccountService.SaveBankAccount(ba);
+                }
+                else return false;
+            }
+            else return false;
+        }
+        else return false;
+
+        if(!isWithdraw) transactionRepository.save(createNewTransaction(iban,iban,ba.getUserId().intValue(),amount,"DEPOSIT"));
+        else transactionRepository.save(createNewTransaction(iban,iban,ba.getUserId().intValue(),amount,"WITHDRAW"));
+        return true;
     }
 
     public void SaveTransaction(Transaction t) {

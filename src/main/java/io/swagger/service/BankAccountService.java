@@ -159,7 +159,10 @@ public class BankAccountService {
         newBankAccount.setIban(this.generateRandomIban());
         newBankAccount.setBalance(ThreadLocalRandom.current().nextDouble(300, 1800));
         newBankAccount.setAbsoluteLimit(0.0);
-        newBankAccount.accountType(BankAccount.AccountTypeEnum.CURRENT);
+        Random rand = new Random();
+        Integer num = rand.nextInt(2);
+        if(num == 0) newBankAccount.accountType(BankAccount.AccountTypeEnum.CURRENT);
+        else newBankAccount.accountType(BankAccount.AccountTypeEnum.SAVINGS);
         newBankAccount.userId(ThreadLocalRandom.current().nextInt(0, 100000));
 
         bankAccountRepository.save(newBankAccount);
