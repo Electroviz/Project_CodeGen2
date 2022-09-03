@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.threeten.bp.OffsetDateTime;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -28,10 +29,28 @@ public class TransactionService {
     private UserService userService;
 
 
+    //Melle
     public boolean IbanHasSufficientMoney(String iban, Double amountToTransfer) {
         BankAccount BankAccountByIban = bankAccountService.GetBankAccountByIban(iban);
         if(BankAccountByIban != null && BankAccountByIban.getBalance() - amountToTransfer >= 0) return true;
         else return false;
+    }
+
+    //Melle
+    public List<Transaction> GetTransactionsInBetweenDate(OffsetDateTime firstDate, OffsetDateTime secondDate) {
+        List<Transaction> allTransactions = transactionRepository.findAll();
+        List<Transaction> correctTransactions = new ArrayList<>();
+        for (int i = 0; i < allTransactions.size(); i++) {
+            Transaction transaction = allTransactions.get(i);
+            if(transaction.getTimestamp().isAfter(firstDate) && transaction.getTimestamp().isBefore(secondDate)) {
+                correctTransactions.add(transaction);
+            }
+            else if(transaction.getTimestamp().isAfter(secondDate) && transaction.getTimestamp().isBefore(firstDate)) {
+                correctTransactions.add(transaction);
+            }
+        }
+
+        return correctTransactions;
     }
 
     //Melle

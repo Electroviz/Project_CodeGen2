@@ -1,5 +1,6 @@
 package io.swagger.controller;
 
+import io.swagger.model.Transaction;
 import io.swagger.service.BankAccountService;
 import io.swagger.service.TransactionService;
 import io.swagger.service.UserService;
@@ -7,6 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.threeten.bp.OffsetDateTime;
+
+import java.util.List;
 
 @RestController
 @CrossOrigin
@@ -33,11 +37,13 @@ public class TransactionController {
         else return ResponseEntity.status(400).body(null);
     }
 
+    //Melle
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value="/transactions/all")
     public ResponseEntity GetAllTransactions() {
         return ResponseEntity.status(200).body(transactionService.GetAllTransactionsFromDatabase());
     }
 
+    //Melle
     @RequestMapping(method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE, value="/transactions/withdraw/{iban}/{amount}")
     public ResponseEntity Withdraw(@PathVariable("iban") String iban, @PathVariable("amount") Double amount) {
         if(transactionService.WithdrawOrDepositMoney(iban,amount,true)) {
@@ -48,6 +54,7 @@ public class TransactionController {
         }
     }
 
+    //Melle
     @RequestMapping(method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE, value="/transactions/deposit/{iban}/{amount}")
     public ResponseEntity Deposit(@PathVariable("iban") String iban, @PathVariable("amount") Double amount) {
         if(transactionService.WithdrawOrDepositMoney(iban,amount,false)) {
@@ -58,21 +65,12 @@ public class TransactionController {
         }
     }
 
+    //Melle
+    @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value="/transactions/byDate/{fromDate}/{toDate}")
+    public ResponseEntity GetTransactionsByDate(@PathVariable("fromDate") OffsetDateTime fromDate, @PathVariable("todate") OffsetDateTime toDate) {
+        List<Transaction> correctTransactions = transactionService.GetTransactionsInBetweenDate(fromDate,toDate);
 
-    //    @CrossOrigin
-//    @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value="/bankAccounts/{userId}")
-//    public ResponseEntity testFunc(@PathVariable("userId") long userId) {
-//        List<BankAccount> bankAccounts = bankAccountService.GetBankAccountsByUserId(userId);
-//
-//        if(bankAccounts.stream().count() == 0 || bankAccounts == null) return ResponseEntity.status(400).body("Bad Request");
-//        else return ResponseEntity.status(200).body(bankAccounts);
-//    }
-//
-//    //melle
-//    @CrossOrigin
-//    @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE,value = "/allBankAccounts")
-//    public ResponseEntity getAccountByIBANController(){
-//
-//        return bankAccountService.GetAllBankAccounts();
-//    }
+        if(correctTransactions == null || correctTransactions.size() == 0) return ResponseEntity.status(400).body("No transactions in between this date");
+        else return ResponseEntity.status(200).body(correctTransactions);
+    }
 }
