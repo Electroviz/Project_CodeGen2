@@ -42,6 +42,9 @@ public class TransactionService {
             BankAccount toBankAccount = bankAccountService.GetBankAccountByIban(toIban);
             if(fromBankAccount == null || toBankAccount == null) return false;
 
+            double transactionLimit = userService.getUserById(fromBankAccount.getUserId().longValue()).getTransactionLimit().doubleValue();
+            if(amount > transactionLimit && transactionLimit != 0) return false;
+
 
             fromBankAccount.setBalance(fromBankAccount.getBalance() - amount);
             bankAccountService.SaveBankAccount(fromBankAccount);
