@@ -90,4 +90,20 @@ public class TransactionController {
         if(t == null ) return ResponseEntity.status(400).body(null);
         else return ResponseEntity.status(200).body(t);
     }
+
+    //Melle
+    @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value="/transactions/byAmountEqual/{iban}/{amount}")
+    public ResponseEntity GetTransactionByAmountEqualToNum (@PathVariable("iban") String iban, @PathVariable("amount") Double amount) {
+
+    }
+
+    @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value="/transactions/byAmountSmaller/{iban}/{amount}")
+    public ResponseEntity GetTransactionByAmountSmallerToNum (@PathVariable("iban") String iban, @PathVariable("amount") Double amount) {
+
+    }
+
+    @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value="/transactions/byAmountBigger/{iban}/{amount}")
+    public ResponseEntity GetTransactionByAmountBiggerToNum (@PathVariable("iban") String iban, @PathVariable("amount") Double amount) {
+
+    }
 }

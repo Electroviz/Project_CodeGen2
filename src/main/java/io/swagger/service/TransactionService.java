@@ -56,8 +56,13 @@ public class TransactionService {
     }
 
     //Melle
-    public Transaction GetTransactionByIbans(String fromIban, String toIban) {
-        return transactionRepository.findTransactionByFromAndToIban(fromIban,toIban);
+    public List<Transaction> GetTransactionByIbans(String fromIban, String toIban) {
+        return transactionRepository.findTransactionsByFromAndToIban(fromIban,toIban);
+    }
+
+    //Melle
+    public List<Transaction> GetTransactionByRelationship(String iban, Double num, String comparison) {
+        if(comparison == "equals") continue;
     }
 
     //Melle
