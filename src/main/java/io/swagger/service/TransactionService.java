@@ -42,8 +42,14 @@ public class TransactionService {
             BankAccount toBankAccount = bankAccountService.GetBankAccountByIban(toIban);
             if(fromBankAccount == null || toBankAccount == null) return false;
 
+            //CHECK IF THE TRANSACTION LIMIT IS BEING EXCEEDED
             double transactionLimit = userService.getUserById(fromBankAccount.getUserId().longValue()).getTransactionLimit().doubleValue();
             if(amount > transactionLimit && transactionLimit != 0) return false;
+
+            //CHECK IF THE BALANCE IS NOT BECOMMING LOWER THE THE PRE DEFINED ABSOLUTE LIMIT FOR THE USER
+            if(fromBankAccount.getBalance() - amount < fromBankAccount.getAbsoluteLimit()) return false;
+
+            //DAY LIMIT CHECK NECESSARY
 
 
             fromBankAccount.setBalance(fromBankAccount.getBalance() - amount);
