@@ -37,20 +37,27 @@ public class TransactionService {
     }
 
     //Melle
-    public List<Transaction> GetTransactionsInBetweenDate(OffsetDateTime firstDate, OffsetDateTime secondDate) {
+    public List<Transaction> GetTransactionsInBetweenDate(OffsetDateTime firstDate, OffsetDateTime secondDate, Integer userId) {
         List<Transaction> allTransactions = transactionRepository.findAll();
         List<Transaction> correctTransactions = new ArrayList<>();
         for (int i = 0; i < allTransactions.size(); i++) {
             Transaction transaction = allTransactions.get(i);
             if(transaction.getTimestamp().isAfter(firstDate) && transaction.getTimestamp().isBefore(secondDate)) {
-                correctTransactions.add(transaction);
+                if(userId == null || userId < 0) correctTransactions.add(transaction);
+                else if(transaction.getUserIDPerforming() == userId) correctTransactions.add(transaction);
             }
             else if(transaction.getTimestamp().isAfter(secondDate) && transaction.getTimestamp().isBefore(firstDate)) {
-                correctTransactions.add(transaction);
+                if(userId == null || userId < 0) correctTransactions.add(transaction);
+                else if(transaction.getUserIDPerforming() == userId) correctTransactions.add(transaction);
             }
         }
 
         return correctTransactions;
+    }
+
+    //Melle
+    public Transaction GetTransactionByIbans(String fromIban, String toIban) {
+        return transactionRepository.findTransactionByFromAndToIban(fromIban,toIban);
     }
 
     //Melle
@@ -61,9 +68,12 @@ public class TransactionService {
             BankAccount toBankAccount = bankAccountService.GetBankAccountByIban(toIban);
             if(fromBankAccount == null || toBankAccount == null) return false;
 
-            //CHECK IF THE TRANSACTION LIMIT IS BEING EXCEEDED
-            double transactionLimit = userService.getUserById(fromBankAccount.getUserId().longValue()).getTransactionLimit().doubleValue();
-            if(amount > transactionLimit && transactionLimit != 0) return false;
+            //this if statement exists because of Dummy data purpose
+            if( userService.getUserById(fromBankAccount.getUserId().longValue()) != null) {
+                //CHECK IF THE TRANSACTION LIMIT IS BEING EXCEEDED
+                double transactionLimit = userService.getUserById(fromBankAccount.getUserId().longValue()).getTransactionLimit().doubleValue();
+                if (amount > transactionLimit && transactionLimit != 0) return false;
+            }
 
             //CHECK IF THE BALANCE IS NOT BECOMMING LOWER THE THE PRE DEFINED ABSOLUTE LIMIT FOR THE USER
             if(fromBankAccount.getBalance() - amount < fromBankAccount.getAbsoluteLimit()) return false;

@@ -68,9 +68,26 @@ public class TransactionController {
     //Melle
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value="/transactions/byDate/{fromDate}/{toDate}")
     public ResponseEntity GetTransactionsByDate(@PathVariable("fromDate") OffsetDateTime fromDate, @PathVariable("todate") OffsetDateTime toDate) {
-        List<Transaction> correctTransactions = transactionService.GetTransactionsInBetweenDate(fromDate,toDate);
+        List<Transaction> correctTransactions = transactionService.GetTransactionsInBetweenDate(fromDate,toDate,null);
 
         if(correctTransactions == null || correctTransactions.size() == 0) return ResponseEntity.status(400).body("No transactions in between this date");
         else return ResponseEntity.status(200).body(correctTransactions);
+    }
+
+    //Melle
+    @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value="/transactions/byDateAndUser/{fromDate}/{toDate}/{userId}")
+    public ResponseEntity GetTransactionsByDateAndUser(@PathVariable("fromDate") OffsetDateTime fromDate, @PathVariable("todate") OffsetDateTime toDate, @PathVariable("userId") Integer userId) {
+        List<Transaction> correctTransactions = transactionService.GetTransactionsInBetweenDate(fromDate,toDate,userId);
+
+        if(correctTransactions == null || correctTransactions.size() == 0) return ResponseEntity.status(400).body("No transactions in between this date");
+        else return ResponseEntity.status(200).body(correctTransactions);
+    }
+
+    //Melle
+    @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value="/transactions/byIbans/{fromIban}/{toIban}")
+    public ResponseEntity GetTransactionByIbans(@PathVariable("fromIban") String fromIban, @PathVariable("toIban") String toIban) {
+        Transaction t = transactionService.GetTransactionByIbans(fromIban,toIban);
+        if(t == null ) return ResponseEntity.status(400).body(null);
+        else return ResponseEntity.status(200).body(t);
     }
 }
