@@ -150,7 +150,7 @@ public class UserService {
                 if(user.getEmail().length() < 50 && user.getEmail().length() > 5 && checkIfStringIsEmail(user.getEmail())){
                     if(user.getDayLimit().doubleValue() >= 0 && user.getDayLimit().doubleValue() <= 10000){
                         if(user.getTransactionLimit().doubleValue() >= 0 && user.getTransactionLimit().doubleValue() <= 10000){
-                            if(user.getRole().equals(UserRoleEnum.ROLE_BANK) || user.getRole().equals(UserRoleEnum.ROLE_CUSTOMER) || user.getRole().equals(UserRoleEnum.ROLE_EMPLOYEE)){
+                            //if(user.getRole().equals(UserRoleEnum.ROLE_BANK) || user.getRole().equals(UserRoleEnum.ROLE_CUSTOMER) || user.getRole().equals(UserRoleEnum.ROLE_EMPLOYEE)){
                                 if(user.getPassword().length() >= 6 && user.getPassword().length() <= 32){
                                     return true;
                                 }
@@ -159,7 +159,7 @@ public class UserService {
                     }
                 }
             }
-        }
+        //}
         return false;
     }
     //Nick
