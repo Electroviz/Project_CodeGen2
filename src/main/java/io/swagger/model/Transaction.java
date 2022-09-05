@@ -21,7 +21,7 @@ import javax.validation.constraints.*;
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-05-12T15:22:53.754Z[GMT]")
 
 @Entity
-@Table(name = "TRANSACTION")
+@Table(name = "transaction")
 public class Transaction   {
 
   @Id

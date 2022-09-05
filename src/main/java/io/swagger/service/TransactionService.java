@@ -62,7 +62,10 @@ public class TransactionService {
 
     //Melle
     public List<Transaction> GetTransactionByRelationship(String iban, Double num, String comparison) {
-        if(comparison == "equals") continue;
+//        if(comparison == "equal") continue;
+//        else if(comparison == "smaller") continue;
+//        else if(comparison == "bigger") continue;
+        return null;
     }
 
     //Melle

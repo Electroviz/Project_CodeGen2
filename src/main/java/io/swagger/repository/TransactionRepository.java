@@ -13,9 +13,9 @@ import java.util.List;
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
 
     //Melle
-    @Query(value = "SELECT * FROM TRANSACTION t WHERE t.from = ?1 AND t.to = ?2", nativeQuery = true)
+    @Query(value = "SELECT * FROM transaction t WHERE t.from = ?1 AND t.to = ?2", nativeQuery = true)
     List<Transaction> findTransactionsByFromAndToIban(String fromIban, String toIban);
 
-    @Query(value = "SELECT * FROM TRANSACTION WHERE from = ?1 OR to = ?1 AND amount = ?2", nativeQuery = true)
+    @Query(value = "SELECT * FROM transaction WHERE from = ?1 OR to = ?1 AND amount = ?2", nativeQuery = true)
     List<Transaction> findTransactionsByAmount(String iban, Double amount);
 }
