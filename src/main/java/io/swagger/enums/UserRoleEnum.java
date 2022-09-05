@@ -7,6 +7,10 @@ import org.springframework.security.core.GrantedAuthority;
 
 
 public enum UserRoleEnum implements GrantedAuthority {
+    ROLE_BANK,
+    ROLE_EMPLOYEE,
+    ROLE_CUSTOMER;
+    /*
     ROLE_BANK("bank"),
     ROLE_EMPLOYEE("employee"),
     ROLE_CUSTOMER("customer");
@@ -32,7 +36,7 @@ public enum UserRoleEnum implements GrantedAuthority {
         }
         return null;
     }
-
+    */
     @Override
     public String getAuthority() {
         return name();

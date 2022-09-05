@@ -104,6 +104,7 @@ public class UserController {
 
     @CrossOrigin
     @RequestMapping(value = "/get/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('EMPLOYEE')")
     public ResponseEntity getUserById(@PathVariable("id") Long id){
 
         ModelMapper modelMapper = new ModelMapper();
