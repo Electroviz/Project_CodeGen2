@@ -57,15 +57,56 @@ public class TransactionService {
 
     //Melle
     public List<Transaction> GetTransactionByIbans(String fromIban, String toIban) {
-        return transactionRepository.findTransactionsByFromAndToIban(fromIban,toIban);
+        return QuerySimulatorFindTransactionByIbans(fromIban,toIban);
+        //return transactionRepository.QuerySimulatorFindTransactionByIbans(fromIban,toIban);
+    }
+
+    private List<Transaction> QuerySimulatorFindTransactionByIbans(String fromIban, String toIban) {
+        //Because the custom queries syntax is not working (already tried every possible solution but it doesn't work.)
+        List<Transaction> allTransactions = transactionRepository.findAll();
+        List<Transaction> correctTransactions = new ArrayList<>();
+        for(int i = 0; i < allTransactions.size(); i++) {
+            Transaction transaction = allTransactions.get(i);
+            if(Objects.equals(transaction.getFrom(), fromIban) && Objects.equals(transaction.getTo(), toIban)) {
+                //combination from to is correct and found
+                correctTransactions.add(transaction);
+            }
+            else if(Objects.equals(transaction.getFrom(), toIban) && Objects.equals(transaction.getTo(), fromIban)) {
+                //combination in wrong order is found
+                correctTransactions.add(transaction);
+            }
+        }
+
+        return correctTransactions;
     }
 
     //Melle
     public List<Transaction> GetTransactionByRelationship(String iban, Double num, String comparison) {
-//        if(comparison == "equal") continue;
-//        else if(comparison == "smaller") continue;
-//        else if(comparison == "bigger") continue;
-        return null;
+        if(Objects.equals(comparison, "equal")) return SimulateQueryTransactionBalance(iban, num, comparison);
+        else if(Objects.equals(comparison, "smaller")) return SimulateQueryTransactionBalance(iban, num, comparison);
+        else return SimulateQueryTransactionBalance(iban, num, comparison); //if(comparison == "bigger")
+    }
+
+    //Melle
+    private List<Transaction> SimulateQueryTransactionBalance(String iban, Double amount, String comparison) {
+        List<Transaction> allTransactions = transactionRepository.findAll();
+        List<Transaction> correctTransactions = new ArrayList<>();
+
+        for(Transaction t : allTransactions) {
+            if(t.getTo().equals(iban) || t.getFrom().equals(iban)) {
+                if(comparison.equals("equal")) {
+                    if(Double.compare(amount, t.getAmount()) == 0) correctTransactions.add(t);
+                }
+                else if(comparison.equals("smaller")) {
+                    if(Double.compare(amount, t.getAmount()) > 0) correctTransactions.add(t);
+                }
+                else {
+                    if(Double.compare(amount, t.getAmount()) < 0) correctTransactions.add(t);
+                }
+            }
+        }
+
+        return correctTransactions;
     }
 
     //Melle

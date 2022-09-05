@@ -70,7 +70,7 @@ public class TransactionController {
     public ResponseEntity GetTransactionsByDate(@PathVariable("fromDate") OffsetDateTime fromDate, @PathVariable("todate") OffsetDateTime toDate) {
         List<Transaction> correctTransactions = transactionService.GetTransactionsInBetweenDate(fromDate,toDate,null);
 
-        if(correctTransactions == null || correctTransactions.size() == 0) return ResponseEntity.status(400).body("No transactions in between this date");
+        if(correctTransactions == null || correctTransactions.size() == 0) return ResponseEntity.status(204).body("No transactions in between this date");
         else return ResponseEntity.status(200).body(correctTransactions);
     }
 
@@ -79,7 +79,7 @@ public class TransactionController {
     public ResponseEntity GetTransactionsByDateAndUser(@PathVariable("fromDate") OffsetDateTime fromDate, @PathVariable("todate") OffsetDateTime toDate, @PathVariable("userId") Integer userId) {
         List<Transaction> correctTransactions = transactionService.GetTransactionsInBetweenDate(fromDate,toDate,userId);
 
-        if(correctTransactions == null || correctTransactions.size() == 0) return ResponseEntity.status(400).body("No transactions in between this date");
+        if(correctTransactions == null || correctTransactions.size() == 0) return ResponseEntity.status(204).body("No transactions in between this date");
         else return ResponseEntity.status(200).body(correctTransactions);
     }
 
@@ -91,19 +91,28 @@ public class TransactionController {
         else return ResponseEntity.status(200).body(t);
     }
 
-//    //Melle
-//    @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value="/transactions/byAmountEqual/{iban}/{amount}")
-//    public ResponseEntity GetTransactionByAmountEqualToNum (@PathVariable("iban") String iban, @PathVariable("amount") Double amount) {
-//        List<Transaction> result = transactionService.GetTransactionByRelationship(iban,amount,"equal");
-//    }
-//
-//    @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value="/transactions/byAmountSmaller/{iban}/{amount}")
-//    public ResponseEntity GetTransactionByAmountSmallerToNum (@PathVariable("iban") String iban, @PathVariable("amount") Double amount) {
-//        List<Transaction> result = transactionService.GetTransactionByRelationship(iban,amount,"smaller");
-//    }
-//
-//    @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value="/transactions/byAmountBigger/{iban}/{amount}")
-//    public ResponseEntity GetTransactionByAmountBiggerToNum (@PathVariable("iban") String iban, @PathVariable("amount") Double amount) {
-//        List<Transaction> result = transactionService.GetTransactionByRelationship(iban,amount,"bigger");
-//    }
+    //Melle
+    @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value="/transactions/byAmountIsEqual/{iban}/{amount}")
+    public ResponseEntity GetTransactionByAmountEqualToNum (@PathVariable("iban") String iban, @PathVariable("amount") Double amount) {
+        List<Transaction> result = transactionService.GetTransactionByRelationship(iban,amount,"equal");
+
+        if(result.size() == 0) return ResponseEntity.status(204).body(result);
+        else return ResponseEntity.status(200).body(result);
+    }
+
+    @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value="/transactions/byAmountIsSmaller/{iban}/{amount}")
+    public ResponseEntity GetTransactionByAmountSmallerToNum (@PathVariable("iban") String iban, @PathVariable("amount") Double amount) {
+        List<Transaction> result = transactionService.GetTransactionByRelationship(iban,amount,"smaller");
+
+        if(result.size() == 0) return ResponseEntity.status(204).body(result);
+        else return ResponseEntity.status(200).body(result);
+    }
+
+    @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value="/transactions/byAmountIsBigger/{iban}/{amount}")
+    public ResponseEntity GetTransactionByAmountBiggerToNum (@PathVariable("iban") String iban, @PathVariable("amount") Double amount) {
+        List<Transaction> result = transactionService.GetTransactionByRelationship(iban,amount,"bigger");
+
+        if(result.size() == 0) return ResponseEntity.status(204).body(result);
+        else return ResponseEntity.status(200).body(result);
+    }
 }
