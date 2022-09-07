@@ -36,13 +36,11 @@ public class TransactionController {
     //Melle
     @RequestMapping(method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE, value="/transactions/{fromIban}/{toIban}/{amount}")
     public ResponseEntity transferMoney(@PathVariable("fromIban") String fromIban, @PathVariable("toIban") String toIban, @PathVariable("amount") Double amount) {
-        //eigenlijk moet de fromIban opgehaald worden aan de hand van ingelogde user.
-        //NOTTEEEE USERIDPERFORMING MOET NOG VAN 0 GEHAALD WORDEN EN ADHV JWT TOKEN GEFIXED WORDEN
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User u = userService.getUserById(userService.getUserIdByUsername(authentication.getName()));
 
         boolean canPerform = false;
-        if(Objects.equals(u.getRole(), UserRoleEnum.ROLE_EMPLOYEE)) canPerform = true;
+        if(u.getRole() == UserRoleEnum.ROLE_EMPLOYEE) canPerform = true;
         else {
             if(Objects.equals(bankAccountService.GetBankAccountByIban(fromIban).getUserId(), u.getId())) canPerform = true;
         }
