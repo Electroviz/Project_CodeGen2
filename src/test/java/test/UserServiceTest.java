@@ -5,21 +5,22 @@ import io.swagger.service.UserService;
 import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserServiceTest {
 
+    @Autowired
+    UserService userService;
     @Test
     void addUserShouldNotReturnNull() {
-        User user = new User();
-        assertNotNull(user);
+        //User user = userService.addUser()
+        //assertNotNull(user);
     }
 
     @Test
     void checkIfStringIsEmailWorks() {
-        UserService userService = new UserService();
-
         Assertions.assertFalse(userService.checkIfStringIsEmail("test.com"));
     }
 
