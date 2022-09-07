@@ -165,7 +165,7 @@ public class TransactionService {
         return newTrans;
     }
 
-    public boolean WithdrawOrDepositMoney(String iban, Double amount, boolean isWithdraw) {
+    public boolean WithdrawOrDepositMoney(String iban, Double amount, boolean isWithdraw, Integer userIdPerforming) {
         BankAccount ba = bankAccountService.GetBankAccountByIban(iban);
 
         if(ba != null) {
@@ -186,8 +186,8 @@ public class TransactionService {
         }
         else return false;
 
-        if(!isWithdraw) transactionRepository.save(createNewTransaction(iban,iban,ba.getUserId().intValue(),amount,"DEPOSIT"));
-        else transactionRepository.save(createNewTransaction(iban,iban,ba.getUserId().intValue(),amount,"WITHDRAW"));
+        if(!isWithdraw) transactionRepository.save(createNewTransaction(iban,iban,userIdPerforming,amount,"DEPOSIT"));
+        else transactionRepository.save(createNewTransaction(iban,iban,userIdPerforming,amount,"WITHDRAW"));
         return true;
     }
 

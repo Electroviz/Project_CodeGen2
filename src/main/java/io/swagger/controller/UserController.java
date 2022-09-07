@@ -18,13 +18,13 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
+@CrossOrigin
 @RequestMapping("/user")
 public class UserController {
 
     @Autowired
     private UserService userService;
 
-    @CrossOrigin
     @RequestMapping(value = "/getall", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity getAll(){
 
@@ -41,7 +41,7 @@ public class UserController {
     }
 
     //melle
-    @CrossOrigin
+
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value= "/getUserIdJwtValidation")
     public ResponseEntity getUserIdByJwtTokenVerification() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -62,7 +62,7 @@ public class UserController {
     }
 
     //melle
-    @CrossOrigin
+    @PreAuthorize("hasRole('EMPLOYEE')")
     @RequestMapping(value = "/getAllUsersWithoutBankAccounts", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity getUsersWithoutBankAccounts() {
         List<User> usersWithoutBankAccounts = userService.getUsersWithoutBankAccount();
@@ -71,7 +71,7 @@ public class UserController {
     }
 
     //melle
-    @CrossOrigin
+
     @RequestMapping(value = "/testLogin/{username}/{password}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity loginAttempt(@PathVariable("username") String username, @PathVariable("password") String password) {
 
@@ -90,7 +90,7 @@ public class UserController {
 //        return ResponseEntity.status(200).body()
 //    }
 
-    @CrossOrigin
+
     @RequestMapping(value = "/registeruser", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity add(@RequestBody UserDTO userDTO){
 
@@ -102,7 +102,7 @@ public class UserController {
         return ResponseEntity.status(201).body(response);
     }
 
-    @CrossOrigin
+
     @RequestMapping(value = "/get/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('EMPLOYEE')")
     public ResponseEntity getUserById(@PathVariable("id") Long id){
@@ -116,7 +116,7 @@ public class UserController {
         return ResponseEntity.status(201).body(response);
     }
 
-    @CrossOrigin
+
     @RequestMapping(value = "/login", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public String login(@RequestBody Login login){
 

@@ -95,6 +95,10 @@ public class BankAccountService {
         }
     }
 
+    public boolean CheckIbanBelongsToUser(Integer userId,String iban) {
+        return Objects.equals(GetBankAccountByIban(iban).getUserId().intValue(),userId);
+    }
+
     public boolean UserAlreadyHasBankAccounts(Long userId) {
         List<BankAccount> bankAccounts = bankAccountRepository.findByuserId(userId);
         if(bankAccounts != null && bankAccounts.stream().count() > 1) return true;
