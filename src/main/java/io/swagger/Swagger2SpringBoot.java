@@ -76,7 +76,7 @@ public class Swagger2SpringBoot implements CommandLineRunner {
           firstUser.setTransactionLimit(BigDecimal.valueOf(3000.0));
           firstUser.setDayLimit(BigDecimal.valueOf(3000.0));
 
-          userService.addUser(firstUser);
+          userService.addUser(firstUser,true);
 
 
         User second = new User();
@@ -91,7 +91,7 @@ public class Swagger2SpringBoot implements CommandLineRunner {
         second.setTransactionLimit(BigDecimal.valueOf(3000.0));
         second.setDayLimit(BigDecimal.valueOf(3000.0));
 
-        userService.addUser(second);
+        userService.addUser(second, false);
 //          bankAccountService.CreateDummyDataBankAccount(firstUser.getId(), BankAccount.AccountTypeEnum.CURRENT);
 //          bankAccountService.CreateDummyDataBankAccount(firstUser.getId(), BankAccount.AccountTypeEnum.SAVINGS);
 

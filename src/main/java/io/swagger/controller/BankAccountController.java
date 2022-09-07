@@ -133,7 +133,7 @@ public class BankAccountController {
                 return ResponseEntity.status(400).body("Bad Request");
             }
         }
-        else return ResponseEntity.status(400).body("Bad Request");
+        else return ResponseEntity.status(401).body("Bad Request");
     }
 
     //Nicky

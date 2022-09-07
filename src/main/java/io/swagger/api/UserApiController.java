@@ -1,6 +1,7 @@
 package io.swagger.api;
 
 import io.swagger.annotations.Api;
+import io.swagger.enums.UserRoleEnum;
 import io.swagger.model.Login;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.model.UserDTO;
@@ -65,9 +66,9 @@ public class UserApiController implements UserApi {
 
         ModelMapper modelMapper = new ModelMapper();
         User user = modelMapper.map(body, User.class);
-
-        ResponseEntity response = userService.addUser(user);
-
+        ResponseEntity response = null;
+        if(user.getRole() == UserRoleEnum.ROLE_EMPLOYEE) response = userService.addUser(user, true);
+        else response = userService.addUser(user, false);
 
         return new ResponseEntity(response, HttpStatus.CREATED);
     }
