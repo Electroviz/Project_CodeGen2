@@ -22,6 +22,7 @@ import org.springframework.web.server.ResponseStatusException;
 import org.threeten.bp.OffsetDateTime;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -49,7 +50,7 @@ public class UserService {
 
     //Nick
 
-    public ResponseEntity addUser(User user){
+    public ResponseEntity addUser(User user, boolean asEmployee){
 
 //        if (userRepository.findByusername(user.getUsername()).getRole().equals(UserRoleEnum.ROLE_CUSTOMER)){
 //            return ResponseEntity.status(403).body("Unauthorized");
@@ -62,6 +63,14 @@ public class UserService {
             if(checkUserInputAddUser(user)){
 
                 user.setPassword(passwordEncoder.encode(user.getPassword()));
+                if(asEmployee == false) {
+                    user.setRoles(new ArrayList<>(Arrays.asList(UserRoleEnum.ROLE_CUSTOMER)));
+                    user.setRole(UserRoleEnum.ROLE_CUSTOMER);
+                }
+                else {
+                    user.setRoles(new ArrayList<>(Arrays.asList(UserRoleEnum.ROLE_EMPLOYEE)));
+                    user.setRole(UserRoleEnum.ROLE_EMPLOYEE);
+                }
 
                 user = userRepository.save(user);
 

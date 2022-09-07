@@ -97,7 +97,20 @@ public class UserController {
         ModelMapper modelMapper = new ModelMapper();
         User user = modelMapper.map(userDTO, User.class);
 
-        ResponseEntity response = userService.addUser(user);
+        ResponseEntity response = userService.addUser(user,false);
+
+        return ResponseEntity.status(201).body(response);
+    }
+
+    //Melle
+    @RequestMapping(value = "/registeruser/asEmployee", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('EMPLOYEE')")
+    public ResponseEntity addAsEmployee(@RequestBody UserDTO userDTO){
+
+        ModelMapper modelMapper = new ModelMapper();
+        User user = modelMapper.map(userDTO, User.class);
+
+        ResponseEntity response = userService.addUser(user,true);
 
         return ResponseEntity.status(201).body(response);
     }
