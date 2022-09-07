@@ -69,7 +69,7 @@ public class BankAccountService {
         double totalAmount = 0;
         for(int i = 0; i < bankAccounts.size(); i++) totalAmount += bankAccounts.get(i).getBalance();
 
-        if(bankAccounts.stream().count() < 2) return ResponseEntity.status(400).body("Bad Request");
+        if(bankAccounts.stream().count() < 2) return ResponseEntity.status(404).body("Bad Request"); //404 not found
         else return ResponseEntity.status(200).body(totalAmount);
     }
 

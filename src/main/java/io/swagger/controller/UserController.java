@@ -72,15 +72,15 @@ public class UserController {
 
     //melle
 
-    @RequestMapping(value = "/testLogin/{username}/{password}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity loginAttempt(@PathVariable("username") String username, @PathVariable("password") String password) {
-
-        User u = this.userService.TestLoginAttempt(username, password);
-
-        if(u == null) return ResponseEntity.status(400).body("Bad Request");
-        else return ResponseEntity.status(200).body(u);
-
-    }
+//    @RequestMapping(value = "/testLogin/{username}/{password}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+//    public ResponseEntity loginAttempt(@PathVariable("username") String username, @PathVariable("password") String password) {
+//
+//        User u = this.userService.TestLoginAttempt(username, password);
+//
+//        if(u == null) return ResponseEntity.status(400).body("Bad Request");
+//        else return ResponseEntity.status(200).body(u);
+//
+//    }
 
     //melle
 //    @CrossOrigin
@@ -103,7 +103,7 @@ public class UserController {
     }
 
     //Melle
-    @RequestMapping(value = "/registeruser/asEmployee", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/registerUser/asEmployee", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('EMPLOYEE')")
     public ResponseEntity addAsEmployee(@RequestBody UserDTO userDTO){
 
