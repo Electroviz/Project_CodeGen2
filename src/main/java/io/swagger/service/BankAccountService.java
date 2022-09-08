@@ -69,7 +69,7 @@ public class BankAccountService {
         double totalAmount = 0;
         for(int i = 0; i < bankAccounts.size(); i++) totalAmount += bankAccounts.get(i).getBalance();
 
-        if(bankAccounts.stream().count() < 2) return ResponseEntity.status(400).body("Bad Request");
+        if(bankAccounts.stream().count() < 2) return ResponseEntity.status(404).body("Bad Request"); //404 not found
         else return ResponseEntity.status(200).body(totalAmount);
     }
 
@@ -95,6 +95,10 @@ public class BankAccountService {
         }
     }
 
+    public boolean CheckIbanBelongsToUser(Integer userId,String iban) {
+        return Objects.equals(GetBankAccountByIban(iban).getUserId().intValue(),userId);
+    }
+
     public boolean UserAlreadyHasBankAccounts(Long userId) {
         List<BankAccount> bankAccounts = bankAccountRepository.findByuserId(userId);
         if(bankAccounts != null && bankAccounts.stream().count() > 1) return true;
@@ -111,6 +115,7 @@ public class BankAccountService {
             newBankAccount.setIban(this.generateRandomIban());
             newBankAccount.setBalance(0.0);
             newBankAccount.setAbsoluteLimit(0.0);
+            newBankAccount.SetAccountStatus(BankAccount.AccountStatusEnum.ACTIVE);
             if(i == 0) newBankAccount.accountType(BankAccount.AccountTypeEnum.CURRENT);
             else if(i == 1) newBankAccount.accountType(BankAccount.AccountTypeEnum.SAVINGS);
 
@@ -158,7 +163,10 @@ public class BankAccountService {
         newBankAccount.setIban(this.generateRandomIban());
         newBankAccount.setBalance(ThreadLocalRandom.current().nextDouble(300, 1800));
         newBankAccount.setAbsoluteLimit(0.0);
-        newBankAccount.accountType(BankAccount.AccountTypeEnum.CURRENT);
+        Random rand = new Random();
+        Integer num = rand.nextInt(2);
+        if(num == 0) newBankAccount.accountType(BankAccount.AccountTypeEnum.CURRENT);
+        else newBankAccount.accountType(BankAccount.AccountTypeEnum.SAVINGS);
         newBankAccount.userId(ThreadLocalRandom.current().nextInt(0, 100000));
 
         bankAccountRepository.save(newBankAccount);
@@ -176,8 +184,40 @@ public class BankAccountService {
     }
 
     //melle
-    public boolean BankAccountIsSavings() {
-        return false;
+    public boolean BankAccountIsValidForTransactions(String Iban) {
+        BankAccount BaForIban = GetBankAccountByIban(Iban);
+        if(BaForIban.getAccountTypeEnum() == BankAccount.AccountTypeEnum.CURRENT && BaForIban.getAccountStatus() != BankAccount.AccountStatusEnum.CLOSED) return true;
+        else return false;
+    }
+
+    //Melle
+    public boolean BankAccountsTransactionIsPossible(String IbanSender , String IbanReciever) {
+        BankAccount BaReciever = GetBankAccountByIban(IbanReciever);
+        BankAccount BaSender = GetBankAccountByIban(IbanSender);
+
+        if(BaReciever.getAccountStatus() == BankAccount.AccountStatusEnum.CLOSED || BaSender.getAccountStatus() == BankAccount.AccountStatusEnum.CLOSED) return false;
+
+        boolean transactionValid = false;
+
+        if(BaReciever.getAccountType() == BankAccount.AccountTypeEnum.SAVINGS &&
+            BaSender.getAccountType() == BankAccount.AccountTypeEnum.CURRENT &&
+                BaReciever.getUserId() == BaSender.getUserId()) {
+            //sender is sending money to its own savings account
+            transactionValid = true;
+        }
+        else if(BaSender.getAccountType() == BankAccount.AccountTypeEnum.SAVINGS &&
+                BaReciever.getAccountType() == BankAccount.AccountTypeEnum.CURRENT &&
+                BaReciever.getUserId() == BaSender.getUserId()) {
+            //sender is sending money from its own savings to its current account
+            transactionValid = true;
+        }
+        else if(BaSender.getAccountType() == BankAccount.AccountTypeEnum.CURRENT && BaReciever.getAccountType() == BankAccount.AccountTypeEnum.CURRENT){
+            //sending money from current to current account is allways possible
+            transactionValid = true;
+        }
+        //else default value = false
+
+        return transactionValid;
     }
 
     //melle

@@ -62,7 +62,7 @@ public class User {
      * @return role
      **/
     @Schema(required = true, description = "")
-    @NotNull
+    //@NotNull
 
     @Valid
     public UserRoleEnum getRole() {

@@ -65,17 +65,19 @@ public class Swagger2SpringBoot implements CommandLineRunner {
         //Nick
 //        create fake users and transactions
           User firstUser = new User();
-          firstUser.setUsername("test");
+          firstUser.setUsername("test123");
           firstUser.setFullname("Jantje Egberts");
           firstUser.setEmail("jantje@live.nl");
-          firstUser.setPassword("geheim");
+          firstUser.setPassword("geheim123");
           firstUser.setPhone("+310628495028");
           firstUser.setDateOfBirth("12-03-1997");
           firstUser.setRole(UserRoleEnum.ROLE_EMPLOYEE);
+          firstUser.setRoles(new ArrayList<>(Arrays.asList(UserRoleEnum.ROLE_EMPLOYEE)));
           firstUser.setTransactionLimit(BigDecimal.valueOf(3000.0));
           firstUser.setDayLimit(BigDecimal.valueOf(3000.0));
 
-          userService.addUser(firstUser);
+          userService.addUser(firstUser,true);
+
 
         User second = new User();
         second.setUsername("Eland");
@@ -85,10 +87,11 @@ public class Swagger2SpringBoot implements CommandLineRunner {
         second.setPhone("+310628495028");
         second.setDateOfBirth("12-03-1997");
         second.setRole(UserRoleEnum.ROLE_CUSTOMER);
+        second.setRoles(new ArrayList<>(Arrays.asList(UserRoleEnum.ROLE_CUSTOMER)));
         second.setTransactionLimit(BigDecimal.valueOf(3000.0));
         second.setDayLimit(BigDecimal.valueOf(3000.0));
 
-        userService.addUser(second);
+        userService.addUser(second, false);
 //          bankAccountService.CreateDummyDataBankAccount(firstUser.getId(), BankAccount.AccountTypeEnum.CURRENT);
 //          bankAccountService.CreateDummyDataBankAccount(firstUser.getId(), BankAccount.AccountTypeEnum.SAVINGS);
 

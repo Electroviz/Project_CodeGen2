@@ -79,6 +79,8 @@ public class BankAccount   {
       this.value = value;
     }
 
+
+
     @Override
     @JsonValue
     public String toString() {
@@ -107,6 +109,10 @@ public class BankAccount   {
   @JsonProperty("accountType")
   private AccountTypeEnum accountType = null;
 
+
+  public AccountTypeEnum getAccountTypeEnum() {
+    return this.accountType;
+  }
   @JsonProperty("absolute limit")
   private Double absoluteLimit = null;
 

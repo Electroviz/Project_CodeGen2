@@ -1,4 +1,4 @@
-package cucumber;
+package swagger;
 
 import org.junit.internal.Classes;
 import org.junit.runner.RunWith;

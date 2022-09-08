@@ -21,6 +21,8 @@ class UserServiceTest {
 
     @Test
     void checkIfStringIsEmailWorks() {
+        UserService userService = new UserService();
+
         Assertions.assertFalse(userService.checkIfStringIsEmail("test.com"));
     }
 

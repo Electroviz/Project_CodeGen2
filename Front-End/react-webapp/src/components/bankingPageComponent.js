@@ -450,7 +450,7 @@ const bankingPageComponent = () => {
                     <div id="allUsersList" style={{height: "auto", maxHeight: "20rem", width: "50%", marginLeft: "25%", overflow: "auto", display: "block"}}>
                         
                     </div>
-                    <div style={{ display: "block"}}>
+                    {/* <div style={{ display: "block"}}>
                         <p style={{ fontSize: "1.15rem", marginBottom: "0rem", display: "inline-block"}}>Change the <b>daily limit</b> for user id: </p>
                         <input id="changeDailyLimitUserId" style={{ display: "inline-block", fontSize: "1.15rem", marginLeft: "0.2rem", marginRight: "0.2rem", width: "3rem"}} />
                         <p style={{ fontSize: "1.15rem", marginBottom: "0rem", display: "inline-block"}}> to value </p>
@@ -463,7 +463,7 @@ const bankingPageComponent = () => {
                         <p style={{ fontSize: "1.15rem", marginBottom: "0rem", display: "inline-block"}}> to value </p>
                         <input id="changeTransactionLimitUserValue" style={{ display: "inline-block", fontSize: "1.15rem", marginLeft: "0.2rem", marginRight: "0.2rem", width: "7rem"}} />
                         <button  style={{ display: "inline-block", fontSize: "1.15rem", marginLeft: "0.2rem"}}>Confirm</button>
-                    </div>
+                    </div> */}
                 </div>
             </div>
 

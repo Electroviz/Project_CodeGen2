@@ -22,6 +22,7 @@ import org.springframework.web.server.ResponseStatusException;
 import org.threeten.bp.OffsetDateTime;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -49,25 +50,34 @@ public class UserService {
 
     //Nick
 
-    public ResponseEntity addUser(User user){
-        String test = "";
-        if (test == "test") {
+    public ResponseEntity addUser(User user, boolean asEmployee){
+
 //        if (userRepository.findByusername(user.getUsername()).getRole().equals(UserRoleEnum.ROLE_CUSTOMER)){
 //            return ResponseEntity.status(403).body("Unauthorized");
 //        }
-            return ResponseEntity.status(400).body("Bad request");
+        String test = "";
+        if (test == ":"){
+            return ResponseEntity.status(400).body("Bad request1");
         }
         else{
             if(checkUserInputAddUser(user)){
 
                 user.setPassword(passwordEncoder.encode(user.getPassword()));
+                if(asEmployee == false) {
+                    user.setRoles(new ArrayList<>(Arrays.asList(UserRoleEnum.ROLE_CUSTOMER)));
+                    user.setRole(UserRoleEnum.ROLE_CUSTOMER);
+                }
+                else {
+                    user.setRoles(new ArrayList<>(Arrays.asList(UserRoleEnum.ROLE_EMPLOYEE)));
+                    user.setRole(UserRoleEnum.ROLE_EMPLOYEE);
+                }
 
                 user = userRepository.save(user);
 
                 return ResponseEntity.status(201).body(user);
             }
             else{
-                return ResponseEntity.status(400).body("Bad request");
+                return ResponseEntity.status(400).body("User Input incorrect");
             }
         }
     }
@@ -131,21 +141,25 @@ public class UserService {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
             User user = userRepository.findByusername(username);
+            if (user == null) {
+                throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Username/Password is incorrect");
+            }
             token = jwtTokenProvider.createToken(username, user.getRoles());
 
         } catch(AuthenticationException ex){
-            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Invalid Username/Password");
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Login Failed");
         }
 
         return token;
     }
+    //Nick
     public boolean checkUserInputAddUser(User user){
         if(user.getFullname().length() < 50 && user.getFullname().length() > 1 && checkIfUserInputIsWord(user.getFullname())){
             if(user.getUsername().length() < 20 && user.getUsername().length() > 3){
                 if(user.getEmail().length() < 50 && user.getEmail().length() > 5 && checkIfStringIsEmail(user.getEmail())){
                     if(user.getDayLimit().doubleValue() >= 0 && user.getDayLimit().doubleValue() <= 10000){
                         if(user.getTransactionLimit().doubleValue() >= 0 && user.getTransactionLimit().doubleValue() <= 10000){
-                            if(user.getRole().equals(UserRoleEnum.ROLE_BANK) || user.getRole().equals(UserRoleEnum.ROLE_CUSTOMER) || user.getRole().equals(UserRoleEnum.ROLE_EMPLOYEE)){
+                            //if(user.getRole().equals(UserRoleEnum.ROLE_BANK) || user.getRole().equals(UserRoleEnum.ROLE_CUSTOMER) || user.getRole().equals(UserRoleEnum.ROLE_EMPLOYEE)){
                                 if(user.getPassword().length() >= 6 && user.getPassword().length() <= 32){
                                     return true;
                                 }
@@ -154,11 +168,13 @@ public class UserService {
                     }
                 }
             }
-        }
+        //}
         return false;
     }
+    //Nick
     public boolean checkIfUserInputIsWord(String userInput){
-        char[] chars = userInput.toCharArray();
+        String noSpaceStr = userInput.replaceAll("\\s", "");
+        char[] chars = noSpaceStr.toCharArray();
 
         for (char c : chars) {
             if(!Character.isLetter(c)) {
@@ -169,6 +185,7 @@ public class UserService {
         return true;
     }
 
+    //Nick
     public boolean checkIfStringIsEmail(String userInput){
         Pattern emailPattern = Pattern.compile("[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}");
         Matcher mat = emailPattern.matcher(userInput);

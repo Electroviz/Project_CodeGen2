@@ -1,5 +1,7 @@
 package io.swagger.api;
 
+import io.swagger.annotations.Api;
+import io.swagger.enums.UserRoleEnum;
 import io.swagger.model.Login;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.model.UserDTO;
@@ -41,6 +43,7 @@ import java.util.stream.Collectors;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-05-12T15:22:53.754Z[GMT]")
 @RestController
+@Api(tags= {"Users"})
 public class UserApiController implements UserApi {
 
     private static final Logger log = LoggerFactory.getLogger(UserApiController.class);
@@ -63,9 +66,9 @@ public class UserApiController implements UserApi {
 
         ModelMapper modelMapper = new ModelMapper();
         User user = modelMapper.map(body, User.class);
-
-        ResponseEntity response = userService.addUser(user);
-
+        ResponseEntity response = null;
+        if(user.getRole() == UserRoleEnum.ROLE_EMPLOYEE) response = userService.addUser(user, true);
+        else response = userService.addUser(user, false);
 
         return new ResponseEntity(response, HttpStatus.CREATED);
     }
