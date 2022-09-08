@@ -152,6 +152,7 @@ public class BankAccountController {
 
     //melle
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE,value="/getBankAccount/{IBAN}")
+    @PreAuthorize("hasRole('EMPLOYEE') or hasRole('CUSTOMER')")
     public ResponseEntity getBankAccountInfoByIbanController(@PathVariable("IBAN") String IBAN) {
         //protection for requesting bankaccount info
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -180,13 +181,15 @@ public class BankAccountController {
 
     //Nicky
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE,value="/getBankAccount/name/{FULLNAME}")
+    @PreAuthorize("hasRole('EMPLOYEE') or hasRole('CUSTOMER')")
     public ResponseEntity getBankAccountInfoByName(@PathVariable("FULLNAME") String fullName) {
-
+        //Anyone that is logged in should be able to perform this method
         List<String> ibansToReturn = bankAccountService.getAccountByName(fullName);
 
         if(ibansToReturn != null) {
-            return new ResponseEntity<List>(ibansToReturn,HttpStatus.ACCEPTED);
+            return new ResponseEntity<List>(ibansToReturn,HttpStatus.OK);
         }
+        else if(ibansToReturn.size() == 0) return ResponseEntity.status(404).body(null);
         else {
             return ResponseEntity.status(400).body("Bad Request");
         }
@@ -207,6 +210,7 @@ public class BankAccountController {
 
     //Nicky
     @RequestMapping(method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE,value="/deleteAccount/{IBAN}")
+    @PreAuthorize("hasRole('EMPLOYEE')")
     public ResponseEntity deleteAccount(@PathVariable("IBAN") String IBAN) {
         BankAccount bankAccount = bankAccountService.DeleteBankAccount(IBAN);
 
