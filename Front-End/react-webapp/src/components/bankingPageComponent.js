@@ -4,7 +4,7 @@ import axios from 'axios';
 
 const bankingPageComponent = () => {
     var instance = axios.create();
-    var jwtToken = "";
+    var jwtToken = getCookie("jwt");
     var userId = -1;
     var userRights = "none";
     var allBankAccountsInfo = null;
@@ -55,11 +55,29 @@ const bankingPageComponent = () => {
             })
             .then(res => {
                 //
-            });
+                window.location.reload();
+            })
+            .catch((error) => console.log(jwtToken, error));
 
-            window.location.reload();
+            //window.location.reload();
         }
      }
+
+     function getCookie(cname) {
+        let name = cname + "=";
+        let decodedCookie = decodeURIComponent(document.cookie);
+        let ca = decodedCookie.split(';');
+        for(let i = 0; i <ca.length; i++) {
+          let c = ca[i];
+          while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+          }
+          if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+          }
+        }
+        return "";
+      }
 
     const SetBankingInfoCurrentUser = () => {
         //first get and set the User id by JWT token, if JWT token is not valid anymore return to login page
