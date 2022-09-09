@@ -51,10 +51,6 @@ public class UserService {
     //Nick
 
     public ResponseEntity addUser(User user, boolean asEmployee){
-
-//        if (userRepository.findByusername(user.getUsername()).getRole().equals(UserRoleEnum.ROLE_CUSTOMER)){
-//            return ResponseEntity.status(403).body("Unauthorized");
-//        }
         String test = "";
         if (test == ":"){
             return ResponseEntity.status(400).body("Bad request1");
@@ -139,7 +135,7 @@ public class UserService {
         String token = "";
 
         try {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+            //authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
             User user = userRepository.findByusername(username);
             if (user == null) {
                 throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Username/Password is incorrect");

@@ -9,6 +9,7 @@ import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,6 +56,7 @@ class BankAccountServiceTest {
     }
 
     @Test
+    @PreAuthorize("hasRole('EMPLOYEE') or hasRole('CUSTOMER')")
     void getTotalBalanceByUserId() {
         try {
             double balance = (double) bankAccountService.GetTotalBalanceByUserId(Long.valueOf(12)).getBody();
@@ -77,6 +79,7 @@ class BankAccountServiceTest {
     }
 
     @Test
+    @PreAuthorize("hasRole('EMPLOYEE') or hasRole('CUSTOMER')")
     void getAllBankAccounts() {
         try {
             List<BankAccount> allBankAccounts = (List<BankAccount>) bankAccountService.GetAllBankAccounts();
