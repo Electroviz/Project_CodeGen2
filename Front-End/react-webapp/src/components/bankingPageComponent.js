@@ -4,7 +4,7 @@ import axios from 'axios';
 
 const bankingPageComponent = () => {
     var instance = axios.create();
-    var jwtToken = "";
+    var jwtToken = getCookie("jwt");
     var userId = -1;
     var userRights = "none";
     var allBankAccountsInfo = null;
@@ -45,21 +45,60 @@ const bankingPageComponent = () => {
         
     }
 
-    const CreateBankAccountsForUser = (e) => {
+    const CreateBankAccountsForUser = async (e) => {
         if(userId != -1) {
+            axios.interceptors.request.use(
+                config => {
+                    config.headers.Authorization = 'Bearer ' + getCookie("jwt");
+                    return config;
+                },
+                error => {
+                    return Promise.reject(error);
+                }
+            )
+
+            const result = await axios.post('http://localhost:8080/api/initBankAccounts/' + userId);
+            console.log(result.data);
+
+
+        }
+        
+        
+        if(userId != -1 && false == true) {
             instance.post('http://localhost:8080/api/initBankAccounts/' + userId,{
                 headers: {
-                    'Content-Type': null,
-                    Authorization: "Bearer " + jwtToken,
+                    "Authorization": "Bearer " + getToken(),
                 }
             })
             .then(res => {
                 //
-            });
+                window.location.reload();
+            })
+            .catch((error) => console.log("Bearer " + getToken(), error));
 
-            window.location.reload();
+            //window.location.reload();
         }
      }
+
+     function getToken() {
+        return getCookie("jwt");
+     }
+
+     function getCookie(cname) {
+        let name = cname + "=";
+        let decodedCookie = decodeURIComponent(document.cookie);
+        let ca = decodedCookie.split(';');
+        for(let i = 0; i <ca.length; i++) {
+          let c = ca[i];
+          while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+          }
+          if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+          }
+        }
+        return "";
+      }
 
     const SetBankingInfoCurrentUser = () => {
         //first get and set the User id by JWT token, if JWT token is not valid anymore return to login page

@@ -78,8 +78,7 @@ public class BankAccountController {
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value="/totalBalance/{userId}")
     @PreAuthorize("hasRole('EMPLOYEE') or hasRole('CUSTOMER')")
     public ResponseEntity getTotalBalanceForUserId(@PathVariable("userId") Long userId) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User u = userService.getUserById(userService.getUserIdByUsername(authentication.getName()));
+        User u = this.getLoggedInUser();
 
         if(Objects.equals(u.getRole(), UserRoleEnum.ROLE_EMPLOYEE)) {
             //allow the function to be executed for any user
@@ -102,8 +101,7 @@ public class BankAccountController {
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value="/bankAccounts/{userId}")
     @PreAuthorize("hasRole('EMPLOYEE') or hasRole('CUSTOMER')")
     public ResponseEntity testFunc(@PathVariable("userId") long userId) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User u = userService.getUserById(userService.getUserIdByUsername(authentication.getName()));
+        User u = this.getLoggedInUser();
 
         List<BankAccount> bankAccounts = bankAccountService.GetBankAccountsByUserId(userId);
 
@@ -136,8 +134,7 @@ public class BankAccountController {
     public ResponseEntity registerNewBankAccountController(@RequestBody BankAccount account){
         ResponseEntity response = bankAccountService.CreateNewBankAccount();
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User u = userService.getUserById(userService.getUserIdByUsername(authentication.getName()));
+        User u = this.getLoggedInUser();
 
         if(u.getRole() != UserRoleEnum.ROLE_EMPLOYEE) {
             if(Objects.equals(u.getId(), account.getUserId()) == false) return ResponseEntity.status(401).body(null);
@@ -152,10 +149,10 @@ public class BankAccountController {
 
     //melle
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE,value="/getBankAccount/{IBAN}")
+    @PreAuthorize("hasRole('EMPLOYEE') or hasRole('CUSTOMER')")
     public ResponseEntity getBankAccountInfoByIbanController(@PathVariable("IBAN") String IBAN) {
         //protection for requesting bankaccount info
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User u = userService.getUserById(userService.getUserIdByUsername(authentication.getName()));
+        User u = this.getLoggedInUser();
 
         boolean canPerform = false;
 
@@ -180,13 +177,15 @@ public class BankAccountController {
 
     //Nicky
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE,value="/getBankAccount/name/{FULLNAME}")
+    @PreAuthorize("hasRole('EMPLOYEE') or hasRole('CUSTOMER')")
     public ResponseEntity getBankAccountInfoByName(@PathVariable("FULLNAME") String fullName) {
-
+        //Anyone that is logged in should be able to perform this method
         List<String> ibansToReturn = bankAccountService.getAccountByName(fullName);
 
         if(ibansToReturn != null) {
-            return new ResponseEntity<List>(ibansToReturn,HttpStatus.ACCEPTED);
+            return new ResponseEntity<List>(ibansToReturn,HttpStatus.OK);
         }
+        else if(ibansToReturn.size() == 0) return ResponseEntity.status(404).body(null);
         else {
             return ResponseEntity.status(400).body("Bad Request");
         }
@@ -207,6 +206,7 @@ public class BankAccountController {
 
     //Nicky
     @RequestMapping(method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE,value="/deleteAccount/{IBAN}")
+    @PreAuthorize("hasRole('EMPLOYEE')")
     public ResponseEntity deleteAccount(@PathVariable("IBAN") String IBAN) {
         BankAccount bankAccount = bankAccountService.DeleteBankAccount(IBAN);
 
@@ -229,5 +229,10 @@ public class BankAccountController {
         else {
             return ResponseEntity.status(400).body("Bad Request");
         }
+    }
+
+    private User getLoggedInUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return userService.getUserById(userService.getUserIdByUsername(authentication.getName()));
     }
 }
