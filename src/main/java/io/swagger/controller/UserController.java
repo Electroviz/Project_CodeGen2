@@ -19,13 +19,13 @@ import java.util.stream.Collectors;
 
 @RestController
 @CrossOrigin
-@RequestMapping("/user")
+@RequestMapping("/user1")
 public class UserController {
 
     @Autowired
     private UserService userService;
 
-    @RequestMapping(value = "/getall", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    /*@RequestMapping(value = "/getall", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity getAll(){
 
         List<User> users = userService.getAll();
@@ -38,10 +38,11 @@ public class UserController {
                 .collect(Collectors.toList());
 
         return ResponseEntity.status(200).body(dtos);
-    }
+    }*/
 
     //melle
 
+    /*
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value= "/getUserIdJwtValidation")
     public ResponseEntity getUserIdByJwtTokenVerification() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -60,8 +61,10 @@ public class UserController {
             return ResponseEntity.status(400).body("Bad Request");
         }
     }
+    */
 
     //melle
+    /*
     @PreAuthorize("hasRole('EMPLOYEE')")
     @RequestMapping(value = "/getAllUsersWithoutBankAccounts", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity getUsersWithoutBankAccounts() {
@@ -69,7 +72,7 @@ public class UserController {
 
         return ResponseEntity.status(200).body(usersWithoutBankAccounts);
     }
-
+    */
     //melle
 
 //    @RequestMapping(value = "/testLogin/{username}/{password}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -90,7 +93,7 @@ public class UserController {
 //        return ResponseEntity.status(200).body()
 //    }
 
-
+    /*
     @RequestMapping(value = "/registeruser", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity add(@RequestBody UserDTO userDTO){
 
@@ -101,8 +104,11 @@ public class UserController {
 
         return ResponseEntity.status(201).body(response);
     }
+    */
+
 
     //Melle
+    /*
     @RequestMapping(value = "/registerUser/asEmployee", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('EMPLOYEE')")
     public ResponseEntity addAsEmployee(@RequestBody UserDTO userDTO){
@@ -114,8 +120,10 @@ public class UserController {
 
         return ResponseEntity.status(201).body(response);
     }
+    */
 
 
+    /*
     @RequestMapping(value = "/get/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('EMPLOYEE')")
     public ResponseEntity getUserById(@PathVariable("id") Long id){
@@ -128,13 +136,15 @@ public class UserController {
 
         return ResponseEntity.status(201).body(response);
     }
+    */
 
-
+    /*
     @RequestMapping(value = "/login", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public String login(@RequestBody Login login){
 
         String test = "test";
         return userService.login(login.getUsername(), login.getPassword());
     }
+    */
 
 }
