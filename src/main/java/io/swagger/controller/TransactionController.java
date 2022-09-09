@@ -36,8 +36,7 @@ public class TransactionController {
     //Melle
     @RequestMapping(method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE, value="/transactions/{fromIban}/{toIban}/{amount}")
     public ResponseEntity transferMoney(@PathVariable("fromIban") String fromIban, @PathVariable("toIban") String toIban, @PathVariable("amount") Double amount) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User u = userService.getUserById(userService.getUserIdByUsername(authentication.getName()));
+        User u = this.getLoggedInUser();
 
         boolean canPerform = false;
         if(u.getRole() == UserRoleEnum.ROLE_EMPLOYEE) canPerform = true;
@@ -65,8 +64,7 @@ public class TransactionController {
     //Melle
     @RequestMapping(method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE, value="/transactions/withdraw/{iban}/{amount}")
     public ResponseEntity Withdraw(@PathVariable("iban") String iban, @PathVariable("amount") Double amount) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User u = userService.getUserById(userService.getUserIdByUsername(authentication.getName()));
+        User u = this.getLoggedInUser();
 
         boolean canPerform = false;
         if(Objects.equals(u.getRole(), UserRoleEnum.ROLE_EMPLOYEE)) canPerform = true;
@@ -88,8 +86,7 @@ public class TransactionController {
     //Melle
     @RequestMapping(method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE, value="/transactions/deposit/{iban}/{amount}")
     public ResponseEntity Deposit(@PathVariable("iban") String iban, @PathVariable("amount") Double amount) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User u = userService.getUserById(userService.getUserIdByUsername(authentication.getName()));
+        User u = this.getLoggedInUser();
 
         boolean canPerform = false;
         if(Objects.equals(u.getRole(), UserRoleEnum.ROLE_EMPLOYEE)) canPerform = true;
@@ -121,8 +118,7 @@ public class TransactionController {
     //Melle
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value="/transactions/byDateAndUser/{fromDate}/{toDate}/{userId}")
     public ResponseEntity GetTransactionsByDateAndUser(@PathVariable("fromDate") OffsetDateTime fromDate, @PathVariable("todate") OffsetDateTime toDate, @PathVariable("userId") Integer userId) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User u = userService.getUserById(userService.getUserIdByUsername(authentication.getName()));
+        User u = this.getLoggedInUser();
 
         List<Transaction> correctTransactions = new ArrayList<>();
         if(Objects.equals(u.getRole(), UserRoleEnum.ROLE_EMPLOYEE)) {
@@ -138,8 +134,7 @@ public class TransactionController {
     //Melle
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value="/transactions/byIbans/{fromIban}/{toIban}")
     public ResponseEntity GetTransactionByIbans(@PathVariable("fromIban") String fromIban, @PathVariable("toIban") String toIban) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User u = userService.getUserById(userService.getUserIdByUsername(authentication.getName()));
+        User u = this.getLoggedInUser();
 
         List<Transaction> correctTransactions = new ArrayList<>();
         //only let a customer execute this code if from or to iban is his own iban
@@ -162,8 +157,7 @@ public class TransactionController {
     //Melle
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value="/transactions/byAmountIsEqual/{iban}/{amount}")
     public ResponseEntity GetTransactionByAmountEqualToNum (@PathVariable("iban") String iban, @PathVariable("amount") Double amount) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User u = userService.getUserById(userService.getUserIdByUsername(authentication.getName()));
+        User u = this.getLoggedInUser();
 
         List<Transaction> result = new ArrayList<>();
 
@@ -183,8 +177,7 @@ public class TransactionController {
 
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value="/transactions/byAmountIsSmaller/{iban}/{amount}")
     public ResponseEntity GetTransactionByAmountSmallerToNum (@PathVariable("iban") String iban, @PathVariable("amount") Double amount) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User u = userService.getUserById(userService.getUserIdByUsername(authentication.getName()));
+        User u = this.getLoggedInUser();
 
         List<Transaction> result = new ArrayList<>();
 
@@ -204,8 +197,7 @@ public class TransactionController {
 
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value="/transactions/byAmountIsBigger/{iban}/{amount}")
     public ResponseEntity GetTransactionByAmountBiggerToNum (@PathVariable("iban") String iban, @PathVariable("amount") Double amount) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User u = userService.getUserById(userService.getUserIdByUsername(authentication.getName()));
+        User u = this.getLoggedInUser();
 
         List<Transaction> result = new ArrayList<>();
 
@@ -221,5 +213,10 @@ public class TransactionController {
 
         if(result.size() == 0) return ResponseEntity.status(204).body(result);
         else return ResponseEntity.status(200).body(result);
+    }
+
+    private User getLoggedInUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return userService.getUserById(userService.getUserIdByUsername(authentication.getName()));
     }
 }
