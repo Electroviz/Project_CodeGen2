@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.server.ResponseStatusException;
 import org.threeten.bp.OffsetDateTime;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -63,6 +64,8 @@ public class UserService {
             if(checkUserInputAddUser(user)){
 
                 user.setPassword(passwordEncoder.encode(user.getPassword()));
+                user.setDayLimit(BigDecimal.valueOf(10000.0));
+                user.setTransactionLimit(BigDecimal.valueOf(10000.0));
                 if(asEmployee == false) {
                     user.setRoles(new ArrayList<>(Arrays.asList(UserRoleEnum.ROLE_CUSTOMER)));
                     user.setRole(UserRoleEnum.ROLE_CUSTOMER);

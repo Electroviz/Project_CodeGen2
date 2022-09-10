@@ -26,7 +26,7 @@ const RegisterComp = () => {
                 "password": password,
                 "dayLimit": 10000,
                 "transactionLimit": 10000,
-                "role": "customer"
+                "role": "ROLE_CUSTOMER"
             });
 
             instance.post('http://localhost:8080/api/user/registeruser', params, {

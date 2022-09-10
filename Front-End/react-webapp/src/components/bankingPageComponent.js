@@ -58,215 +58,158 @@ const bankingPageComponent = () => {
             )
 
             const result = await axios.post('http://localhost:8080/api/initBankAccounts/' + userId);
-            console.log(result.data);
-
-
+            if(result.status == 200) window.location.reload();
+            else console.log(result);
         }
+    }
+
+    async function GetAndSetUserIdByJwtToken() {
+        const jwtToken = getToken();
+
+        const result = await axios.get('http://localhost:8080/api/user/getUserIdJwtValidation');
+
+        if(result.status == 200) {
+            document.cookie = "userId = " + result.data;
+            userId = result.data;
+        }
+        else window.location.href = "/";
         
-        
-        if(userId != -1 && false == true) {
-            instance.post('http://localhost:8080/api/initBankAccounts/' + userId,{
-                headers: {
-                    "Authorization": "Bearer " + getToken(),
-                }
-            })
-            .then(res => {
-                //
-                window.location.reload();
-            })
-            .catch((error) => console.log("Bearer " + getToken(), error));
 
-            //window.location.reload();
-        }
-     }
-
-     function getToken() {
-        return getCookie("jwt");
-     }
-
-     function getCookie(cname) {
-        let name = cname + "=";
-        let decodedCookie = decodeURIComponent(document.cookie);
-        let ca = decodedCookie.split(';');
-        for(let i = 0; i <ca.length; i++) {
-          let c = ca[i];
-          while (c.charAt(0) == ' ') {
-            c = c.substring(1);
-          }
-          if (c.indexOf(name) == 0) {
-            return c.substring(name.length, c.length);
-          }
-        }
-        return "";
-      }
+    }
 
     const SetBankingInfoCurrentUser = () => {
         //first get and set the User id by JWT token, if JWT token is not valid anymore return to login page
         //get jwt token if not set yet
-        let name = "jwt" + "=";
-        let decodedCookie = decodeURIComponent(document.cookie);
-        let ca = decodedCookie.split(';');
-        for(let i = 0; i <ca.length; i++) {
-          let c = ca[i];
-          while (c.charAt(0) == ' ') {
-            c = c.substring(1);
-          }
-          if (c.indexOf(name) == 0) {
-            jwtToken = c.substring(name.length, c.length);
-          }
-        }
+        //set total balance, daily limit, transaction limit, set his info voor CURRENT & SAVINGS IBAN balance, absolute limit
 
-        instance.get('http://localhost:8080/api/user/getUserIdJwtValidation', {
-            headers: {
-                'Content-Type': null,
-                Authorization: "Bearer " + jwtToken,
-            }
-        })
-        .then(res => {
-            if(res.status >= 200 && res.status <= 300) {
-                userId = res.data;
-
-                //set rest of the current user data, because the current JWT is a valid JWT token
-                //set total balance
-                instance.get('http://localhost:8080/api/totalBalance/' + userId, {
-                headers: {
-                    'Content-Type': null,
-                    Authorization: "Bearer " + jwtToken,
+        setTimeout(async function() {
+            axios.interceptors.request.use(
+                config => {
+                    config.headers.Authorization = 'Bearer ' + getCookie("jwt");
+                    return config;
+                },
+                error => {
+                    return Promise.reject(error);
                 }
-                })
-                .then(res => { 
-                    if(res.status >= 200 && res.status <= 300) document.getElementById("displayTotalBalance").innerHTML = "€ " + res.data;
-                    else document.getElementById("displayTotalBalance").innerHTML = "€ 0";
-                });
-
-                // /bankAccounts/{userId}
-                instance.get('http://localhost:8080/api/bankAccounts/' + userId, {
-                headers: {
-                    'Content-Type': null,
-                    Authorization: "Bearer " + jwtToken,
-                }
-                })
-                .then(res => { 
-                    if(res.status >= 200 && res.status <= 300) {
-                        if(res.data.length > 0) {
-                            for(let i = 0; i < res.data.length; i++) {
-                                if(res.data[i]["accountType"] == "Current") {
-                                    document.getElementById("currentIban").innerHTML = res.data[i]["iban"];
-                                    document.getElementById("currentBalance").innerHTML = "€ " + res.data[i]["balance"];
-                                    document.getElementById("currentAbsoluteLimit").innerHTML = "€ " + res.data[i]["absolute limit"];
-                                }
-                                else {
-                                    //savings
-                                    document.getElementById("savingIban").innerHTML = res.data[i]["iban"];
-                                    document.getElementById("savingBalance").innerHTML = "€ " + res.data[i]["balance"];
-                                    document.getElementById("savingAbsoluteLimit").innerHTML = "€ " + res.data[i]["absolute limit"];
-                                }
-                            }
+            );
+    
+            GetAndSetUserIdByJwtToken();
+    
+            //set banking info
+            try {
+                const bankingInfoRequest = await axios.get('http://localhost:8080/api/bankAccounts/' + getCookie("userId")); 
+                if(bankingInfoRequest.status == 200) {
+                    //set the banking info
+                    var bankingInfoData = bankingInfoRequest.data;
+                    for(var i = 0; i < bankingInfoData.length; i++) {
+                        var bankInfo = bankingInfoData[i];
+                        if(bankInfo["accountType"] == "Current") {
+                            document.getElementById("currentIban").innerHTML = bankInfo["iban"];
+                            document.getElementById("currentBalance").innerHTML = bankInfo["balance"];
+                            document.getElementById("currentAbsoluteLimit").innerHTML = bankInfo["absolute limit"];
                         }
                         else {
-                            //show button to create bank accounts for user ID
-                            document.getElementById("createBankAccountsButt").style.visibility = "visible";
+                            document.getElementById("savingIban").innerHTML = bankInfo["iban"];
+                            document.getElementById("savingBalance").innerHTML = bankInfo["balance"];
+                            document.getElementById("savingAbsoluteLimit").innerHTML = bankInfo["absolute limit"];
                         }
                     }
-                }).catch((error) => {
-                    document.getElementById("displayTotalBalance").innerHTML = "€ 0";
-                    //show button to create bank accounts for user ID
-                    document.getElementById("createBankAccountsButt").style.visibility = "visible"; 
-                    document.getElementById("currentUsersBankingInfo").remove();
-                });
-
-                if(userId != -1) {
-                    //set user info
-                    instance.get('http://localhost:8080/api/user/get/' + userId, {
-                    headers: {
-                        'Content-Type': null,
-                        Authorization: "Bearer " + jwtToken,
+                    
+                    var totalBalance = 0;
+                    for(var i = 0; i < bankingInfoData.length; i++) {
+                        totalBalance = (totalBalance + bankingInfoData[i]["balance"]);
                     }
-                    })
-                    .then(res => { 
-                        if(res.status >= 200 && res.status <= 300) {
-                            document.getElementById("currentUserFullName").innerHTML = "Welcome " + res.data["fullname"];
-                            document.getElementById("displayTransactionLimit").innerHTML = res.data["transactionLimit"];
-                            document.getElementById("displayDailyLimit").innerHTML = res.data["dailyLimit"];
-                            userRights = res.data["role"];
-                            if(userRights != "employee") document.getElementById("EmployeeContainer").remove();
-                            else {
+    
+                    document.getElementById("displayTotalBalance").innerHTML = "€ " + totalBalance;
+    
+                    // console.log(bankingInfoData);
+                }
+            }
+            catch (error) {
+                document.getElementById("displayTotalBalance").innerHTML = "€ 0";
+
+                //show button to create bank accounts for user ID
+                document.getElementById("createBankAccountsButt").style.visibility = "visible"; 
+                document.getElementById("currentUsersBankingInfo").remove();
+            }
+
+
+            //set user info
+            try {
+                ///get/{id}
+                const userResult = await axios.get('http://localhost:8080/api/user/get/' + getCookie("userId"));
+
+                if(userResult.status >= 200 && userResult.status < 300) {
+                    var userData = userResult.data;
+                    document.getElementById("currentUserFullName").innerHTML = userData["fullname"];
+                    document.getElementById("displayDailyLimit").innerHTML = userData["dayLimit"];
+                    document.getElementById("displayTransactionLimit").innerHTML = userData["trasnactionLimit"];
+
+                    var userRights = userData["role"];
+                    if(userRights != "ROLE_EMPLOYEE") document.getElementById("EmployeeContainer").remove();
+                    else {
                                 //load all info for the employee
                                 loadAllUsersWithoutBankAccounts();
                                 loadAllBankAccountInfo();
                                 loadAllUsersInfo();
-                            }
-                        }
-                    });
+                    }
                 }
             }
-            else {
-                if(window.location.pathname == "/")window.location.href = "/login";
+            catch (error) {
+                document.getElementById("EmployeeContainer").remove();
             }
-            
-        })
-        .catch((error) => {
-            if(window.location.pathname == "/homePage") window.location.href = "/login";
-        });
-
+        },200);
     }
 
-    const ChangeBankAccountStatus = (e) => {
+    const ChangeBankAccountStatus = async (e) => {
         var iban = document.getElementById("changeStatusIban").value;
         var status = document.getElementById("changeStatus").value.toUpperCase();
 
-        instance.put('http://localhost:8080/api/putBankAccountStatus/' + status + '/' + iban, {
-                headers: {
-                    'Content-Type': null,
-                    Authorization: "Bearer " + jwtToken,
-                }
-                })
-                .then(res => { 
-                    if(res.status >= 200 && res.status <= 300) {
-                        alert("Succes");
-                        loadAllBankAccountInfo();
-                    }
-                }).catch((error) => {
-                    alert("Failed to change the status");
-                });
+        try {
+            const result = await axios.put('http://localhost:8080/api/putBankAccountStatus/' + status + '/' + iban);
+            if(result.status >= 200 && result.status < 300) {
+                loadAllBankAccountInfo();
+            }
+            else {
+                alert("Failed to change the status");
+            }
+        }
+        catch (error) {
+            alert("Failed to change the status");
+        }
     }
 
-    const ChangeBankAccountAbsoluteLimit = (e) => {
+    const ChangeBankAccountAbsoluteLimit = async (e) => {
         var iban = document.getElementById("changeAbsoluteLimitIban").value;
         var value = document.getElementById("changeAbsoluteLimitValue").value;
 
-        instance.put('http://localhost:8080/api/putAbsoluteLimit/' + value + '/' + iban, {
-                headers: {
-                    'Content-Type': null,
-                    Authorization: "Bearer " + jwtToken,
-                }
-                })
-                .then(res => { 
-                    if(res.status >= 200 && res.status <= 300) {
-                        alert("Succes");
-                        loadAllBankAccountInfo();
-                    }
-                }).catch((error) => {
-                    alert("Failed to change the status");
-                });
+        try {
+            const result = await axios.put('http://localhost:8080/api/putAbsoluteLimit/' + value + '/' + iban);
+
+            if(result.status >= 200 && result.status < 300) {
+                loadAllBankAccountInfo();
+            }
+            else alert("Failed to change the absolute limit");
+        }
+        catch (error) {
+            alert("Failed to change the absolute limit");
+        }
     }
 
-    const EmployeeCreateBankAccountForUser = (e) => {
+    const EmployeeCreateBankAccountForUser = async (e) => {
         // /initBankAccounts/{userId}
-        instance.post('http://localhost:8080/api/initBankAccounts/' + document.getElementById("inputCreateBankAccUserId").value, {
-                headers: {
-                    'Content-Type': null,
-                    Authorization: "Bearer " + jwtToken,
-                }
-                })
-                .then(res => { 
-                    if(res.status >= 200 && res.status <= 300) {
-                        alert("Succes");
-                        loadAllUsersWithoutBankAccounts();
-                    }
-                }).catch((error) => {
-                    alert("Failed to change the status");
-                });
+        
+        try {
+            const result = await axios.post('http://localhost:8080/api/initBankAccounts/' + document.getElementById("inputCreateBankAccUserId").value);
+
+            if(result.status >= 200 && result.status < 300) {
+                loadAllUsersWithoutBankAccounts();
+            }
+            else alert("Failed to create bank account for user");
+        }
+        catch (error) {
+            alert("Failed to create bank account for user");
+        }
     }
     
     function loadAllUsersInfo() {
@@ -382,13 +325,33 @@ const bankingPageComponent = () => {
                 }
             });
     }
+
+    function getToken() {
+        return getCookie("jwt");
+     }
+
+     function getCookie(cname) {
+        let name = cname + "=";
+        let decodedCookie = decodeURIComponent(document.cookie);
+        let ca = decodedCookie.split(';');
+        for(let i = 0; i <ca.length; i++) {
+          let c = ca[i];
+          while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+          }
+          if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+          }
+        }
+        return "";
+      }
     
     return (
         <div>
             <div style={{ marginTop: "0.8rem", width: "100%", borderBottom: "0.4rem solid black"}}>
                 <h1>BANKING APPLICATION</h1>
                 <div style={{ display: "block" }}>
-                    <p id="currentUserFullName" style={{ width: "100%", textAlign: "center"}}></p>
+                    <p id="currentUserFullName" style={{ width: "100%", textAlign: "center", fontWeight: "bold", fontSize: "1.4rem", marginBottom: "-0.5rem"}}></p>
                 </div>
 
                 <div id="currentUsersBankingInfo">
@@ -434,6 +397,13 @@ const bankingPageComponent = () => {
                 </div>
 
                 <button id="createBankAccountsButt" onClick={ CreateBankAccountsForUser } style={{ display: "block", visibility: "hidden", width: "15%", marginLeft: "42.5%", marginBottom: "1.8rem"}}>create your banking accounts</button>
+            
+            
+            
+                <div id="makeAnTransactionSection">
+                    
+                </div>
+            
             </div>
 
 
@@ -515,3 +485,132 @@ const bankingPageComponent = () => {
 }
 
 export default bankingPageComponent;
+
+
+        
+
+
+
+
+
+        // let name = "jwt" + "=";
+        // let decodedCookie = decodeURIComponent(document.cookie);
+        // let ca = decodedCookie.split(';');
+        // for(let i = 0; i <ca.length; i++) {
+        //   let c = ca[i];
+        //   while (c.charAt(0) == ' ') {
+        //     c = c.substring(1);
+        //   }
+        //   if (c.indexOf(name) == 0) {
+        //     jwtToken = c.substring(name.length, c.length);
+        //   }
+        // }
+
+        // if(userId != -1) {
+        //     axios.interceptors.request.use(
+        //         config => {
+        //             config.headers.Authorization = 'Bearer ' + getCookie("jwt");
+        //             return config;
+        //         },
+        //         error => {
+        //             return Promise.reject(error);
+        //         }
+        //     )
+
+        //     const result = await axios.post('http://localhost:8080/api/initBankAccounts/' + userId);
+        //     if(result.status == 200) window.location.reload();
+        //     else console.log(result);
+        // }
+
+        // instance.get('http://localhost:8080/api/user/getUserIdJwtValidation', {
+        //     headers: {
+        //         'Content-Type': null,
+        //         Authorization: "Bearer " + jwtToken,
+        //     }
+        // })
+        // .then(res => {
+        //     if(res.status >= 200 && res.status <= 300) {
+        //         userId = res.data;
+
+        //         //set rest of the current user data, because the current JWT is a valid JWT token
+        //         //set total balance
+        //         instance.get('http://localhost:8080/api/totalBalance/' + userId, {
+        //         headers: {
+        //             'Content-Type': null,
+        //             Authorization: "Bearer " + jwtToken,
+        //         }
+        //         })
+        //         .then(res => { 
+        //             if(res.status >= 200 && res.status <= 300) document.getElementById("displayTotalBalance").innerHTML = "€ " + res.data;
+        //             else document.getElementById("displayTotalBalance").innerHTML = "€ 0";
+        //         });
+
+        //         // /bankAccounts/{userId}
+        //         instance.get('http://localhost:8080/api/bankAccounts/' + userId, {
+        //         headers: {
+        //             'Content-Type': null,
+        //             Authorization: "Bearer " + jwtToken,
+        //         }
+        //         })
+        //         .then(res => { 
+        //             if(res.status >= 200 && res.status <= 300) {
+        //                 if(res.data.length > 0) {
+        //                     for(let i = 0; i < res.data.length; i++) {
+        //                         if(res.data[i]["accountType"] == "Current") {
+        //                             document.getElementById("currentIban").innerHTML = res.data[i]["iban"];
+        //                             document.getElementById("currentBalance").innerHTML = "€ " + res.data[i]["balance"];
+        //                             document.getElementById("currentAbsoluteLimit").innerHTML = "€ " + res.data[i]["absolute limit"];
+        //                         }
+        //                         else {
+        //                             //savings
+        //                             document.getElementById("savingIban").innerHTML = res.data[i]["iban"];
+        //                             document.getElementById("savingBalance").innerHTML = "€ " + res.data[i]["balance"];
+        //                             document.getElementById("savingAbsoluteLimit").innerHTML = "€ " + res.data[i]["absolute limit"];
+        //                         }
+        //                     }
+        //                 }
+        //                 else {
+        //                     //show button to create bank accounts for user ID
+        //                     document.getElementById("createBankAccountsButt").style.visibility = "visible";
+        //                 }
+        //             }
+        //         }).catch((error) => {
+        //             document.getElementById("displayTotalBalance").innerHTML = "€ 0";
+        //             //show button to create bank accounts for user ID
+        //             document.getElementById("createBankAccountsButt").style.visibility = "visible"; 
+        //             document.getElementById("currentUsersBankingInfo").remove();
+        //         });
+
+        //         if(userId != -1) {
+        //             //set user info
+        //             instance.get('http://localhost:8080/api/user/get/' + userId, {
+        //             headers: {
+        //                 'Content-Type': null,
+        //                 Authorization: "Bearer " + jwtToken,
+        //             }
+        //             })
+        //             .then(res => { 
+        //                 if(res.status >= 200 && res.status <= 300) {
+        //                     document.getElementById("currentUserFullName").innerHTML = "Welcome " + res.data["fullname"];
+        //                     document.getElementById("displayTransactionLimit").innerHTML = res.data["transactionLimit"];
+        //                     document.getElementById("displayDailyLimit").innerHTML = res.data["dailyLimit"];
+        //                     userRights = res.data["role"];
+        //                     if(userRights != "employee") document.getElementById("EmployeeContainer").remove();
+        //                     else {
+        //                         //load all info for the employee
+        //                         loadAllUsersWithoutBankAccounts();
+        //                         loadAllBankAccountInfo();
+        //                         loadAllUsersInfo();
+        //                     }
+        //                 }
+        //             });
+        //         }
+        //     }
+        //     else {
+        //         if(window.location.pathname == "/")window.location.href = "/login";
+        //     }
+            
+        // })
+        // .catch((error) => {
+        //     if(window.location.pathname == "/homePage") window.location.href = "/login";
+        // });
