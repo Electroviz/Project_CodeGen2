@@ -1,17 +1,24 @@
-package test;
+package io.swagger;
 
 import io.swagger.enums.BankAccountType;
+import io.swagger.enums.UserRoleEnum;
 import io.swagger.model.BankAccount;
 import io.swagger.model.TransactionInfo;
 import io.swagger.model.entity.User;
 import io.swagger.service.BankAccountService;
+import io.swagger.service.UserService;
 import org.junit.Assert;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.test.web.servlet.MockMvc;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -19,7 +26,12 @@ import static org.junit.jupiter.api.Assertions.*;
 class BankAccountServiceTest {
 
     @Autowired
-    BankAccountService bankAccountService;
+    private MockMvc mvc;
+
+    @MockBean
+    private BankAccountService bankAccountService;;
+    private BankAccount bankAccount;
+
     @Test
     void deleteBankAccount() {
         BankAccount account = new BankAccount();

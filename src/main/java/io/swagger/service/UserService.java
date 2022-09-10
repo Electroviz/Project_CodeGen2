@@ -58,7 +58,7 @@ public class UserService {
         else{
             if(checkUserInputAddUser(user)){
 
-                user.setPassword(passwordEncoder.encode(user.getPassword()));
+                //user.setPassword(passwordEncoder.encode(user.getPassword()));
                 if(asEmployee == false) {
                     user.setRoles(new ArrayList<>(Arrays.asList(UserRoleEnum.ROLE_CUSTOMER)));
                     user.setRole(UserRoleEnum.ROLE_CUSTOMER);
