@@ -3,6 +3,7 @@ package io.swagger;
 import io.swagger.enums.UserRoleEnum;
 import io.swagger.model.entity.User;
 import io.swagger.service.UserService;
+import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,12 +17,14 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -81,19 +84,6 @@ class UserServiceTest {
     }
 
     @Test
-    void getUserIdByUsernameTest(){
-        try {
-            this.mvc.perform(MockMvcRequestBuilders.get("/api/get/12")
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                    .content("{}"))
-                    .andExpect(status().isCreated());
-        }
-        catch (Exception e){
-            e.printStackTrace();
-        }
-    }
-
-    @Test
     void getUsersWithoutBankaccount(){
         try {
             List<User> userList = userService.getUsersWithoutBankAccount();
@@ -108,8 +98,11 @@ class UserServiceTest {
     @Test
     void getUserById(){
         try {
-            User userCheck = userService.getUserById(12L);
-            assertNotNull(userCheck);
+            this.mvc.perform(MockMvcRequestBuilders.get("/api/get/12")
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                    .content("{}"))
+                    .andExpect(MockMvcResultMatchers.status().isCreated())
+                    .andExpect(jsonPath("$.keys()", Matchers.is(1)));
         }
         catch (Exception e){
             e.printStackTrace();
