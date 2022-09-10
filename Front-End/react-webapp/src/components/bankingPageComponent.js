@@ -8,6 +8,8 @@ const bankingPageComponent = () => {
     var userId = -1;
     var userRights = "none";
     var allBankAccountsInfo = null;
+    var loggedInUser = null;
+
 
     const GetIbanByFullName = (e) => {
         if(jwtToken == "") {
@@ -101,12 +103,14 @@ const bankingPageComponent = () => {
                 if(bankingInfoRequest.status == 200) {
                     //set the banking info
                     var bankingInfoData = bankingInfoRequest.data;
+                    allBankAccountsInfo = bankingInfoData;
                     for(var i = 0; i < bankingInfoData.length; i++) {
                         var bankInfo = bankingInfoData[i];
                         if(bankInfo["accountType"] == "Current") {
                             document.getElementById("currentIban").innerHTML = bankInfo["iban"];
                             document.getElementById("currentBalance").innerHTML = bankInfo["balance"];
                             document.getElementById("currentAbsoluteLimit").innerHTML = bankInfo["absolute limit"];
+                            console.log(bankInfo);
                         }
                         else {
                             document.getElementById("savingIban").innerHTML = bankInfo["iban"];
@@ -145,12 +149,15 @@ const bankingPageComponent = () => {
                     document.getElementById("displayDailyLimit").innerHTML = userData["dayLimit"];
                     document.getElementById("displayTransactionLimit").innerHTML = userData["trasnactionLimit"];
 
+                    loggedInUser = userData; 
+
                     var userRights = userData["role"];
                     if(userRights != "ROLE_EMPLOYEE") document.getElementById("EmployeeContainer").remove();
                     else {
                                 //load all info for the employee
                                 loadAllUsersWithoutBankAccounts();
                                 loadAllBankAccountInfo();
+                                loadAllTransactionInfo();
                                 loadAllUsersInfo();
                     }
                 }
@@ -176,6 +183,91 @@ const bankingPageComponent = () => {
         }
         catch (error) {
             alert("Failed to change the status");
+        }
+    }
+
+    const FindTransactionHistory = async (e) => {
+        try {
+            var transactionHistoryIban = document.getElementById("transactionHistoryIban").value;
+            const result = await axios.get('http://localhost:8080/api/transactions/byIbans/' + GetLoggedInUsersCurrentIban() + '/' + transactionHistoryIban);
+            // /transactions/byIbans/{fromIban}/{toIban}
+            if(result.status >= 200 && result.status < 300) { 
+                document.getElementById("transactionHistoryWithIbanWrapper").style.display = "block";
+                document.getElementById("transactionHistoryWithIbanText").innerHTML = "See transaction history with iban: <u>" + transactionHistoryIban + '</u>';
+
+                var container = document.getElementById("allTransactionHistoryWithIban");
+                container.innerHTML = "";
+
+                for(let i = 0; i < result.data.length; i++) {
+                    var bankAccInfoElm = document.createElement("p");
+                    bankAccInfoElm.style.textAlign = "center";
+                    bankAccInfoElm.style.marginBottom = "0.8rem";
+                    bankAccInfoElm.style.borderBottom = "0.1rem solid black";
+                    bankAccInfoElm.innerHTML = 
+                    "<b>from:</b> " + result.data[i]["from"] + ", " +
+                    "<b>to:</b> " + result.data[i]["to"] + ", " +
+                    "<b>amount:</b> €" + result.data[i]["amount"] + ", " +
+                    "<b>date:</b> " + result.data[i]["timestamp"] + ", " +
+                    "<b>description:</b> " + result.data[i]["description"];
+                    
+                    
+                    container.append(bankAccInfoElm);
+                }
+            }
+            else {
+
+            }
+        }
+        catch (error) {
+
+        }
+    }
+
+    const SendMoneyToIban = async (e) => {
+
+        try {
+            const result = await axios.put('http://localhost:8080/api/transactions/' + GetLoggedInUsersCurrentIban() + '/' + document.getElementById("sendMoneyIban").value + '/' + document.getElementById("sendMoneyAmount").value);
+
+            if(result.status >= 200 && result.status < 300) {
+                alert("Succesfully send € " +  document.getElementById("sendMoneyAmount").value + " to iban: " + document.getElementById("sendMoneyIban").value);
+                window.location.reload();
+            }
+        }
+        catch (error) {
+            alert("Failed to send € " + document.getElementById("sendMoneyAmount").value + " to iban: " + document.getElementById("sendMoneyIban").value);
+        }
+    }
+
+    function GetLoggedInUsersCurrentIban() {
+        if(allBankAccountsInfo != null) {
+            for(var i = 0; i < allBankAccountsInfo.length; i++) if(allBankAccountsInfo[i]["accountType"] == "Current") return allBankAccountsInfo[i]["iban"];
+        }
+        else return "";
+    }
+
+    function GetLoggedInUsersSavingsIban() {
+        if(allBankAccountsInfo != null) {
+            for(var i = 0; i < allBankAccountsInfo.length; i++) if(allBankAccountsInfo[i]["accountType"] == "Savings") return allBankAccountsInfo[i]["iban"];
+        }
+        else return "";
+    }
+
+    const PerformTransactionForIbans = async (e) => {
+        var ibanFrom = document.getElementById("employeeTransactionFromIban").value;
+        var ibanTo = document.getElementById("employeeTransactionToIban").value;
+        var amount = document.getElementById("employeeTransactionAmount").value;
+
+        try {
+            const result = await axios.put('http://localhost:8080/api/transactions/' + ibanFrom + '/' + ibanTo + '/' + amount);
+
+            if(result.status >= 200 && result.status < 300) {
+                alert("Succesfully transfered money from iban: " + ibanFrom + " to iban: " + ibanTo + " , and the amount transfered: €" + amount);
+                loadAllBankAccountInfo();
+            }
+            else alert("Could not transfer money from iban: " + ibanFrom + " to iban: " + ibanTo + " , and the amount transfered: €" + amount);
+        }
+        catch (error) {
+            alert("Could not transfer money from iban: " + ibanFrom + " to iban: " + ibanTo + " , and the amount transfered: €" + amount);
         }
     }
 
@@ -293,6 +385,37 @@ const bankingPageComponent = () => {
             });
     }
 
+    function loadAllTransactionInfo() {
+        instance.get('http://localhost:8080/api/transactions/byAmountIsBigger/' + GetLoggedInUsersCurrentIban() + '/-1', {
+            headers: {
+                'Content-Type': null,
+                Authorization: "Bearer " + jwtToken,
+            }
+            })
+            .then(res => { 
+                if(res.status >= 200 && res.status <= 300) {
+                    var container = document.getElementById("allTransactionsHistory");
+                    container.innerHTML = "";
+                    console.log(res.data);
+                    for(let i = 0; i < res.data.length; i++) {
+                        var bankAccInfoElm = document.createElement("p");
+                        bankAccInfoElm.style.textAlign = "center";
+                        bankAccInfoElm.style.marginBottom = "0.8rem";
+                        bankAccInfoElm.style.borderBottom = "0.1rem solid black";
+                        bankAccInfoElm.innerHTML = 
+                        "<b>from:</b> " + res.data[i]["from"] + ", " +
+                        "<b>to:</b> " + res.data[i]["to"] + ", " +
+                        "<b>amount:</b> €" + res.data[i]["amount"] + ", " +
+                        "<b>date:</b> " + res.data[i]["timestamp"] + ", " +
+                        "<b>description:</b> " + res.data[i]["description"];
+                        
+                        
+                        container.append(bankAccInfoElm);
+                    }
+                }
+            });
+    }
+
     function loadAllBankAccountInfo() {
         instance.get('http://localhost:8080/api/allBankAccounts', {
             headers: {
@@ -400,8 +523,52 @@ const bankingPageComponent = () => {
             
             
             
-                <div id="makeAnTransactionSection">
-                    
+                <div id="makeAnTransactionSection" style={{ marginTop: "-1.8rem", paddingBottom: "3rem"}}>
+                    <div style={{ display: "block", textAlign: "center", fontSize: "1.4rem", fontWeight: "bold"}}>
+                        <p>Perform a transaction</p>
+                    </div>
+                    <div style={{ display: "block"}}>
+                        <p style={{ fontSize: "1.15rem", marginBottom: "0rem", display: "inline-block"}}>Send money from current bank account to iban: </p>
+                        <input id="sendMoneyIban" style={{ display: "inline-block", fontSize: "1.15rem", marginLeft: "0.2rem", marginRight: "0.2rem"}} />
+                        <p style={{ fontSize: "1.15rem", marginBottom: "0rem", display: "inline-block"}}> with amount: </p>
+                        <input id="sendMoneyAmount" style={{ display: "inline-block", fontSize: "1.15rem", marginLeft: "0.2rem", marginRight: "0.2rem", width: "7rem"}} />
+                        <button onClick={ SendMoneyToIban } style={{ display: "inline-block", fontSize: "1.15rem", marginLeft: "0.2rem"}}>Confirm</button>
+                    </div>
+
+                    <div>
+                        <p style={{ fontSize: "1.4rem", fontWeight: "bold", marginBottom: "0rem"}}>Your transaction History:</p>
+                        <div id="allTransactionsHistory" style={{height: "auto", maxHeight: "20rem", width: "50%", marginLeft: "25%", overflow: "auto", display: "block"}}>
+                            
+                        </div>
+                    </div>
+
+                    <div>
+                        <div style={{ display: "block"}}>
+                            <p style={{ fontSize: "1.15rem", marginBottom: "0rem", display: "inline-block"}}>See transaction history with iban: </p>
+                            <input id="transactionHistoryIban" style={{ display: "inline-block", fontSize: "1.15rem", marginLeft: "0.2rem", marginRight: "0.2rem"}} />
+                            <button onClick={ FindTransactionHistory } style={{ display: "inline-block", fontSize: "1.15rem", marginLeft: "0.2rem"}}>Confirm</button>
+                        </div>
+
+                        <div style={{ display: "block"}}>
+                        <p style={{ fontSize: "1.15rem", marginBottom: "0rem", display: "inline-block"}}>Find transaction{'(s)'} where amount: </p>
+                        <input id="changeStatusIban" style={{ display: "inline-block", fontSize: "1.15rem", marginLeft: "0.2rem", marginRight: "0.2rem"}} />
+                        <p style={{ fontSize: "1.15rem", marginBottom: "0rem", display: "inline-block"}}> is compared to </p>
+                        <select id="changeStatus" style={{ display: "inline-block"}}>
+                            <option>{'='}</option>
+                            <option>{'<'}</option>
+                            <option>{'>'}</option>
+                        </select>
+                        <button onClick={  } style={{ display: "inline-block", fontSize: "1.15rem", marginLeft: "0.2rem"}}>Confirm</button>
+                    </div>
+
+                        <div id="transactionHistoryWithIbanWrapper" style={{ display: 'none'}}>
+                            <p id="transactionHistoryWithIbanText" style={{ fontSize: "1.4rem", fontWeight: "bold", marginBottom: "0rem"}}>Your transaction History with iban:</p>
+                            <div id="allTransactionHistoryWithIban" style={{height: "auto", maxHeight: "20rem", width: "50%", marginLeft: "25%", overflow: "auto", display: "block"}}>
+                            
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             
             </div>
@@ -441,6 +608,15 @@ const bankingPageComponent = () => {
                         <p style={{ fontSize: "1.15rem", marginBottom: "0rem", display: "inline-block"}}> to </p>
                         <input id="changeAbsoluteLimitValue" style={{ display: "inline-block", fontSize: "1.15rem", marginLeft: "0.2rem", marginRight: "0.2rem", width: "7rem"}} />
                         <button onClick={ ChangeBankAccountAbsoluteLimit } style={{ display: "inline-block", fontSize: "1.15rem", marginLeft: "0.2rem"}}>Confirm</button>
+                    </div>
+                    <div style={{ display: "block"}}>
+                        <p style={{ fontSize: "1.15rem", marginBottom: "0rem", display: "inline-block"}}>Perform transaction from iban: </p>
+                        <input id="employeeTransactionFromIban" style={{ display: "inline-block", fontSize: "1.15rem", marginLeft: "0.2rem", marginRight: "0.2rem"}} />
+                        <p style={{ fontSize: "1.15rem", marginBottom: "0rem", display: "inline-block"}}> to iban: </p>
+                        <input id="employeeTransactionToIban" style={{ display: "inline-block", fontSize: "1.15rem", marginLeft: "0.2rem", marginRight: "0.2rem"}} />
+                        <p style={{ fontSize: "1.15rem", marginBottom: "0rem", display: "inline-block"}}> amount transfered: </p>
+                        <input id="employeeTransactionAmount" style={{ display: "inline-block", fontSize: "1.15rem", marginLeft: "0.2rem", marginRight: "0.2rem", width: "7rem"}} />
+                        <button onClick={ PerformTransactionForIbans } style={{ display: "inline-block", fontSize: "1.15rem", marginLeft: "0.2rem"}}>Confirm</button>
                     </div>
                 </div>
 
