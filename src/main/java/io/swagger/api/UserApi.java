@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -47,27 +48,11 @@ public interface UserApi {
         @ApiResponse(responseCode = "401", description = "Unauthorised for this action"),
         
         @ApiResponse(responseCode = "404", description = "Requested object not found") })
-    @RequestMapping(value = "/user",
-        produces = { "application/json" }, 
-        consumes = { "application/json" }, 
+    @RequestMapping(value = "/registeruser",
+        produces = MediaType.APPLICATION_JSON_VALUE,
+        consumes = MediaType.APPLICATION_JSON_VALUE,
         method = RequestMethod.POST)
-    ResponseEntity<UserDTO> createUser(@Parameter(in = ParameterIn.DEFAULT, description = "Get user information", required=true, schema=@Schema()) @Valid @RequestBody UserDTO body);
-
-    @Operation(summary = "Deletes a user from the system", description = "", tags={ "Users" })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "succesfully removed user from the system"),
-        
-        @ApiResponse(responseCode = "400", description = "Invalid input"),
-        
-        @ApiResponse(responseCode = "401", description = "Unauthorised for this action"),
-        
-        @ApiResponse(responseCode = "403", description = "Forbidden"),
-        
-        @ApiResponse(responseCode = "404", description = "Requested object not found") })
-    @RequestMapping(value = "/user/{userid}",
-        method = RequestMethod.DELETE)
-    ResponseEntity<Void> deleteUser(@Parameter(in = ParameterIn.PATH, description = "UserId to delete a user", required=true, schema=@Schema()) @PathVariable("userid") String userid);
-
+    ResponseEntity add(@RequestBody UserDTO userDTO);
 
     @Operation(summary = "Get a list of all users", description = "", security = {
         @SecurityRequirement(name = "bearerAuth")    }, tags={ "Users" })
@@ -79,12 +64,10 @@ public interface UserApi {
         @ApiResponse(responseCode = "401", description = "Unauthorised for this action"),
         
         @ApiResponse(responseCode = "404", description = "Requested object not found") })
-    @RequestMapping(value = "/user",
-        produces = { "application/json" }, 
+    @RequestMapping(value = "/getall",
+        produces = MediaType.APPLICATION_JSON_VALUE,
         method = RequestMethod.GET)
-    ResponseEntity<List<UserDTO>> getAllUsers(@Min(0)@Parameter(in = ParameterIn.QUERY, description = "number of records to skip for pagination" ,schema=@Schema(allowableValues={  }
-)) @Valid @RequestParam(value = "skip", required = false) Integer skip, @Min(0) @Max(50) @Parameter(in = ParameterIn.QUERY, description = "maximum number of records to return" ,schema=@Schema(allowableValues={  }, maximum="50"
-)) @Valid @RequestParam(value = "limit", required = false) Integer limit);
+    ResponseEntity getAll();
 
 
     @Operation(summary = "Logs user into the system", description = "", tags={ "Users" })
@@ -98,33 +81,13 @@ public interface UserApi {
         @ApiResponse(responseCode = "403", description = "Forbidden"),
         
         @ApiResponse(responseCode = "404", description = "Requested object not found") })
-    @RequestMapping(value = "/user/login",
+    @RequestMapping(value = "/login",
         produces = { "text/plain" }, 
         consumes = { "application/json" }, 
         method = RequestMethod.POST)
-    ResponseEntity<String> loginUser(@Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody Login body);
+    String login(@RequestBody Login login);
 
-
-    @Operation(summary = "Edit user information by userId", description = "", security = {
-        @SecurityRequirement(name = "bearerAuth")    }, tags={ "Users" })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "User details sucessfully updated", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserDTO.class))),
-        
-        @ApiResponse(responseCode = "400", description = "Invalid input"),
-        
-        @ApiResponse(responseCode = "401", description = "Unauthorised for this action"),
-        
-        @ApiResponse(responseCode = "403", description = "Forbidden"),
-        
-        @ApiResponse(responseCode = "404", description = "Requested object not found") })
-    @RequestMapping(value = "/user/{userid}",
-        produces = { "application/json" }, 
-        consumes = { "application/json" }, 
-        method = RequestMethod.PUT)
-    ResponseEntity<UserDTO> updateUser(@Parameter(in = ParameterIn.PATH, description = "UserId to edit a user", required=true, schema=@Schema()) @PathVariable("userid") String userid, @Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody UserDTO body);
-
-
-    @Operation(summary = "", description = "", security = {
+    @Operation(summary = "get user by userid", description = "", security = {
         @SecurityRequirement(name = "bearerAuth")    }, tags={ "Users" })
     @ApiResponses(value = { 
         @ApiResponse(responseCode = "200", description = "User Found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserDTO.class))),
@@ -136,10 +99,55 @@ public interface UserApi {
         @ApiResponse(responseCode = "403", description = "Forbidden"),
         
         @ApiResponse(responseCode = "404", description = "Requested object not found") })
-    @RequestMapping(value = "/user/{userid}",
-        produces = { "application/json" }, 
+    @RequestMapping(value = "/get/{id}",
+        produces = MediaType.APPLICATION_JSON_VALUE,
         method = RequestMethod.GET)
-    ResponseEntity<UserDTO> userUseridGet(@Parameter(in = ParameterIn.PATH, description = "UserId to get user information", required=true, schema=@Schema()) @PathVariable("userid") String userid);
+    ResponseEntity getUserById(@PathVariable("id") Long id);
 
+    @Operation(summary = "Get UserId by JWT", description = "", security = {
+            @SecurityRequirement(name = "bearerAuth")    }, tags={ "Users" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "List of users", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserDTO.class))),
+
+            @ApiResponse(responseCode = "400", description = "Invalid input"),
+
+            @ApiResponse(responseCode = "401", description = "Unauthorised for this action"),
+
+            @ApiResponse(responseCode = "404", description = "Requested object not found") })
+    @RequestMapping(value = "/getUserIdJwtValidation",
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            method = RequestMethod.GET)
+    ResponseEntity getUserIdByJwtTokenVerification();
+
+    @Operation(summary = "Get a list of all users without a bank account", description = "", security = {
+            @SecurityRequirement(name = "bearerAuth")    }, tags={ "Users" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "List of users", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = UserDTO.class)))),
+
+            @ApiResponse(responseCode = "400", description = "Invalid input"),
+
+            @ApiResponse(responseCode = "401", description = "Unauthorised for this action"),
+
+            @ApiResponse(responseCode = "404", description = "Requested object not found") })
+    @RequestMapping(value = "/getAllUsersWithoutBankAccounts",
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            method = RequestMethod.GET)
+    ResponseEntity getUsersWithoutBankAccounts();
+
+    @Operation(summary = "Register as Employee", description = "Register User as Employee", security = {
+            @SecurityRequirement(name = "bearerAuth")    }, tags={ "Users" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "user account created", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserDTO.class))),
+
+            @ApiResponse(responseCode = "400", description = "Invalid input"),
+
+            @ApiResponse(responseCode = "401", description = "Unauthorised for this action"),
+
+            @ApiResponse(responseCode = "404", description = "Requested object not found") })
+    @RequestMapping(value = "/registerUser/asEmployee",
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            method = RequestMethod.POST)
+    ResponseEntity addAsEmployee(@RequestBody UserDTO userDTO);
 }
 
