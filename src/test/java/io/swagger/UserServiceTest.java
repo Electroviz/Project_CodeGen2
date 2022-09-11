@@ -16,6 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MockMvcBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
@@ -56,12 +57,14 @@ class UserServiceTest {
         user.setRoles(new ArrayList<>(Arrays.asList(UserRoleEnum.ROLE_EMPLOYEE)));
         user.setTransactionLimit(BigDecimal.valueOf(3000.0));
         user.setDayLimit(BigDecimal.valueOf(3000.0));
+        //userService.addUser(user);
     }
 
     @Test
     void addUserShouldNotReturnNull() throws Exception{
         this.mvc.perform(MockMvcRequestBuilders.post("/api/registeruser/asEmployee")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .header("")
                 .content("{}"))
                 .andExpect(status().isCreated());
         //Assertions.assertNotNull(userService.addUser(user, false).getBody());
