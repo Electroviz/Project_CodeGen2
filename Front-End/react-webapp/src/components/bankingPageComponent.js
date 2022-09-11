@@ -110,7 +110,6 @@ const bankingPageComponent = () => {
                             document.getElementById("currentIban").innerHTML = bankInfo["iban"];
                             document.getElementById("currentBalance").innerHTML = bankInfo["balance"];
                             document.getElementById("currentAbsoluteLimit").innerHTML = bankInfo["absolute limit"];
-                            console.log(bankInfo);
                         }
                         else {
                             document.getElementById("savingIban").innerHTML = bankInfo["iban"];
@@ -488,7 +487,6 @@ const bankingPageComponent = () => {
                 if(res.status >= 200 && res.status <= 300) {
                     var container = document.getElementById("allTransactionsHistory");
                     container.innerHTML = "";
-                    console.log(res.data);
                     for(let i = 0; i < res.data.length; i++) {
                         var bankAccInfoElm = document.createElement("p");
                         bankAccInfoElm.style.textAlign = "center";
