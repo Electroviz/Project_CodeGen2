@@ -23,13 +23,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -43,6 +40,7 @@ import java.util.stream.Collectors;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-05-12T15:22:53.754Z[GMT]")
 @RestController
+@RequestMapping("/user")
 @Api(tags= {"Users"})
 public class UserApiController implements UserApi {
 
@@ -73,15 +71,9 @@ public class UserApiController implements UserApi {
         return new ResponseEntity(response, HttpStatus.CREATED);
     }
 
-    public ResponseEntity<Void> deleteUser(@Parameter(in = ParameterIn.PATH, description = "UserId to delete a user", required=true, schema=@Schema()) @PathVariable("userid") String userid) {
-        String accept = request.getHeader("Accept");
-        return new ResponseEntity<Void>(HttpStatus.NOT_IMPLEMENTED);
-    }
 
-    public ResponseEntity<List<UserDTO>> getAllUsers(@Min(0)@Parameter(in = ParameterIn.QUERY, description = "number of records to skip for pagination" ,schema=@Schema(allowableValues={  }
-)) @Valid @RequestParam(value = "skip", required = false) Integer skip,@Min(0) @Max(50) @Parameter(in = ParameterIn.QUERY, description = "maximum number of records to return" ,schema=@Schema(allowableValues={  }, maximum="50"
-)) @Valid @RequestParam(value = "limit", required = false) Integer limit) {
-
+    @PreAuthorize("hasRole('EMPLOYEE')")
+    public ResponseEntity getAll(){
 
         List<User> users = userService.getAll();
 
@@ -92,22 +84,10 @@ public class UserApiController implements UserApi {
                 .map(user -> modelMapper.map(user, UserDTO.class))
                 .collect(Collectors.toList());
 
-        return new ResponseEntity<List<UserDTO>>(dtos, HttpStatus.OK);
+        return ResponseEntity.status(200).body(dtos);
     }
 
-    public ResponseEntity<String> loginUser(@Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody Login body) {
-        //User User = new User();
-        //User.setUsername(body.getUsername());
-        //User.setPassword(body.getPassword());
 
-        return new ResponseEntity<String>(HttpStatus.OK);
-    }
-
-    public ResponseEntity<UserDTO> updateUser(@Parameter(in = ParameterIn.PATH, description = "UserId to edit a user", required=true, schema=@Schema()) @PathVariable("userid") String userid,@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody UserDTO body) {
-
-
-        return new ResponseEntity<UserDTO>(HttpStatus.NOT_IMPLEMENTED);
-    }
 
     public ResponseEntity<UserDTO> userUseridGet(@Parameter(in = ParameterIn.PATH, description = "UserId to get user information", required=true, schema=@Schema()) @PathVariable("userid") String userid) {
         String accept = request.getHeader("Accept");
@@ -123,4 +103,68 @@ public class UserApiController implements UserApi {
         return new ResponseEntity<UserDTO>(HttpStatus.NOT_IMPLEMENTED);
     }
 
+    public ResponseEntity getUserIdByJwtTokenVerification() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        try {
+            String uname = authentication.getName();
+            if(uname != null) {
+                if(uname.length() > 0) {
+                    Long uId = userService.getUserIdByUsername(uname);
+                    if(uId != -1) return ResponseEntity.status(200).body(uId);
+                    else return ResponseEntity.status(400).body("Bad Request");
+                }
+            }
+
+            return ResponseEntity.status(400).body("Bad Request");
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body("Bad Request");
+        }
+    }
+
+    @PreAuthorize("hasRole('EMPLOYEE')")
+    public ResponseEntity getUsersWithoutBankAccounts() {
+        List<User> usersWithoutBankAccounts = userService.getUsersWithoutBankAccount();
+
+        return ResponseEntity.status(200).body(usersWithoutBankAccounts);
+    }
+
+    public ResponseEntity add(@RequestBody UserDTO userDTO){
+
+        ModelMapper modelMapper = new ModelMapper();
+        User user = modelMapper.map(userDTO, User.class);
+
+        ResponseEntity response = userService.addUser(user,false);
+
+        return ResponseEntity.status(201).body(response);
+    }
+
+    @PreAuthorize("hasRole('EMPLOYEE')")
+    public ResponseEntity addAsEmployee(@RequestBody UserDTO userDTO){
+
+        ModelMapper modelMapper = new ModelMapper();
+        User user = modelMapper.map(userDTO, User.class);
+
+        ResponseEntity response = userService.addUser(user,true);
+
+        return ResponseEntity.status(201).body(response);
+    }
+
+
+    @PreAuthorize("hasRole('EMPLOYEE')")
+    public ResponseEntity getUserById(@PathVariable("id") Long id){
+
+        ModelMapper modelMapper = new ModelMapper();
+
+        User user = userService.findById(id);
+
+        UserDTO response = modelMapper.map(user, UserDTO.class);
+
+        return ResponseEntity.status(201).body(response);
+    }
+
+    public String login(@RequestBody Login login){
+
+        String test = "test";
+        return userService.login(login.getUsername(), login.getPassword());
+    }
 }
