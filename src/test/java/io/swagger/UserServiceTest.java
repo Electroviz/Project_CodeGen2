@@ -57,7 +57,7 @@ class UserServiceTest {
         user.setRoles(new ArrayList<>(Arrays.asList(UserRoleEnum.ROLE_EMPLOYEE)));
         user.setTransactionLimit(BigDecimal.valueOf(3000.0));
         user.setDayLimit(BigDecimal.valueOf(3000.0));
-        //userService.addUser(user);
+        userService.addUser(user, true);
     }
 
     @Test

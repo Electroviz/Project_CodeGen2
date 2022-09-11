@@ -34,8 +34,6 @@ public class AccountSteps {
                 HttpMethod.PUT, entity, String.class
         );
     }
-    
-    @Then()
 
     @When("the employee updates the bank account status using the iban")
     public void the_employee_updates_the_bank_account_status_using_the_iban(String status, String iban) {
