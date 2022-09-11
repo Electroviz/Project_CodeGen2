@@ -46,6 +46,7 @@ import java.util.Objects;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-05-12T15:22:53.754Z[GMT]")
 @RestController
+@CrossOrigin
 @Api(tags= {"Transactions"})
 public class TransactionsApiController implements TransactionsApi {
 

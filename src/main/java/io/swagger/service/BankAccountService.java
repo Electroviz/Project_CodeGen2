@@ -255,10 +255,6 @@ public class BankAccountService {
             }
         } while(succes == false);
 
-
-
-
-
         return newIban;
     }
 

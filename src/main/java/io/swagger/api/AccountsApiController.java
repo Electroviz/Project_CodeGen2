@@ -42,6 +42,7 @@ import java.util.*;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-05-12T15:22:53.754Z[GMT]")
 @RestController
+@CrossOrigin
 @Api(tags= {"Accounts"})
 public class AccountsApiController implements AccountsApi {
 
