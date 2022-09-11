@@ -6,6 +6,8 @@
 package io.swagger.api;
 
 import java.math.BigDecimal;
+
+import org.springframework.http.MediaType;
 import org.threeten.bp.OffsetDateTime;
 import io.swagger.model.Transaction;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,6 +33,8 @@ import org.springframework.web.bind.annotation.CookieValue;
 
 import javax.validation.Valid;
 import javax.validation.constraints.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Map;
 
@@ -38,7 +42,7 @@ import java.util.Map;
 @Validated
 public interface TransactionsApi {
 
-    @Operation(summary = "gets transaction history by iban", description = "gets all transactions", security = {
+    @Operation(summary = "gets all transactions", description = "gets all transactions", security = {
         @SecurityRequirement(name = "bearerAuth")    }, tags={ "Transactions" })
     @ApiResponses(value = { 
         @ApiResponse(responseCode = "200", description = "Transactions returned successfully", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = Transaction.class)))),
@@ -50,12 +54,10 @@ public interface TransactionsApi {
         @ApiResponse(responseCode = "403", description = "Forbidden"),
         
         @ApiResponse(responseCode = "404", description = "Requested object not found") })
-    @RequestMapping(value = "/Transactions/{iban}",
-        produces = { "application/json" }, 
+    @RequestMapping(value = "/transactions/all",
+        produces = MediaType.APPLICATION_JSON_VALUE,
         method = RequestMethod.GET)
-    ResponseEntity<List<Transaction>> getHistoryByIban(@Parameter(in = ParameterIn.PATH, description = "The IBAN", required=true, schema=@Schema()) @PathVariable("iban") String iban, @Min(0)@Parameter(in = ParameterIn.QUERY, description = "number of records to skip for pagination" ,schema=@Schema(allowableValues={  }
-)) @Valid @RequestParam(value = "skip", required = false) Integer skip, @Min(0) @Max(50) @Parameter(in = ParameterIn.QUERY, description = "maximum number of records to return" ,schema=@Schema(allowableValues={  }, maximum="50"
-)) @Valid @RequestParam(value = "limit", required = false) Integer limit, @Parameter(in = ParameterIn.QUERY, description = "filter transactions from this date" ,schema=@Schema()) @Valid @RequestParam(value = "startDateTime", required = false) OffsetDateTime startDateTime, @Parameter(in = ParameterIn.QUERY, description = "filter transactions to this date" ,schema=@Schema()) @Valid @RequestParam(value = "endDateTime", required = false) OffsetDateTime endDateTime, @Parameter(in = ParameterIn.QUERY, description = "filter transactions by specific IBAN" ,schema=@Schema()) @Valid @RequestParam(value = "specificIBAN", required = false) String specificIBAN, @Parameter(in = ParameterIn.QUERY, description = "filter transactions equel to amount entered" ,schema=@Schema()) @Valid @RequestParam(value = "equelTo", required = false) BigDecimal equelTo, @Parameter(in = ParameterIn.QUERY, description = "filter transactions lower to amount entered" ,schema=@Schema()) @Valid @RequestParam(value = "lowerThen", required = false) BigDecimal lowerThen, @Parameter(in = ParameterIn.QUERY, description = "filter transactions higher to amount entered" ,schema=@Schema()) @Valid @RequestParam(value = "higherThen", required = false) BigDecimal higherThen);
+    ResponseEntity GetAllTransactions();
 
 
     @Operation(summary = "transfer money from account to account", description = "transfer money form account to account", security = {
@@ -70,10 +72,131 @@ public interface TransactionsApi {
         @ApiResponse(responseCode = "403", description = "Forbidden"),
         
         @ApiResponse(responseCode = "404", description = "Requested object not found") })
-    @RequestMapping(value = "/Transactions",
-        consumes = { "application/json" }, 
-        method = RequestMethod.POST)
-    ResponseEntity<Void> transferMoney(@Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody Transaction body);
+    @RequestMapping(value="/transactions/{fromIban}/{toIban}/{amount}",
+        produces = MediaType.APPLICATION_JSON_VALUE,
+        method = RequestMethod.PUT)
+    ResponseEntity transferMoney(@PathVariable("fromIban") String fromIban, @PathVariable("toIban") String toIban, @PathVariable("amount") Double amount);
+
+    @Operation(summary = "withdraw money", description = "withdraw money", security = {
+            @SecurityRequirement(name = "bearerAuth")    }, tags={ "Transactions" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "202", description = "money withdrawn"),
+
+            @ApiResponse(responseCode = "400", description = "Invalid input"),
+
+            @ApiResponse(responseCode = "401", description = "Unauthorised for this action"),
+
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+
+            @ApiResponse(responseCode = "404", description = "Requested object not found") })
+    @RequestMapping(method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE, value="/transactions/withdraw/{iban}/{amount}")
+    ResponseEntity Withdraw(@PathVariable("iban") String iban, @PathVariable("amount") Double amount);
+
+
+    @Operation(summary = "deposit money", description = "deposit money", security = {
+            @SecurityRequirement(name = "bearerAuth")    }, tags={ "Transactions" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "202", description = "money despositted"),
+
+            @ApiResponse(responseCode = "400", description = "Invalid input"),
+
+            @ApiResponse(responseCode = "401", description = "Unauthorised for this action"),
+
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+
+            @ApiResponse(responseCode = "404", description = "Requested object not found") })
+    @RequestMapping(method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE, value="/transactions/deposit/{iban}/{amount}")
+    ResponseEntity Deposit(@PathVariable("iban") String iban, @PathVariable("amount") Double amount);
+
+    @Operation(summary = "deposit money", description = "deposit money", security = {
+            @SecurityRequirement(name = "bearerAuth")    }, tags={ "Transactions" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "202", description = "money despositted"),
+
+            @ApiResponse(responseCode = "400", description = "Invalid input"),
+
+            @ApiResponse(responseCode = "401", description = "Unauthorised for this action"),
+
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+
+            @ApiResponse(responseCode = "404", description = "Requested object not found") })
+    @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value="/transactions/byDate/{fromDate}/{toDate}")
+    ResponseEntity GetTransactionsByDate(@PathVariable("fromDate") String fromDate, @PathVariable("toDate") String toDate) throws ParseException;
+
+    @Operation(summary = "deposit money", description = "deposit money", security = {
+            @SecurityRequirement(name = "bearerAuth")    }, tags={ "Transactions" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "202", description = "money despositted"),
+
+            @ApiResponse(responseCode = "400", description = "Invalid input"),
+
+            @ApiResponse(responseCode = "401", description = "Unauthorised for this action"),
+
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+
+            @ApiResponse(responseCode = "404", description = "Requested object not found") })
+    @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value="/transactions/byDateAndUser/{fromDate}/{toDate}/{userId}")
+    ResponseEntity GetTransactionsByDateAndUser(@PathVariable("fromDate") String fromDate, @PathVariable("toDate") String toDate, @PathVariable("userId") Integer userId) throws ParseException;
+
+    @Operation(summary = "deposit money", description = "deposit money", security = {
+            @SecurityRequirement(name = "bearerAuth")    }, tags={ "Transactions" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "202", description = "money despositted"),
+
+            @ApiResponse(responseCode = "400", description = "Invalid input"),
+
+            @ApiResponse(responseCode = "401", description = "Unauthorised for this action"),
+
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+
+            @ApiResponse(responseCode = "404", description = "Requested object not found") })
+    @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value="/transactions/byIbans/{fromIban}/{toIban}")
+    ResponseEntity GetTransactionByIbans(@PathVariable("fromIban") String fromIban, @PathVariable("toIban") String toIban);
+
+    @Operation(summary = "deposit money", description = "deposit money", security = {
+            @SecurityRequirement(name = "bearerAuth")    }, tags={ "Transactions" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "202", description = "money despositted"),
+
+            @ApiResponse(responseCode = "400", description = "Invalid input"),
+
+            @ApiResponse(responseCode = "401", description = "Unauthorised for this action"),
+
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+
+            @ApiResponse(responseCode = "404", description = "Requested object not found") })
+    @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value="/transactions/byAmountIsEqual/{iban}/{amount}")
+    ResponseEntity GetTransactionByAmountEqualToNum (@PathVariable("iban") String iban, @PathVariable("amount") Double amount);
+
+    @Operation(summary = "deposit money", description = "deposit money", security = {
+            @SecurityRequirement(name = "bearerAuth")    }, tags={ "Transactions" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "202", description = "money despositted"),
+
+            @ApiResponse(responseCode = "400", description = "Invalid input"),
+
+            @ApiResponse(responseCode = "401", description = "Unauthorised for this action"),
+
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+
+            @ApiResponse(responseCode = "404", description = "Requested object not found") })
+    @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value="/transactions/byAmountIsSmaller/{iban}/{amount}")
+    ResponseEntity GetTransactionByAmountSmallerToNum (@PathVariable("iban") String iban, @PathVariable("amount") Double amount);
+
+
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "202", description = "money despositted"),
+
+            @ApiResponse(responseCode = "400", description = "Invalid input"),
+
+            @ApiResponse(responseCode = "401", description = "Unauthorised for this action"),
+
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+
+            @ApiResponse(responseCode = "404", description = "Requested object not found") })
+    @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value="/transactions/byAmountIsBigger/{iban}/{amount}")
+    ResponseEntity GetTransactionByAmountBiggerToNum (@PathVariable("iban") String iban, @PathVariable("amount") Double amount);
+
 
 }
 

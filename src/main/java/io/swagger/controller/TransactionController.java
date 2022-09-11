@@ -36,6 +36,7 @@ public class TransactionController {
     @Autowired
     private TransactionService transactionService;
 
+    /*
     //Melle
     @RequestMapping(method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE, value="/transactions/{fromIban}/{toIban}/{amount}")
     public ResponseEntity transferMoney(@PathVariable("fromIban") String fromIban, @PathVariable("toIban") String toIban, @PathVariable("amount") Double amount) {
@@ -56,14 +57,19 @@ public class TransactionController {
         }
         else return ResponseEntity.status(401).body(null);
     }
+    */
 
+    /*
     //Melle
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value="/transactions/all")
     @PreAuthorize("hasRole('EMPLOYEE')")
     public ResponseEntity GetAllTransactions() {
         return ResponseEntity.status(200).body(transactionService.GetAllTransactionsFromDatabase());
     }
+    */
 
+
+    /*
     //Melle
     @RequestMapping(method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE, value="/transactions/withdraw/{iban}/{amount}")
     public ResponseEntity Withdraw(@PathVariable("iban") String iban, @PathVariable("amount") Double amount) {
@@ -85,7 +91,10 @@ public class TransactionController {
         }
         else return ResponseEntity.status(401).body(null);
     }
+    */
 
+
+    /*
     //Melle
     @RequestMapping(method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE, value="/transactions/deposit/{iban}/{amount}")
     public ResponseEntity Deposit(@PathVariable("iban") String iban, @PathVariable("amount") Double amount) {
@@ -107,6 +116,9 @@ public class TransactionController {
         }
         else return ResponseEntity.status(401).body(null);
     }
+    */
+
+    /*
 
     //Melle
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value="/transactions/byDate/{fromDate}/{toDate}")
@@ -224,4 +236,7 @@ public class TransactionController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return userService.getUserById(userService.getUserIdByUsername(authentication.getName()));
     }
+
+    */
+
 }

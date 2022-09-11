@@ -6,6 +6,7 @@
 package io.swagger.api;
 
 import io.swagger.model.BankAccount;
+import io.swagger.model.Transaction;
 import io.swagger.model.TransactionInfo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -16,6 +17,7 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,7 +39,7 @@ import java.util.Map;
 @Validated
 public interface AccountsApi {
 
-    @Operation(summary = "deposit money on given account", description = "Deposit money onto the given account as long as is it > 0", security = {
+    @Operation(summary = "Change bank account type", description = "Change bank account type", security = {
         @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts" })
     @ApiResponses(value = { 
         @ApiResponse(responseCode = "202", description = "money deposited"),
@@ -49,139 +51,188 @@ public interface AccountsApi {
         @ApiResponse(responseCode = "403", description = "Forbidden"),
         
         @ApiResponse(responseCode = "404", description = "Requested object not found") })
-    @RequestMapping(value = "/Accounts/{iban}/Deposit",
-        consumes = { "application/json" }, 
-        method = RequestMethod.POST)
-    ResponseEntity<Void> accountDeposit(@Parameter(in = ParameterIn.PATH, description = "Iban of the account that is to deposit money to", required=true, schema=@Schema()) @PathVariable("iban") String iban, @Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody TransactionInfo body);
+    @RequestMapping(method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE, value= "/putBankAccountType/{type}/{IBAN}")
+    ResponseEntity putBankAccountTypeByIBAN(@PathVariable("type") String type, @PathVariable("IBAN") String IBAN);
 
+    @Operation(summary = "Change bankaccount Absolute Limit", description = "Change bankaccount Absolute Limit", security = {
+            @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "202", description = "money deposited"),
 
-    @Operation(summary = "withdraw money from given account", description = "withdraw money onto the given account as long as is it > 0", security = {
-        @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts" })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "202", description = "money withdrawn"),
-        
-        @ApiResponse(responseCode = "400", description = "Invalid input"),
-        
-        @ApiResponse(responseCode = "401", description = "Unauthorised for this action"),
-        
-        @ApiResponse(responseCode = "403", description = "Forbidden"),
-        
-        @ApiResponse(responseCode = "404", description = "Requested object not found") })
-    @RequestMapping(value = "/Accounts/{iban}/Withdraw",
-        consumes = { "application/json" }, 
-        method = RequestMethod.POST)
-    ResponseEntity<Void> accountWithdraw(@Parameter(in = ParameterIn.PATH, description = "Iban of the account that is used to withdraw money from", required=true, schema=@Schema()) @PathVariable("iban") String iban, @Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody TransactionInfo body);
+            @ApiResponse(responseCode = "400", description = "Invalid input"),
 
+            @ApiResponse(responseCode = "401", description = "Unauthorised for this action"),
 
-    @Operation(summary = "creates a new bank account", description = "creates a new bank account", security = {
-        @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts" })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "201", description = "bank account created", content = @Content(mediaType = "application/json", schema = @Schema(implementation = BankAccount.class))),
-        
-        @ApiResponse(responseCode = "400", description = "Invalid input"),
-        
-        @ApiResponse(responseCode = "401", description = "Unauthorised for this action"),
-        
-        @ApiResponse(responseCode = "403", description = "Forbidden"),
-        
-        @ApiResponse(responseCode = "404", description = "Requested object not found") })
-    @RequestMapping(value = "/Accounts",
-        produces = { "application/json" }, 
-        consumes = { "application/json" }, 
-        method = RequestMethod.POST)
-    ResponseEntity<BankAccount> createAccount(@Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody BankAccount body);
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
 
+            @ApiResponse(responseCode = "404", description = "Requested object not found") })
+    @RequestMapping(method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE, value= "/putAbsoluteLimit/{value}/{IBAN}")
+    ResponseEntity putBankAccountAbsoluteLimit(@PathVariable("value") String value, @PathVariable("IBAN") String IBAN);
 
-    @Operation(summary = "Delete a bank account", description = "deletes a bank account", security = {
-        @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts" })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "Bankaccount deleted"),
-        
-        @ApiResponse(responseCode = "400", description = "Invalid input"),
-        
-        @ApiResponse(responseCode = "401", description = "Unauthorised for this action"),
-        
-        @ApiResponse(responseCode = "403", description = "Forbidden"),
-        
-        @ApiResponse(responseCode = "404", description = "Requested object not found") })
-    @RequestMapping(value = "/Accounts/{iban}",
-        method = RequestMethod.DELETE)
-    ResponseEntity<Void> deleteAccount(@Parameter(in = ParameterIn.PATH, description = "The IBAN", required=true, schema=@Schema()) @PathVariable("iban") String iban);
+    @Operation(summary = "Change Bank Account status", description = "Change Bank Account status", security = {
+            @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "202", description = "money deposited"),
 
+            @ApiResponse(responseCode = "400", description = "Invalid input"),
 
-    @Operation(summary = "get account by IBAN", description = "get bankaccount by IBAN", security = {
-        @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts" })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "IBAN Found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = BankAccount.class))),
-        
-        @ApiResponse(responseCode = "400", description = "Invalid input"),
-        
-        @ApiResponse(responseCode = "401", description = "Unauthorised for this action"),
-        
-        @ApiResponse(responseCode = "403", description = "Forbidden"),
-        
-        @ApiResponse(responseCode = "404", description = "Requested object not found") })
-    @RequestMapping(value = "/Accounts/{iban}",
-        produces = { "application/json" }, 
-        method = RequestMethod.GET)
-    ResponseEntity<BankAccount> getAccountByIBAN(@Parameter(in = ParameterIn.PATH, description = "The IBAN", required=true, schema=@Schema()) @PathVariable("iban") String iban);
+            @ApiResponse(responseCode = "401", description = "Unauthorised for this action"),
 
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
 
-    @Operation(summary = "gets accounts by name", description = "get bankaccount by fullname", security = {
-        @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts" })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "returns the IBAN that matches the users fullname", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = String.class)))),
-        
-        @ApiResponse(responseCode = "400", description = "Invalid input"),
-        
-        @ApiResponse(responseCode = "401", description = "Unauthorised for this action"),
-        
-        @ApiResponse(responseCode = "403", description = "Forbidden"),
-        
-        @ApiResponse(responseCode = "404", description = "Requested object not found") })
-    @RequestMapping(value = "/Accounts/{fullName}",
-        produces = { "application/json" }, 
-        method = RequestMethod.GET)
-    ResponseEntity<List<String>> getAccountByName(@Parameter(in = ParameterIn.PATH, description = "full name of a user", required=true, schema=@Schema()) @PathVariable("fullName") String fullName);
+            @ApiResponse(responseCode = "404", description = "Requested object not found") })
+    @RequestMapping(method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE, value = "/putBankAccountStatus/{status}/{IBAN}")
+    ResponseEntity putBankAccountStatusByIban(@PathVariable("status") String status, @PathVariable("IBAN") String IBAN);
 
+    @Operation(summary = "Get total balance by an userid", description = "Get total balance by an userid", security = {
+            @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "202", description = "money deposited"),
 
-    @Operation(summary = "gets accounts", description = "gets all bank accounts", security = {
-        @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts" })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "Accounts returned successfully", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = BankAccount.class)))),
-        
-        @ApiResponse(responseCode = "400", description = "Invalid input"),
-        
-        @ApiResponse(responseCode = "401", description = "Unauthorised for this action"),
-        
-        @ApiResponse(responseCode = "403", description = "Forbidden"),
-        
-        @ApiResponse(responseCode = "404", description = "Requested object not found") })
-    @RequestMapping(value = "/Accounts",
-        produces = { "application/json" }, 
-        method = RequestMethod.GET)
-    ResponseEntity<List<BankAccount>> getAccounts(@Min(0)@Parameter(in = ParameterIn.QUERY, description = "number of records to skip for pagination" ,schema=@Schema(allowableValues={  }
-)) @Valid @RequestParam(value = "skip", required = false) Integer skip, @Min(0) @Max(50) @Parameter(in = ParameterIn.QUERY, description = "maximum number of records to return" ,schema=@Schema(allowableValues={  }, maximum="50"
-)) @Valid @RequestParam(value = "limit", required = false) Integer limit);
+            @ApiResponse(responseCode = "400", description = "Invalid input"),
 
+            @ApiResponse(responseCode = "401", description = "Unauthorised for this action"),
 
-    @Operation(summary = "Update account details", description = "Update Account Details", security = {
-        @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts" })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "Account Updated", content = @Content(mediaType = "application/json", schema = @Schema(implementation = BankAccount.class))),
-        
-        @ApiResponse(responseCode = "400", description = "Invalid input"),
-        
-        @ApiResponse(responseCode = "401", description = "Unauthorised for this action"),
-        
-        @ApiResponse(responseCode = "403", description = "Forbidden"),
-        
-        @ApiResponse(responseCode = "404", description = "Requested object not found") })
-    @RequestMapping(value = "/Accounts/{iban}",
-        produces = { "application/json" }, 
-        consumes = { "application/json" }, 
-        method = RequestMethod.PUT)
-    ResponseEntity<BankAccount> updateAccount(@Parameter(in = ParameterIn.PATH, description = "The IBAN", required=true, schema=@Schema()) @PathVariable("iban") String iban, @Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody BankAccount body);
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+
+            @ApiResponse(responseCode = "404", description = "Requested object not found") })
+    @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value="/totalBalance/{userId}")
+    ResponseEntity getTotalBalanceForUserId(@PathVariable("userId") Long userId);
+
+    @Operation(summary = "Create a Bank Account for a user by an user id", description = "Create a Bank Account for a user by an user id", security = {
+            @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "202", description = "money deposited"),
+
+            @ApiResponse(responseCode = "400", description = "Invalid input"),
+
+            @ApiResponse(responseCode = "401", description = "Unauthorised for this action"),
+
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+
+            @ApiResponse(responseCode = "404", description = "Requested object not found") })
+    @RequestMapping(method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, value="/initBankAccounts/{userId}")
+    ResponseEntity postBankAccountsForUserByUserId(@PathVariable("userId") Long userId);
+
+    @Operation(summary = "test function for userid", description = "test function for userid", security = {
+            @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "202", description = "money deposited"),
+
+            @ApiResponse(responseCode = "400", description = "Invalid input"),
+
+            @ApiResponse(responseCode = "401", description = "Unauthorised for this action"),
+
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+
+            @ApiResponse(responseCode = "404", description = "Requested object not found") })
+    @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value="/bankAccounts/{userId}")
+    ResponseEntity testFunc(@PathVariable("userId") long userId);
+
+    @Operation(summary = "Get all bank accounts", description = "Get all bank accounts", security = {
+            @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "202", description = "money deposited"),
+
+            @ApiResponse(responseCode = "400", description = "Invalid input"),
+
+            @ApiResponse(responseCode = "401", description = "Unauthorised for this action"),
+
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+
+            @ApiResponse(responseCode = "404", description = "Requested object not found") })
+    @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE,value = "/allBankAccounts")
+    ResponseEntity getAllBankAccountsController();
+
+    @Operation(summary = "create a bank account", description = "create a bank account", security = {
+            @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "202", description = "money deposited"),
+
+            @ApiResponse(responseCode = "400", description = "Invalid input"),
+
+            @ApiResponse(responseCode = "401", description = "Unauthorised for this action"),
+
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+
+            @ApiResponse(responseCode = "404", description = "Requested object not found") })
+    @RequestMapping(value = "/createBankAccount", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity registerNewBankAccountController(@RequestBody BankAccount account);
+
+    @Operation(summary = "Get bank account by iban", description = "Get bank account by iban", security = {
+            @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "202", description = "money deposited"),
+
+            @ApiResponse(responseCode = "400", description = "Invalid input"),
+
+            @ApiResponse(responseCode = "401", description = "Unauthorised for this action"),
+
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+
+            @ApiResponse(responseCode = "404", description = "Requested object not found") })
+    @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE,value="/getBankAccount/{IBAN}")
+    ResponseEntity getBankAccountInfoByIbanController(@PathVariable("IBAN") String IBAN);
+
+    @Operation(summary = "Get bank account by name", description = "Get bank account by name", security = {
+            @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "202", description = "money deposited"),
+
+            @ApiResponse(responseCode = "400", description = "Invalid input"),
+
+            @ApiResponse(responseCode = "401", description = "Unauthorised for this action"),
+
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+
+            @ApiResponse(responseCode = "404", description = "Requested object not found") })
+    @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE,value="/getBankAccount/name/{FULLNAME}")
+    ResponseEntity getBankAccountInfoByName(@PathVariable("FULLNAME") String fullName);
+
+    @Operation(summary = "Make a desposit with iban", description = "Make a desposit with iban", security = {
+            @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "202", description = "money deposited"),
+
+            @ApiResponse(responseCode = "400", description = "Invalid input"),
+
+            @ApiResponse(responseCode = "401", description = "Unauthorised for this action"),
+
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+
+            @ApiResponse(responseCode = "404", description = "Requested object not found") })
+    @RequestMapping(method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE,value="/getBankAccount/{IBAN}/Deposit")
+    ResponseEntity accountDeposit(@PathVariable("IBAN") String IBAN, @RequestBody Transaction transaction);
+
+    @Operation(summary = "Delete bank account by iban", description = "Delete bank account by iban", security = {
+            @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "202", description = "money deposited"),
+
+            @ApiResponse(responseCode = "400", description = "Invalid input"),
+
+            @ApiResponse(responseCode = "401", description = "Unauthorised for this action"),
+
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+
+            @ApiResponse(responseCode = "404", description = "Requested object not found") })
+    @RequestMapping(method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE,value="/deleteAccount/{IBAN}")
+    ResponseEntity deleteAccount(@PathVariable("IBAN") String IBAN);
+
+    @Operation(summary = "Make a withdraw with iban", description = "Make a withdraw with iban", security = {
+            @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "202", description = "money deposited"),
+
+            @ApiResponse(responseCode = "400", description = "Invalid input"),
+
+            @ApiResponse(responseCode = "401", description = "Unauthorised for this action"),
+
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+
+            @ApiResponse(responseCode = "404", description = "Requested object not found") })
+    @RequestMapping(method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE,value="/getBankAccount/{IBAN}/Withdraw")
+    ResponseEntity accountWithdraw(@PathVariable("IBAN") String IBAN, @RequestBody Transaction transaction);
 
 }
 

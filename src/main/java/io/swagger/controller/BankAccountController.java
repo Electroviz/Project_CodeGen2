@@ -33,6 +33,7 @@ public class BankAccountController {
     @Autowired
     private UserService userService;
 
+    /*
     //melle
     @RequestMapping(method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE, value= "/putBankAccountType/{type}/{IBAN}")
     @PreAuthorize("hasRole('EMPLOYEE')")
@@ -235,4 +236,6 @@ public class BankAccountController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return userService.getUserById(userService.getUserIdByUsername(authentication.getName()));
     }
+    */
+
 }

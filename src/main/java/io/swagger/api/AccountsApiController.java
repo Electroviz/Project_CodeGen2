@@ -2,10 +2,14 @@ package io.swagger.api;
 
 import io.swagger.annotations.Api;
 import io.swagger.controller.BankAccountController;
+import io.swagger.enums.UserRoleEnum;
 import io.swagger.model.BankAccount;
+import io.swagger.model.Transaction;
 import io.swagger.model.TransactionInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.model.entity.User;
 import io.swagger.service.BankAccountService;
+import io.swagger.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -17,15 +21,14 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -35,114 +38,219 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-05-12T15:22:53.754Z[GMT]")
 @RestController
 @Api(tags= {"Accounts"})
 public class AccountsApiController implements AccountsApi {
 
-    private static final Logger log = LoggerFactory.getLogger(AccountsApiController.class);
+    @Autowired
+    private BankAccountService bankAccountService;
 
-    private final ObjectMapper objectMapper;
+    @Autowired
+    private UserService userService;
 
-    private final HttpServletRequest request;
+    //melle
 
-    BankAccountService bankAccountService = new BankAccountService();
-
-    @org.springframework.beans.factory.annotation.Autowired
-    public AccountsApiController(ObjectMapper objectMapper, HttpServletRequest request) {
-        this.objectMapper = objectMapper;
-        this.request = request;
+    @PreAuthorize("hasRole('EMPLOYEE')")
+    public ResponseEntity putBankAccountTypeByIBAN(@PathVariable("type") String type, @PathVariable("IBAN") String IBAN) {
+        type = type.replaceAll("[{}]",""); //make sure that the {variable} quotes are not taking into consideration
+        BankAccount.AccountTypeEnum bankAccountType = BankAccount.AccountTypeEnum.valueOf(type);
+        BankAccount bankAccountByIban = bankAccountService.GetBankAccountByIban(IBAN);
+        if(bankAccountByIban == null) return ResponseEntity.status(400).body("unknown IBAN or TYPE");
+        else {
+            return bankAccountService.PutBankAccountType(bankAccountType,bankAccountService.GetBankAccountByIban(IBAN));
+        }
     }
 
-    public ResponseEntity<Void> accountDeposit(@Parameter(in = ParameterIn.PATH, description = "Iban of the account that is to deposit money to", required=true, schema=@Schema()) @PathVariable("iban") String iban,@Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody TransactionInfo body) {
-        String accept = request.getHeader("Accept");
-        return new ResponseEntity<Void>(HttpStatus.NOT_IMPLEMENTED);
-    }
+    //Melle
 
-    public ResponseEntity<Void> accountWithdraw(@Parameter(in = ParameterIn.PATH, description = "Iban of the account that is used to withdraw money from", required=true, schema=@Schema()) @PathVariable("iban") String iban,@Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody TransactionInfo body) {
-        String accept = request.getHeader("Accept");
-        return new ResponseEntity<Void>(HttpStatus.NOT_IMPLEMENTED);
-    }
-
-    public ResponseEntity<BankAccount> createAccount(@Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody BankAccount body) {
-        BankAccount account = new BankAccount();
-        account.setUserId(bankAccountService.GenerateID());
-        account.setIban(bankAccountService.GenerateIban());
-        account.setBalance(Double.valueOf(0));
-        account.setAbsoluteLimit(body.getAbsoluteLimit());
-        account.setCreationDate(new SimpleDateFormat("dd-MM-yyyy").format(new Date()));
-        account.setAccountType(body.getAccountType());
-
-        bankAccountService.SetBankAccount(account);
-        return new ResponseEntity<BankAccount>(account, HttpStatus.OK);
-    }
-
-    public ResponseEntity<Void> deleteAccount(@Parameter(in = ParameterIn.PATH, description = "The IBAN", required=true, schema=@Schema()) @PathVariable("iban") String iban) {
-        String accept = request.getHeader("Accept");
-        bankAccountService.DeleteBankAccount(iban);
-        return new ResponseEntity<Void>(HttpStatus.OK);
-    }
-
-    public ResponseEntity<BankAccount> getAccountByIBAN(@Parameter(in = ParameterIn.PATH, description = "The IBAN", required=true, schema=@Schema()) @PathVariable("iban") String iban) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
-            try {
-                return new ResponseEntity<BankAccount>(objectMapper.readValue("{\n  \"balance\" : 23.45,\n  \"absolute limit\" : 1,\n  \"iban\" : \"NLxxINHO0xxxxxxxxx\",\n  \"accountType\" : \"Current\",\n  \"creationDate\" : \"01-05-2022:12:00:00\",\n  \"userId\" : 1\n}", BankAccount.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<BankAccount>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
+    @PreAuthorize("hasRole('EMPLOYEE')")
+    public ResponseEntity putBankAccountAbsoluteLimit(@PathVariable("value") String value, @PathVariable("IBAN") String IBAN) {
+        Double newAbsoluteLimit = null;
+        try {
+            newAbsoluteLimit = Double.valueOf(value);
+        }
+        catch(Exception e) {
+            return ResponseEntity.status(412).body("Bad Request"); //412 'precondition failed'
         }
 
-        return new ResponseEntity<BankAccount>(HttpStatus.NOT_IMPLEMENTED);
+        return bankAccountService.PutBankAccountAbsoluteLimit(newAbsoluteLimit,bankAccountService.GetBankAccountByIban(IBAN));
     }
 
-    public ResponseEntity<List<String>> getAccountByName(@Parameter(in = ParameterIn.PATH, description = "full name of a user", required=true, schema=@Schema()) @PathVariable("fullName") String fullName) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
-            try {
-                return new ResponseEntity<List<String>>(objectMapper.readValue("[ \"\", \"\" ]", List.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<List<String>>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
+    //Melle
 
-        return new ResponseEntity<List<String>>(HttpStatus.NOT_IMPLEMENTED);
+    @PreAuthorize("hasRole('EMPLOYEE')")
+    public ResponseEntity putBankAccountStatusByIban(@PathVariable("status") String status, @PathVariable("IBAN") String IBAN) {
+        BankAccount.AccountStatusEnum bankAccountStatus = BankAccount.AccountStatusEnum.valueOf(status);
+        BankAccount bankAccountByIban = bankAccountService.GetBankAccountByIban(IBAN);
+
+        if(bankAccountByIban == null || bankAccountStatus == null) return ResponseEntity.status(400).body(null);
+        else {
+            return bankAccountService.PutBankAccountStatus(bankAccountStatus,bankAccountByIban);
+        }
     }
 
-    public ResponseEntity<List<BankAccount>> getAccounts(@Min(0)@Parameter(in = ParameterIn.QUERY, description = "number of records to skip for pagination" ,schema=@Schema(allowableValues={  }
-)) @Valid @RequestParam(value = "skip", required = false) Integer skip,@Min(0) @Max(50) @Parameter(in = ParameterIn.QUERY, description = "maximum number of records to return" ,schema=@Schema(allowableValues={  }, maximum="50"
-)) @Valid @RequestParam(value = "limit", required = false) Integer limit) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
-            try {
-                return new ResponseEntity<List<BankAccount>>(objectMapper.readValue("[ {\n  \"balance\" : 23.45,\n  \"absolute limit\" : 1,\n  \"iban\" : \"NLxxINHO0xxxxxxxxx\",\n  \"accountType\" : \"Current\",\n  \"creationDate\" : \"01-05-2022:12:00:00\",\n  \"userId\" : 1\n}, {\n  \"balance\" : 23.45,\n  \"absolute limit\" : 1,\n  \"iban\" : \"NLxxINHO0xxxxxxxxx\",\n  \"accountType\" : \"Current\",\n  \"creationDate\" : \"01-05-2022:12:00:00\",\n  \"userId\" : 1\n} ]", List.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<List<BankAccount>>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
+    //melle
 
-        return new ResponseEntity<List<BankAccount>>(HttpStatus.NOT_IMPLEMENTED);
+    @PreAuthorize("hasRole('EMPLOYEE') or hasRole('CUSTOMER')")
+    public ResponseEntity getTotalBalanceForUserId(@PathVariable("userId") Long userId) {
+        User u = this.getLoggedInUser();
+
+        if(Objects.equals(u.getRole(), UserRoleEnum.ROLE_EMPLOYEE)) {
+            //allow the function to be executed for any user
+            return bankAccountService.GetTotalBalanceByUserId(userId); //method return response entity
+        }
+        else {
+            if(Objects.equals(u.getId(), userId)) return bankAccountService.GetTotalBalanceByUserId(userId);
+            else return ResponseEntity.status(401).body(null);
+        }
     }
 
-    public ResponseEntity<BankAccount> updateAccount(@Parameter(in = ParameterIn.PATH, description = "The IBAN", required=true, schema=@Schema()) @PathVariable("iban") String iban,@Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody BankAccount body) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
-            try {
-                return new ResponseEntity<BankAccount>(objectMapper.readValue("{\n  \"balance\" : 23.45,\n  \"absolute limit\" : 1,\n  \"iban\" : \"NLxxINHO0xxxxxxxxx\",\n  \"accountType\" : \"Current\",\n  \"creationDate\" : \"01-05-2022:12:00:00\",\n  \"userId\" : 1\n}", BankAccount.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<BankAccount>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
+    //melle
+
+    @PreAuthorize("hasRole('EMPLOYEE') or hasRole('CUSTOMER')")
+    public ResponseEntity postBankAccountsForUserByUserId(@PathVariable("userId") Long userId) {
+        return bankAccountService.PostOneSavingsAccountAndCurrentAccountForUser(userId);
+    }
+
+    //melle
+
+    @PreAuthorize("hasRole('EMPLOYEE') or hasRole('CUSTOMER')")
+    public ResponseEntity testFunc(@PathVariable("userId") long userId) {
+        User u = this.getLoggedInUser();
+
+        List<BankAccount> bankAccounts = bankAccountService.GetBankAccountsByUserId(userId);
+
+        boolean canPerform = false;
+        if(Objects.equals(u.getRole(), UserRoleEnum.ROLE_EMPLOYEE)) {
+            canPerform = true;
+        }
+        else {
+            if(u.getId() == userId) canPerform = true;
         }
 
-        return new ResponseEntity<BankAccount>(HttpStatus.NOT_IMPLEMENTED);
+        if(canPerform) {
+            if (bankAccounts.stream().count() == 0 || bankAccounts == null)
+                return ResponseEntity.status(404).body(null); //not found
+            else return ResponseEntity.status(200).body(bankAccounts); //succes
+        } else return ResponseEntity.status(401).body(null); //forbidden
+    }
+
+    //melle
+
+    @PreAuthorize("hasRole('EMPLOYEE')")
+    public ResponseEntity getAllBankAccountsController(){
+
+        return bankAccountService.GetAllBankAccounts();
+    }
+
+    //melle
+
+    @PreAuthorize("hasRole('EMPLOYEE') or hasRole('CUSTOMER')")
+    public ResponseEntity registerNewBankAccountController(@RequestBody BankAccount account){
+        ResponseEntity response = bankAccountService.CreateNewBankAccount();
+
+        User u = this.getLoggedInUser();
+
+        if(u.getRole() != UserRoleEnum.ROLE_EMPLOYEE) {
+            if(Objects.equals(u.getId(), account.getUserId()) == false) return ResponseEntity.status(401).body(null);
+        }
+
+        if (response.getStatusCode().isError()) {
+            return new ResponseEntity(response.getStatusCode(), HttpStatus.BAD_REQUEST);
+        } else {
+            return new ResponseEntity(response, HttpStatus.CREATED);
+        }
+    }
+
+    //melle
+
+    @PreAuthorize("hasRole('EMPLOYEE') or hasRole('CUSTOMER')")
+    public ResponseEntity getBankAccountInfoByIbanController(@PathVariable("IBAN") String IBAN) {
+        //protection for requesting bankaccount info
+        User u = this.getLoggedInUser();
+
+        boolean canPerform = false;
+
+        if(u.getRole() == UserRoleEnum.ROLE_EMPLOYEE || u.getRole() == UserRoleEnum.ROLE_BANK) canPerform = true;
+        else {
+            //check if the asked iban is the users iban
+            if(bankAccountService.GetBankAccountByIban(IBAN).getUserId() == u.getId()) canPerform = true;
+            else canPerform = false;
+        }
+
+        if(canPerform) {
+            BankAccount ba = bankAccountService.GetBankAccountByIban(IBAN);
+
+            if (ba != null) {
+                return new ResponseEntity<BankAccount>(ba, HttpStatus.FOUND);
+            } else {
+                return ResponseEntity.status(400).body("Bad Request");
+            }
+        }
+        else return ResponseEntity.status(401).body("Bad Request");
+    }
+
+    //Nicky
+
+    @PreAuthorize("hasRole('EMPLOYEE') or hasRole('CUSTOMER')")
+    public ResponseEntity getBankAccountInfoByName(@PathVariable("FULLNAME") String fullName) {
+        //Anyone that is logged in should be able to perform this method
+        List<String> ibansToReturn = bankAccountService.getAccountByName(fullName);
+
+        if(ibansToReturn != null) {
+            return new ResponseEntity<List>(ibansToReturn,HttpStatus.OK);
+        }
+        else if(ibansToReturn.size() == 0) return ResponseEntity.status(404).body(null);
+        else {
+            return ResponseEntity.status(400).body("Bad Request");
+        }
+    }
+
+    //Nicky
+
+    public ResponseEntity accountDeposit(@PathVariable("IBAN") String IBAN, @RequestBody Transaction transaction) {
+        TransactionInfo transactionInfo = bankAccountService.AccountDeposit(IBAN, transaction.getAmount());
+
+        if(transactionInfo != null) {
+            return new ResponseEntity<TransactionInfo>(transactionInfo,HttpStatus.ACCEPTED);
+        }
+        else {
+            return ResponseEntity.status(400).body("Bad Request");
+        }
+    }
+
+    //Nicky
+
+    @PreAuthorize("hasRole('EMPLOYEE')")
+    public ResponseEntity deleteAccount(@PathVariable("IBAN") String IBAN) {
+        BankAccount bankAccount = bankAccountService.DeleteBankAccount(IBAN);
+
+        if(bankAccount != null) {
+            return new ResponseEntity<BankAccount>(bankAccount,HttpStatus.OK);
+        }
+        else {
+            return ResponseEntity.status(400).body("Bad Request");
+        }
+    }
+
+    //Nicky
+
+    public ResponseEntity accountWithdraw(@PathVariable("IBAN") String IBAN, @RequestBody Transaction transaction) {
+        TransactionInfo transactionInfo = bankAccountService.AccountWithdraw(IBAN, transaction.getAmount());
+
+        if(transactionInfo != null) {
+            return new ResponseEntity<TransactionInfo>(transactionInfo,HttpStatus.ACCEPTED);
+        }
+        else {
+            return ResponseEntity.status(400).body("Bad Request");
+        }
+    }
+
+    private User getLoggedInUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return userService.getUserById(userService.getUserIdByUsername(authentication.getName()));
     }
 }
