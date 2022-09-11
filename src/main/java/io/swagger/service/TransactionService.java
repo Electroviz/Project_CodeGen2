@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.threeten.bp.OffsetDateTime;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -37,22 +38,50 @@ public class TransactionService {
     }
 
     //Melle
-    public List<Transaction> GetTransactionsInBetweenDate(OffsetDateTime firstDate, OffsetDateTime secondDate, Integer userId) {
+    public List<Transaction> GetTransactionsInBetweenDate(Date firstDate, Date secondDate, Integer userId) {
         List<Transaction> allTransactions = transactionRepository.findAll();
         List<Transaction> correctTransactions = new ArrayList<>();
         for (int i = 0; i < allTransactions.size(); i++) {
             Transaction transaction = allTransactions.get(i);
-            if(transaction.getTimestamp().isAfter(firstDate) && transaction.getTimestamp().isBefore(secondDate)) {
+            if((isAfterDate(firstDate,transaction.getTimestamp()) || datesAreEqual(firstDate,transaction.getTimestamp()) ) &&
+                    (isBeforeDate(secondDate,transaction.getTimestamp()) || datesAreEqual(secondDate,transaction.getTimestamp()))
+                ) {
                 if(userId == null || userId < 0) correctTransactions.add(transaction);
                 else if(transaction.getUserIDPerforming() == userId) correctTransactions.add(transaction);
             }
-            else if(transaction.getTimestamp().isAfter(secondDate) && transaction.getTimestamp().isBefore(firstDate)) {
+            else if((isAfterDate(transaction.getTimestamp(),secondDate) || datesAreEqual(transaction.getTimestamp(),secondDate)) &&
+                    (isBeforeDate(transaction.getTimestamp(), firstDate) || datesAreEqual(transaction.getTimestamp(), firstDate))) {
                 if(userId == null || userId < 0) correctTransactions.add(transaction);
                 else if(transaction.getUserIDPerforming() == userId) correctTransactions.add(transaction);
             }
+
+
+
+
         }
 
         return correctTransactions;
+    }
+
+    private boolean datesAreEqual(Date date1, Date date2) {
+        int result = date1.compareTo(date2);
+
+        if(result == 0) return true;
+        else return false;
+    }
+
+    private boolean isBeforeDate(Date date1, Date transaction) {
+        int result = date1.compareTo(transaction);
+
+        if(result > 0) return true;
+        else return false;
+    }
+
+    private boolean isAfterDate(Date date1, Date transaction) {
+        int result = date1.compareTo(transaction);
+
+        if(result < 0) return true;
+        else return false;
     }
 
     //Melle
@@ -160,7 +189,7 @@ public class TransactionService {
         newTrans.setUserIDPerforming(userPerformingId);
         newTrans.setAmount(amount);
         newTrans.setDescription(description);
-        newTrans.setTimestamp(OffsetDateTime.now()); //timestamp
+        newTrans.setTimestamp(new Date(System.currentTimeMillis())); //timestamp
 
         return newTrans;
     }

@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.threeten.bp.OffsetDateTime;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -342,7 +343,7 @@ public class BankAccountService {
             //maak nieuwe transaction aan
             depositTrans.setAmount(amount);
             depositTrans.setDescription("Deposit");
-            depositTrans.setTimestamp(OffsetDateTime.now());
+            depositTrans.setTimestamp(new Date());
             depositTrans.setFrom("NL01INHO0000000001");
             depositTrans.setTo(iban);
             depositTrans.setUserIDPerforming(Math.toIntExact(Long.valueOf(account.getUserId())));
@@ -396,7 +397,7 @@ public class BankAccountService {
 
             withdrawTrans.setAmount(amount);
             withdrawTrans.setDescription("Withdraw");
-            withdrawTrans.setTimestamp(OffsetDateTime.now());
+            withdrawTrans.setTimestamp(new Date(System.currentTimeMillis()));
             withdrawTrans.setTo("NL01INHO0000000001");
             withdrawTrans.setFrom(iban);
             withdrawTrans.setUserIDPerforming(Math.toIntExact(Long.valueOf(account.getUserId())));

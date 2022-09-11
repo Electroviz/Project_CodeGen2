@@ -186,6 +186,53 @@ const bankingPageComponent = () => {
         }
     }
 
+    const FindTransactionHistoryByDate = async (e) => {
+        // console.log(new Date().toISOString());
+
+        try {
+            var fromDate = document.getElementById('inputDateFrom').value;
+            var toDate = document.getElementById('inputDateTo').value;
+
+            // fromDate = fromDate.slice(0, -1) + "+02:00";
+            // toDate = toDate.slice(0, -1) + "+02:00";
+            console.log('http://localhost:8080/api/transactions/byDateAndUser/' + fromDate + '/' + toDate + '/' + userId);
+
+            const result = await axios.get('http://localhost:8080/api/transactions/byDateAndUser/' + fromDate + '/' + toDate + '/' + userId);
+            if(result.status >= 200 && result.status < 300) {
+                if(result.status == 204) alert("No transactions in between this dates");
+                else {
+                    document.getElementById("transactionHistoryWithIbanWrapper").style.display = "block";
+                    document.getElementById('transactionHistoryWithIbanText').innerHTML = "Transactions by from date " + fromDate + " to date " + toDate;
+
+                    var container = document.getElementById("allTransactionHistoryWithIban");
+                    container.innerHTML = "";
+    
+                    for(let i = 0; i < result.data.length; i++) {
+                        var bankAccInfoElm = document.createElement("p");
+                        bankAccInfoElm.style.textAlign = "center";
+                        bankAccInfoElm.style.marginBottom = "0.8rem";
+                        bankAccInfoElm.style.borderBottom = "0.1rem solid black";
+                        bankAccInfoElm.innerHTML = 
+                        "<b>from:</b> " + result.data[i]["from"] + ", " +
+                        "<b>to:</b> " + result.data[i]["to"] + ", " +
+                        "<b>amount:</b> €" + result.data[i]["amount"] + ", " +
+                        "<b>date:</b> " + result.data[i]["timestamp"] + ", " +
+                        "<b>description:</b> " + result.data[i]["description"];
+                        
+                        
+                        container.append(bankAccInfoElm);
+                    }
+                }
+            }
+            else {
+                alert("Something went wrong when finding the transactions, try a different date-format?");
+            }
+        }
+        catch (error) {
+            alert("Something went wrong when finding the transactions, try a different date-format?");
+        }
+    }
+
     const FindTransactionHistoryByComparison = async (e) => {
         try {
             var amount = document.getElementById('transactionComparisonAmount').value;
@@ -340,6 +387,7 @@ const bankingPageComponent = () => {
 
             if(result.status >= 200 && result.status < 300) {
                 loadAllUsersWithoutBankAccounts();
+                window.location.reload();
             }
             else alert("Failed to create bank account for user");
         }
@@ -604,6 +652,14 @@ const bankingPageComponent = () => {
                         </select>
                         <button onClick={ FindTransactionHistoryByComparison } style={{ display: "inline-block", fontSize: "1.15rem", marginLeft: "0.2rem"}}>Confirm</button>
                     </div>
+
+                        <div>
+                            <p style={{ fontSize: "1.4rem", marginBottom: "0rem", display: "block", fontSize: "1.15rem", fontWeight: "bold"}}>Find transactions between dates: </p>
+                            <p style={{ display: 'inline-block', paddingRight: "0.8rem"}}>From date: </p><input id="inputDateFrom" type="date" style={{display: "inline-block"}}/>
+                            <p style={{ display: 'block', margin: '-1.4rem'}}></p>
+                            <p style={{ display: 'inline-block', paddingRight: "2.08rem"}}>To date: </p><input id="inputDateTo" type="date" style={{display: "inline-block"}}/>
+                            <button onClick={ FindTransactionHistoryByDate } style={{ display: "block", fontSize: "1.15rem", width: "10%", marginLeft: "45%"}}>Find</button>
+                        </div>
 
                         <div id="transactionHistoryWithIbanWrapper" style={{ display: 'none'}}>
                             <p id="transactionHistoryWithIbanText" style={{ fontSize: "1.4rem", fontWeight: "bold", marginBottom: "0rem"}}>Your transaction History with iban:</p>

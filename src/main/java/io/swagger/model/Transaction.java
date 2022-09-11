@@ -1,5 +1,6 @@
 package io.swagger.model;
 
+import java.util.Date;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -42,7 +43,7 @@ public class Transaction   {
   private Double amount = null;
 
   @JsonProperty("timestamp")
-  private OffsetDateTime timestamp = null;
+  private Date timestamp = null;
 
   @JsonProperty("description")
   private String description = null;
@@ -133,7 +134,7 @@ public class Transaction   {
     this.amount = amount;
   }
 
-  public Transaction timestamp(OffsetDateTime timestamp) {
+  public Transaction timestamp(Date timestamp) {
     this.timestamp = timestamp;
     return this;
   }
@@ -146,11 +147,11 @@ public class Transaction   {
       @NotNull
 
     @Valid
-    public OffsetDateTime getTimestamp() {
+    public Date getTimestamp() {
     return timestamp;
   }
 
-  public void setTimestamp(OffsetDateTime timestamp) {
+  public void setTimestamp(Date timestamp) {
     this.timestamp = timestamp;
   }
 

@@ -16,7 +16,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.threeten.bp.OffsetDateTime;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -108,8 +111,9 @@ public class TransactionController {
     //Melle
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value="/transactions/byDate/{fromDate}/{toDate}")
     @PreAuthorize("hasRole('EMPLOYEE')")
-    public ResponseEntity GetTransactionsByDate(@PathVariable("fromDate") OffsetDateTime fromDate, @PathVariable("todate") OffsetDateTime toDate) {
-        List<Transaction> correctTransactions = transactionService.GetTransactionsInBetweenDate(fromDate,toDate,null);
+    public ResponseEntity GetTransactionsByDate(@PathVariable("fromDate") String fromDate, @PathVariable("toDate") String toDate) throws ParseException {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        List<Transaction> correctTransactions = transactionService.GetTransactionsInBetweenDate(format.parse(fromDate),format.parse(toDate),null);
 
         if(correctTransactions == null || correctTransactions.size() == 0) return ResponseEntity.status(204).body("No transactions in between this date");
         else return ResponseEntity.status(200).body(correctTransactions);
@@ -117,14 +121,15 @@ public class TransactionController {
 
     //Melle
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value="/transactions/byDateAndUser/{fromDate}/{toDate}/{userId}")
-    public ResponseEntity GetTransactionsByDateAndUser(@PathVariable("fromDate") OffsetDateTime fromDate, @PathVariable("todate") OffsetDateTime toDate, @PathVariable("userId") Integer userId) {
+    public ResponseEntity GetTransactionsByDateAndUser(@PathVariable("fromDate") String fromDate, @PathVariable("toDate") String toDate, @PathVariable("userId") Integer userId) throws ParseException {
         User u = this.getLoggedInUser();
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 
         List<Transaction> correctTransactions = new ArrayList<>();
         if(Objects.equals(u.getRole(), UserRoleEnum.ROLE_EMPLOYEE)) {
-            correctTransactions = transactionService.GetTransactionsInBetweenDate(fromDate,toDate,userId);
+            correctTransactions = transactionService.GetTransactionsInBetweenDate(format.parse(fromDate),format.parse(toDate),userId);
         }
-        else correctTransactions = transactionService.GetTransactionsInBetweenDate(fromDate,toDate,u.getId().intValue());
+        else correctTransactions = transactionService.GetTransactionsInBetweenDate(format.parse(fromDate),format.parse(toDate),u.getId().intValue());
 
 
         if(correctTransactions == null || correctTransactions.size() == 0) return ResponseEntity.status(204).body("No transactions in between this date");
