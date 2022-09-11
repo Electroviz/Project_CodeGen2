@@ -186,6 +186,50 @@ const bankingPageComponent = () => {
         }
     }
 
+    const FindTransactionHistoryByComparison = async (e) => {
+        try {
+            var amount = document.getElementById('transactionComparisonAmount').value;
+            var comparison = document.getElementById('transactionComparisonType').value;
+            var result = null;
+
+            if(comparison == "=") result = await axios.get('http://localhost:8080/api/transactions/byAmountIsEqual/' + GetLoggedInUsersCurrentIban() + '/' + amount);
+            else if(comparison == "<") result = await axios.get('http://localhost:8080/api/transactions/byAmountIsSmaller/' + GetLoggedInUsersCurrentIban() + '/' + amount);
+            else if(comparison == ">") result = await axios.get('http://localhost:8080/api/transactions/byAmountIsBigger/' + GetLoggedInUsersCurrentIban() + '/' + amount);
+            
+            if(result != null && result.status >= 200 && result.status < 300) {
+                if(result.data.length > 0) {
+                    document.getElementById("transactionHistoryWithIbanWrapper").style.display = "block";
+                    document.getElementById('transactionHistoryWithIbanText').innerHTML = "Transactions by comparison " + comparison + " with amount: €" + amount;
+
+                    var container = document.getElementById("allTransactionHistoryWithIban");
+                    container.innerHTML = "";
+    
+                    for(let i = 0; i < result.data.length; i++) {
+                        var bankAccInfoElm = document.createElement("p");
+                        bankAccInfoElm.style.textAlign = "center";
+                        bankAccInfoElm.style.marginBottom = "0.8rem";
+                        bankAccInfoElm.style.borderBottom = "0.1rem solid black";
+                        bankAccInfoElm.innerHTML = 
+                        "<b>from:</b> " + result.data[i]["from"] + ", " +
+                        "<b>to:</b> " + result.data[i]["to"] + ", " +
+                        "<b>amount:</b> €" + result.data[i]["amount"] + ", " +
+                        "<b>date:</b> " + result.data[i]["timestamp"] + ", " +
+                        "<b>description:</b> " + result.data[i]["description"];
+                        
+                        
+                        container.append(bankAccInfoElm);
+                    }
+                }
+                else document.getElementById('transactionHistoryWithIbanText ').innerHTML = "No result found for comparison";
+            }
+            else alert('Could not find a transactions you where looking for.');
+        }
+        catch (error) {
+            console.log(result + error);
+            alert('Something went wrong when finding the transactions you where looking for.');
+        }
+    }
+
     const FindTransactionHistory = async (e) => {
         try {
             var transactionHistoryIban = document.getElementById("transactionHistoryIban").value;
@@ -474,7 +518,7 @@ const bankingPageComponent = () => {
             <div style={{ marginTop: "0.8rem", width: "100%", borderBottom: "0.4rem solid black"}}>
                 <h1>BANKING APPLICATION</h1>
                 <div style={{ display: "block" }}>
-                    <p id="currentUserFullName" style={{ width: "100%", textAlign: "center", fontWeight: "bold", fontSize: "1.4rem", marginBottom: "-0.5rem"}}></p>
+                    <p id="currentUserFullName" style={{ width: "100%", textAlign: "center", fontWeight: "bold", fontSize: "1.4rem", marginBottom: "-0.25rem"}}></p>
                 </div>
 
                 <div id="currentUsersBankingInfo">
@@ -519,7 +563,7 @@ const bankingPageComponent = () => {
                     </div>
                 </div>
 
-                <button id="createBankAccountsButt" onClick={ CreateBankAccountsForUser } style={{ display: "block", visibility: "hidden", width: "15%", marginLeft: "42.5%", marginBottom: "1.8rem"}}>create your banking accounts</button>
+                <button id="createBankAccountsButt" onClick={ CreateBankAccountsForUser } style={{ display: "block", visibility: "hidden", width: "15%", marginLeft: "42.5%", marginBottom: "3rem", marginTop: "1rem"}}>create your banking accounts</button>
             
             
             
@@ -551,14 +595,14 @@ const bankingPageComponent = () => {
 
                         <div style={{ display: "block"}}>
                         <p style={{ fontSize: "1.15rem", marginBottom: "0rem", display: "inline-block"}}>Find transaction{'(s)'} where amount: </p>
-                        <input id="changeStatusIban" style={{ display: "inline-block", fontSize: "1.15rem", marginLeft: "0.2rem", marginRight: "0.2rem"}} />
+                        <input id="transactionComparisonAmount" style={{ display: "inline-block", fontSize: "1.15rem", marginLeft: "0.2rem", marginRight: "0.2rem"}} />
                         <p style={{ fontSize: "1.15rem", marginBottom: "0rem", display: "inline-block"}}> is compared to </p>
-                        <select id="changeStatus" style={{ display: "inline-block"}}>
+                        <select id="transactionComparisonType" style={{ display: "inline-block", padding: "0.2rem", marginLeft: "0.2rem", marginRight: "0.2rem", fontSize: "1.2rem"}}>
                             <option>{'='}</option>
                             <option>{'<'}</option>
                             <option>{'>'}</option>
                         </select>
-                        <button onClick={  } style={{ display: "inline-block", fontSize: "1.15rem", marginLeft: "0.2rem"}}>Confirm</button>
+                        <button onClick={ FindTransactionHistoryByComparison } style={{ display: "inline-block", fontSize: "1.15rem", marginLeft: "0.2rem"}}>Confirm</button>
                     </div>
 
                         <div id="transactionHistoryWithIbanWrapper" style={{ display: 'none'}}>
