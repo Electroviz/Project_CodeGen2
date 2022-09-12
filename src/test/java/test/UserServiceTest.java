@@ -37,8 +37,8 @@ class UserServiceTest {
 
         ResponseEntity result = userService.addUser(u,false);
 
-        assertTrue((result.getStatusCodeValue() == 200 || result.getStatusCodeValue() == 201) && userService.getUserIdByUsername("janus321") != -1);
-        assertFalse(result.getStatusCodeValue() >= 300 || userService.getUserIdByUsername("janus321") == -1);
+        assertTrue((result.getStatusCodeValue() == 200 || result.getStatusCodeValue() == 201) && userService.getUserIdByUsername("janus321343") != -1);
+        assertFalse(result.getStatusCodeValue() >= 300 || userService.getUserIdByUsername("janus321343") == -1);
     }
 
     @Test
@@ -119,10 +119,11 @@ class UserServiceTest {
     @Test
     void GetUserIdByUsernameWorksCorrectlyTest() {
         User u = CreateFakeUser("janus32133215235","Janus Kogelaar","januskogelaar@live.nl", "geheim123");
+        userService.addUser(u,false);
 
         long id = userService.getUserIdByUsername(u.getUsername());
 
-        Assertions.assertTrue(id == u.getId());
+        Assertions.assertTrue(Objects.equals(id, u.getId()) == true);
         Assertions.assertFalse(id != u.getId());
     }
 
@@ -142,6 +143,22 @@ class UserServiceTest {
 
         Assertions.assertTrue(result);
         Assertions.assertFalse(!result);
+    }
+
+    @Test
+    void GetAllUsersFunctionTest() {
+        int originalSize = userService.getAll().size();
+
+        User u1 = CreateFakeUser("parius312","Janus Kogelaar","januskogelasdaar@live.nl", "geheim123");
+        User u2 = CreateFakeUser("parius31222","Janus Kogelaar","januskogelasdasnfahjfaar@live.nl", "geheim123");
+
+        userService.addUser(u1,false);
+        userService.addUser(u2,true);
+
+        int newSize = userService.getAll().size();
+
+        Assertions.assertTrue(originalSize + 2 == newSize);
+        Assertions.assertFalse(originalSize + 2 != newSize);
     }
 
 

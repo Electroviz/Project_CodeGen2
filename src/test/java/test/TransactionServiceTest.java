@@ -38,11 +38,11 @@ public class TransactionServiceTest {
     @Autowired
     BankAccountService bankAccountService;
 
-    public List<BankAccount> bankAccountsList = new ArrayList<>();
+    List<BankAccount> bankAccountsList = new ArrayList<>();
 
 
     @BeforeEach
-    public void Setup() {
+    void Setup() {
         //create some fake bankAccounts with balance
 
         BankAccount ba1 = new BankAccount();
@@ -75,7 +75,7 @@ public class TransactionServiceTest {
     //MELLE:
 
     @Test
-    public void TransferMoneyFromIbanToIbanTest() {
+    void TransferMoneyFromIbanToIbanTest() {
         //should be possible
         boolean result = transactionService.TransferMoneyFromToIban(bankAccountsList.get(0).getIban(),bankAccountsList.get(1).getIban(), 10.0,bankAccountsList.get(0).getUserId().intValue());
 
@@ -84,7 +84,7 @@ public class TransactionServiceTest {
     }
 
     @Test
-    public void TransferMoneyNegativeAmountNotPossibleTest() {
+    void TransferMoneyNegativeAmountNotPossibleTest() {
         //should not be possible
         boolean result = transactionService.TransferMoneyFromToIban(bankAccountsList.get(0).getIban(),bankAccountsList.get(1).getIban(), -100.0,bankAccountsList.get(0).getUserId().intValue());
 
@@ -94,7 +94,7 @@ public class TransactionServiceTest {
     }
 
     @Test
-    public void TransferMoneySameIbanNotPossibleTest() {
+    void TransferMoneySameIbanNotPossibleTest() {
         //should not be possible
         boolean result = transactionService.TransferMoneyFromToIban(bankAccountsList.get(0).getIban(),bankAccountsList.get(0).getIban(), 100.0,bankAccountsList.get(0).getUserId().intValue());
 
@@ -103,7 +103,7 @@ public class TransactionServiceTest {
     }
 
     @Test
-    public void TransferToMuchMoneyThenActiveBalanceTest() {
+    void TransferToMuchMoneyThenActiveBalanceTest() {
         //should not be possible
         boolean result = transactionService.TransferMoneyFromToIban(bankAccountsList.get(0).getIban(),bankAccountsList.get(1).getIban(), (bankAccountsList.get(1).getBalance() + 50.0),bankAccountsList.get(0).getUserId().intValue());
 
@@ -112,7 +112,7 @@ public class TransactionServiceTest {
     }
 
     @Test
-    public void TransferMoneyFromClosedBankAccountTest() {
+    void TransferMoneyFromClosedBankAccountTest() {
         //should not be possible
         BankAccount ba = fakeBankAccount(3,300.0, BankAccount.AccountTypeEnum.CURRENT, BankAccount.AccountStatusEnum.CLOSED);
 
@@ -123,7 +123,7 @@ public class TransactionServiceTest {
     }
 
     @Test
-    public void TransferMoneyFromOneUserIbanToSavingsAccountOtherUser() {
+    void TransferMoneyFromOneUserIbanToSavingsAccountOtherUser() {
         BankAccount baCurrent = fakeBankAccount(3,300.0, BankAccount.AccountTypeEnum.CURRENT, BankAccount.AccountStatusEnum.ACTIVE);
         BankAccount baCurrentSavings = fakeBankAccount(3,300.0, BankAccount.AccountTypeEnum.SAVINGS, BankAccount.AccountStatusEnum.ACTIVE);
         BankAccount baSavings = fakeBankAccount(4,300.0, BankAccount.AccountTypeEnum.SAVINGS, BankAccount.AccountStatusEnum.CLOSED);
@@ -136,7 +136,7 @@ public class TransactionServiceTest {
     }
 
     @Test
-    public void TransferMoneyToClosedBankAccountTest() {
+    void TransferMoneyToClosedBankAccountTest() {
         //should not be possible
         BankAccount ba = fakeBankAccount(3,300.0, BankAccount.AccountTypeEnum.CURRENT, BankAccount.AccountStatusEnum.CLOSED);
 
@@ -147,7 +147,7 @@ public class TransactionServiceTest {
     }
 
     @Test
-    public void TransferMoneyToNonExistingIbanTest() {
+    void TransferMoneyToNonExistingIbanTest() {
         //should not be possible
         boolean result = transactionService.TransferMoneyFromToIban(bankAccountsList.get(0).getIban(),bankAccountService.GenerateIban(), (bankAccountsList.get(0).getBalance() + 50.0),bankAccountsList.get(0).getUserId().intValue());
 
@@ -160,7 +160,7 @@ public class TransactionServiceTest {
     //START DEPOSIT AND WITHDRAW TESTS
 
     @Test
-    public void WithdrawToMuchMoneyTest() {
+    void WithdrawToMuchMoneyTest() {
         //should not be possible
         BankAccount ba = fakeBankAccount(3,300.0, BankAccount.AccountTypeEnum.CURRENT, BankAccount.AccountStatusEnum.ACTIVE);
 
@@ -171,7 +171,7 @@ public class TransactionServiceTest {
     }
 
     @Test
-    public void WithdrawExactBalanceTest() {
+    void WithdrawExactBalanceTest() {
         //should be possible
         BankAccount ba = fakeBankAccount(3,300.0, BankAccount.AccountTypeEnum.CURRENT, BankAccount.AccountStatusEnum.ACTIVE);
 
@@ -183,7 +183,7 @@ public class TransactionServiceTest {
     }
 
     @Test
-    public void MoneyIsBeingDepositedTest() {
+    void MoneyIsBeingDepositedTest() {
         //should be predefined balance
         Double endingAmount = 500.0;
 
@@ -199,7 +199,7 @@ public class TransactionServiceTest {
     }
 
     @Test
-    public void MoneyDepositNegativeValueTest() {
+    void MoneyDepositNegativeValueTest() {
         //should not be possible
         boolean result = transactionService.WithdrawOrDepositMoney(bankAccountsList.get(0).getIban(),-200.0,false,bankAccountsList.get(0).getUserId().intValue());
 
@@ -212,7 +212,7 @@ public class TransactionServiceTest {
     //START GET TRANSACTIONS (COLLECT THE EXPECTED DATA)
 
     @Test
-    public void GetCorrectTransactionsByDateTest() throws ParseException {
+    void GetCorrectTransactionsByDateTest() throws ParseException {
         //to iban , from iban
         BankAccount ba = fakeBankAccount(4,300.0, BankAccount.AccountTypeEnum.CURRENT, BankAccount.AccountStatusEnum.ACTIVE);
 
@@ -230,7 +230,7 @@ public class TransactionServiceTest {
     }
 
     @Test
-    public void GetTransactionWhereBalanceIsEqualTest() {
+    void GetTransactionWhereBalanceIsEqualTest() {
         BankAccount ba1 = fakeBankAccount(1,300.0, BankAccount.AccountTypeEnum.CURRENT, BankAccount.AccountStatusEnum.ACTIVE);
         BankAccount ba2 = fakeBankAccount(2,500.0, BankAccount.AccountTypeEnum.CURRENT, BankAccount.AccountStatusEnum.ACTIVE);
 
@@ -245,7 +245,7 @@ public class TransactionServiceTest {
     }
 
     @Test
-    public void GetTransactionWhereBalanceIsSmallerTest() {
+    void GetTransactionWhereBalanceIsSmallerTest() {
         BankAccount ba1 = fakeBankAccount(1,300.0, BankAccount.AccountTypeEnum.CURRENT, BankAccount.AccountStatusEnum.ACTIVE);
         BankAccount ba2 = fakeBankAccount(2,500.0, BankAccount.AccountTypeEnum.CURRENT, BankAccount.AccountStatusEnum.ACTIVE);
 
@@ -260,7 +260,7 @@ public class TransactionServiceTest {
     }
 
     @Test
-    public void GetTransactionWhereBalanceIsBiggerTest() {
+    void GetTransactionWhereBalanceIsBiggerTest() {
         BankAccount ba1 = fakeBankAccount(1,300.0, BankAccount.AccountTypeEnum.CURRENT, BankAccount.AccountStatusEnum.ACTIVE);
         BankAccount ba2 = fakeBankAccount(2,500.0, BankAccount.AccountTypeEnum.CURRENT, BankAccount.AccountStatusEnum.ACTIVE);
 
@@ -275,7 +275,7 @@ public class TransactionServiceTest {
     }
 
     @Test
-    public void GetTransactionWhereBalanceIsBiggerMultipleOtherTransactionsTest() {
+    void GetTransactionWhereBalanceIsBiggerMultipleOtherTransactionsTest() {
         BankAccount ba1 = fakeBankAccount(1,300.0, BankAccount.AccountTypeEnum.CURRENT, BankAccount.AccountStatusEnum.ACTIVE);
         BankAccount ba2 = fakeBankAccount(2,500.0, BankAccount.AccountTypeEnum.CURRENT, BankAccount.AccountStatusEnum.ACTIVE);
         BankAccount ba3 = fakeBankAccount(3,800.0, BankAccount.AccountTypeEnum.CURRENT, BankAccount.AccountStatusEnum.ACTIVE);
