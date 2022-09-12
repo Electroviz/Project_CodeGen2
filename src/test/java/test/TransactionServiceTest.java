@@ -102,7 +102,7 @@ public class TransactionServiceTest {
     @Test
     public void TransferToMuchMoneyThenActiveBalanceTest() {
         //should not be possible
-        boolean result = transactionService.TransferMoneyFromToIban(bankAccountsList.get(0).getIban(),bankAccountsList.get(1).getIban(), (bankAccountsList.get(0).getBalance() + 50.0),bankAccountsList.get(0).getUserId().intValue());
+        boolean result = transactionService.TransferMoneyFromToIban(bankAccountsList.get(0).getIban(),bankAccountsList.get(1).getIban(), (bankAccountsList.get(1).getBalance() + 50.0),bankAccountsList.get(0).getUserId().intValue());
 
         Assertions.assertTrue(result == false);
         Assertions.assertFalse(result == true);
