@@ -116,6 +116,34 @@ class UserServiceTest {
         Assertions.assertFalse(!resultShouldBeTrue1 || !resultShouldBeTrue2 || resultShouldBeFalse1 || resultShouldBeFalse2);
     }
 
+    @Test
+    void GetUserIdByUsernameWorksCorrectlyTest() {
+        User u = CreateFakeUser("janus32133215235","Janus Kogelaar","januskogelaar@live.nl", "geheim123");
+
+        long id = userService.getUserIdByUsername(u.getUsername());
+
+        Assertions.assertTrue(id == u.getId());
+        Assertions.assertFalse(id != u.getId());
+    }
+
+    @Test
+    void GetUserByIdWorksCorrectlyTest() {
+        User u = CreateFakeUser("parius","Janus Kogelaar","januskogelaar@live.nl", "geheim123");
+
+        userService.addUser(u,false);
+
+        User dbUser = userService.getUserById(userService.getUserIdByUsername(u.getUsername()));
+
+        boolean result = true;
+
+        if(!dbUser.getUsername().equals(u.getUsername())) result = false;
+        else if(!dbUser.getFullname().equals(u.getFullname())) result = false;
+        else if(!dbUser.getEmail().equals(u.getEmail())) result = false;
+
+        Assertions.assertTrue(result);
+        Assertions.assertFalse(!result);
+    }
+
 
 
     private User CreateFakeUser(String username,String fullName, String email, String plainPassword) {
