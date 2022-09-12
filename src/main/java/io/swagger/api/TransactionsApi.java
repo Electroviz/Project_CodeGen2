@@ -32,7 +32,7 @@ public interface TransactionsApi {
     @Operation(summary = "gets all transactions", description = "gets all transactions", security = {
         @SecurityRequirement(name = "bearerAuth")    }, tags={ "Transactions" })
     @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "Succesfully recieved transactions", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = Transaction.class)))),
+        @ApiResponse(responseCode = "200", description = "Succesfully recieved transactions"),
         
         @ApiResponse(responseCode = "400", description = "Invalid input"),
         
