@@ -48,12 +48,12 @@ public class TransactionService {
                 ) {
                 if(userId == null || userId < 0) correctTransactions.add(transaction);
                     //from iban used because otherwise employees transaction history will also contain performed transactions by the employee
-                else if(bankAccountService.GetBankAccountByIban(transaction.getFrom()).getUserId().intValue() == userId) correctTransactions.add(transaction);
+                else if(bankAccountService.GetBankAccountByIban(transaction.getFrom()).getUserId().intValue() == userId || bankAccountService.GetBankAccountByIban(transaction.getTo()).getUserId().intValue() == userId) correctTransactions.add(transaction);
             }
             else if((isAfterDate(transaction.getTimestamp(),secondDate) || datesAreEqual(transaction.getTimestamp(),secondDate)) &&
                     (isBeforeDate(transaction.getTimestamp(), firstDate) || datesAreEqual(transaction.getTimestamp(), firstDate))) {
                 if(userId == null || userId < 0) correctTransactions.add(transaction);
-                else if(bankAccountService.GetBankAccountByIban(transaction.getFrom()).getUserId().intValue() == userId) correctTransactions.add(transaction);
+                else if(bankAccountService.GetBankAccountByIban(transaction.getFrom()).getUserId().intValue() == userId || bankAccountService.GetBankAccountByIban(transaction.getTo()).getUserId().intValue() == userId) correctTransactions.add(transaction);
             }
         }
 

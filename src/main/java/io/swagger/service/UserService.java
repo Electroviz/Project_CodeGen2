@@ -49,13 +49,10 @@ public class UserService {
 
     private List<User> userList = new ArrayList<>();
 
-    //Nick
 
+    //nick
     public ResponseEntity addUser(User user, boolean asEmployee){
 
-//        if (userRepository.findByusername(user.getUsername()).getRole().equals(UserRoleEnum.ROLE_CUSTOMER)){
-//            return ResponseEntity.status(403).body("Unauthorized");
-//        }
         String test = "";
         if (test == ":"){
             return ResponseEntity.status(400).body("Bad request1");
@@ -103,7 +100,6 @@ public class UserService {
         return usersWithoutBankAccount;
     }
 
-    //melle
     public User TestLoginAttempt(String username, String password) {
         User usernameUser = userRepository.findByusername(username);
 

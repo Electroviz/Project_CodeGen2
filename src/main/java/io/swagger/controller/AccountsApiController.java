@@ -1,43 +1,21 @@
-package io.swagger.api;
+package io.swagger.controller;
 
 import io.swagger.annotations.Api;
-import io.swagger.controller.BankAccountController;
+import io.swagger.api.AccountsApi;
 import io.swagger.enums.UserRoleEnum;
 import io.swagger.model.BankAccount;
-import io.swagger.model.Transaction;
-import io.swagger.model.TransactionInfo;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.model.entity.User;
 import io.swagger.service.BankAccountService;
 import io.swagger.service.UserService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
-import javax.validation.constraints.*;
-import javax.validation.Valid;
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-05-12T15:22:53.754Z[GMT]")
@@ -53,7 +31,6 @@ public class AccountsApiController implements AccountsApi {
     private UserService userService;
 
     //melle
-
     @PreAuthorize("hasRole('EMPLOYEE')")
     public ResponseEntity putBankAccountTypeByIBAN(@PathVariable("type") String type, @PathVariable("IBAN") String IBAN) {
         type = type.replaceAll("[{}]",""); //make sure that the {variable} quotes are not taking into consideration
@@ -119,7 +96,7 @@ public class AccountsApiController implements AccountsApi {
     //melle
 
     @PreAuthorize("hasRole('EMPLOYEE') or hasRole('CUSTOMER')")
-    public ResponseEntity testFunc(@PathVariable("userId") long userId) {
+    public ResponseEntity getBankAccountByUserId(@PathVariable("userId") long userId) {
         User u = this.getLoggedInUser();
 
         List<BankAccount> bankAccounts = bankAccountService.GetBankAccountsByUserId(userId);
@@ -139,6 +116,7 @@ public class AccountsApiController implements AccountsApi {
         } else return ResponseEntity.status(401).body(null); //forbidden
     }
 
+
     //melle
 
     @PreAuthorize("hasRole('EMPLOYEE')")
@@ -148,25 +126,6 @@ public class AccountsApiController implements AccountsApi {
     }
 
     //melle
-    @PreAuthorize("hasRole('EMPLOYEE') or hasRole('CUSTOMER')")
-    public ResponseEntity registerNewBankAccountController(@RequestBody BankAccount account){
-        ResponseEntity response = bankAccountService.CreateNewBankAccount();
-
-        User u = this.getLoggedInUser();
-
-        if(u.getRole() != UserRoleEnum.ROLE_EMPLOYEE) {
-            if(Objects.equals(u.getId(), account.getUserId()) == false) return ResponseEntity.status(401).body(null);
-        }
-
-        if (response.getStatusCode().isError()) {
-            return new ResponseEntity(response.getStatusCode(), HttpStatus.BAD_REQUEST);
-        } else {
-            return new ResponseEntity(response, HttpStatus.CREATED);
-        }
-    }
-
-    //melle
-
     @PreAuthorize("hasRole('EMPLOYEE') or hasRole('CUSTOMER')")
     public ResponseEntity getBankAccountInfoByIbanController(@PathVariable("IBAN") String IBAN) {
         //protection for requesting bankaccount info
@@ -211,19 +170,6 @@ public class AccountsApiController implements AccountsApi {
 
     //Nicky
 
-    public ResponseEntity accountDeposit(@PathVariable("IBAN") String IBAN, @RequestBody Transaction transaction) {
-        TransactionInfo transactionInfo = bankAccountService.AccountDeposit(IBAN, transaction.getAmount());
-
-        if(transactionInfo != null) {
-            return new ResponseEntity<TransactionInfo>(transactionInfo,HttpStatus.ACCEPTED);
-        }
-        else {
-            return ResponseEntity.status(400).body("Bad Request");
-        }
-    }
-
-    //Nicky
-
     @PreAuthorize("hasRole('EMPLOYEE')")
     public ResponseEntity deleteAccount(@PathVariable("IBAN") String IBAN) {
         BankAccount bankAccount = bankAccountService.DeleteBankAccount(IBAN);
@@ -236,18 +182,6 @@ public class AccountsApiController implements AccountsApi {
         }
     }
 
-    //Nicky
-
-    public ResponseEntity accountWithdraw(@PathVariable("IBAN") String IBAN, @RequestBody Transaction transaction) {
-        TransactionInfo transactionInfo = bankAccountService.AccountWithdraw(IBAN, transaction.getAmount());
-
-        if(transactionInfo != null) {
-            return new ResponseEntity<TransactionInfo>(transactionInfo,HttpStatus.ACCEPTED);
-        }
-        else {
-            return ResponseEntity.status(400).body("Bad Request");
-        }
-    }
 
     private User getLoggedInUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
