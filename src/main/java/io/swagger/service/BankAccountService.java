@@ -144,6 +144,16 @@ public class BankAccountService {
         }
     }
 
+    public List<BankAccount> GetAllBankAccountsList() {
+        List<BankAccount> allBankAccounts = bankAccountRepository.findAll();
+        for(BankAccount ba : allBankAccounts) {
+            if("NL01INHO0000000001".equals(ba.getIban())) allBankAccounts.remove(ba);
+            break;
+        }
+
+        return allBankAccounts;
+    }
+
     //Melle
     public BankAccount GetBankAccountByIban(String iban) {
         iban = iban.replaceAll("[{}]",""); //make sure that the {variable} quotes are not taking into consideration

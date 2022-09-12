@@ -1,20 +1,50 @@
 package test;
 
+import io.swagger.Swagger2SpringBoot;
 import io.swagger.enums.BankAccountType;
 import io.swagger.model.BankAccount;
 import io.swagger.model.TransactionInfo;
 import io.swagger.model.entity.User;
+import io.swagger.service.BankAccountService;
 import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+
+
+@SpringBootTest(classes= Swagger2SpringBoot.class)
 class BankAccountServiceTest {
 
+    @Autowired
+    BankAccountService bankAccountService;
 
+    @Test
+    void testTest() {
+        BankAccount ba = new BankAccount();
+        ba.setBalance(200.0);
+        ba.setIban("ANSGHBNAS");
+        ba.setUserId(1);
+        ba.setAccountStatus(BankAccount.AccountStatusEnum.ACTIVE);
+        ba.setAccountType(BankAccount.AccountTypeEnum.CURRENT);
+        ba.setAbsoluteLimit(100.0);
+
+        bankAccountService.SaveBankAccount(ba);
+
+        List<BankAccount> allBa = bankAccountService.GetAllBankAccountsList();
+
+        Assertions.assertTrue(allBa.size() > 0);
+        Assertions.assertFalse(allBa.size() == 0);
+    }
 
     @Test
     void deleteBankAccount() {
@@ -133,10 +163,10 @@ class BankAccountServiceTest {
         assertTrue(bankAccount.getBalance() >= bankAccount.getAbsoluteLimit());
     }
 
-    @Test
-    public void TheBanksOwnAccountIsActive() {
-        List<BankAccount> allBankAccounts = getAllBankAccounts();
-    }
+//    @Test
+//    public void TheBanksOwnAccountIsActive() {
+//        List<BankAccount> allBankAccounts = getAllBankAccounts();
+//    }
 
 //    @Test
 //    public void DoesListContainIban(String iban){
