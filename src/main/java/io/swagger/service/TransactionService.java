@@ -47,17 +47,14 @@ public class TransactionService {
                     (isBeforeDate(secondDate,transaction.getTimestamp()) || datesAreEqual(secondDate,transaction.getTimestamp()))
                 ) {
                 if(userId == null || userId < 0) correctTransactions.add(transaction);
-                else if(transaction.getUserIDPerforming() == userId) correctTransactions.add(transaction);
+                    //from iban used because otherwise employees transaction history will also contain performed transactions by the employee
+                else if(bankAccountService.GetBankAccountByIban(transaction.getFrom()).getUserId().intValue() == userId) correctTransactions.add(transaction);
             }
             else if((isAfterDate(transaction.getTimestamp(),secondDate) || datesAreEqual(transaction.getTimestamp(),secondDate)) &&
                     (isBeforeDate(transaction.getTimestamp(), firstDate) || datesAreEqual(transaction.getTimestamp(), firstDate))) {
                 if(userId == null || userId < 0) correctTransactions.add(transaction);
-                else if(transaction.getUserIDPerforming() == userId) correctTransactions.add(transaction);
+                else if(bankAccountService.GetBankAccountByIban(transaction.getFrom()).getUserId().intValue() == userId) correctTransactions.add(transaction);
             }
-
-
-
-
         }
 
         return correctTransactions;
@@ -144,7 +141,9 @@ public class TransactionService {
         if(bankAccountService.BankAccountsTransactionIsPossible(fromIban,toIban)) {
             BankAccount fromBankAccount = bankAccountService.GetBankAccountByIban(fromIban);
             BankAccount toBankAccount = bankAccountService.GetBankAccountByIban(toIban);
+
             if(fromBankAccount == null || toBankAccount == null) return false;
+            else if(amount <= 0.0) return false;
 
             //this if statement exists because of Dummy data purpose
             if( userService.getUserById(fromBankAccount.getUserId().longValue()) != null) {
@@ -156,7 +155,7 @@ public class TransactionService {
             //CHECK IF THE BALANCE IS NOT BECOMMING LOWER THE THE PRE DEFINED ABSOLUTE LIMIT FOR THE USER
             if(fromBankAccount.getBalance() - amount < fromBankAccount.getAbsoluteLimit()) return false;
 
-            //DAY LIMIT CHECK NECESSARY
+            //DAY LIMIT CHECK NECESSARY - BUT NOT FUNCTIONAL :(
 
 
             fromBankAccount.setBalance(fromBankAccount.getBalance() - amount);
@@ -194,10 +193,12 @@ public class TransactionService {
         return newTrans;
     }
 
+    //Melle
     public boolean WithdrawOrDepositMoney(String iban, Double amount, boolean isWithdraw, Integer userIdPerforming) {
         BankAccount ba = bankAccountService.GetBankAccountByIban(iban);
 
-        if(ba != null) {
+        if(amount <= 0) return false;
+        else if(ba != null) {
             if(ba.getAccountType() != BankAccount.AccountTypeEnum.SAVINGS && ba.getAccountStatus() != BankAccount.AccountStatusEnum.CLOSED) {
                 if(isWithdraw == false) {
                     //is depositing the amount
