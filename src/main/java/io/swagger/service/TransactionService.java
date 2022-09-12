@@ -138,8 +138,6 @@ public class TransactionService {
     //Melle
     public boolean TransferMoneyFromToIban(String toIban, String fromIban, Double amount, Integer userIdPerforming) {
         //check if the bankaccount is not a savings account or a closed account.
-        if(amount <= 0.0) return false;
-
         if(bankAccountService.BankAccountsTransactionIsPossible(fromIban,toIban)) {
             BankAccount fromBankAccount = bankAccountService.GetBankAccountByIban(fromIban);
             BankAccount toBankAccount = bankAccountService.GetBankAccountByIban(toIban);

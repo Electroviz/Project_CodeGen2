@@ -313,6 +313,21 @@ const bankingPageComponent = () => {
         }
     }
 
+    const SendMoneyToCurrentFromSavings = async (e) => {
+        try {
+            const result = await axios.put('http://localhost:8080/api/transactions/' + GetLoggedInUsersSavingsIban() + '/' 
+                                                + GetLoggedInUsersCurrentIban() + '/' + document.getElementById("takeMoneyAmountSavings").value);
+
+            if(result.status >= 200 && result.status < 300) {
+                alert("Succesfully send € " +  document.getElementById("sendMoneyAmount").value + " to iban: " + document.getElementById("takeMoneyAmountSavings").value);
+                window.location.reload();
+            }
+        }
+        catch (error) {
+            alert("Failed to send € " + document.getElementById("sendMoneyAmount").value + " to iban: " + document.getElementById("takeMoneyAmountSavings").value);
+        }
+    }
+
     const SendMoneyToIban = async (e) => {
 
         try {
@@ -617,12 +632,20 @@ const bankingPageComponent = () => {
                     <div style={{ display: "block", textAlign: "center", fontSize: "1.4rem", fontWeight: "bold"}}>
                         <p>Perform a transaction</p>
                     </div>
+
                     <div style={{ display: "block"}}>
                         <p style={{ fontSize: "1.15rem", marginBottom: "0rem", display: "inline-block"}}>Send money from current bank account to iban: </p>
                         <input id="sendMoneyIban" style={{ display: "inline-block", fontSize: "1.15rem", marginLeft: "0.2rem", marginRight: "0.2rem"}} />
                         <p style={{ fontSize: "1.15rem", marginBottom: "0rem", display: "inline-block"}}> with amount: </p>
                         <input id="sendMoneyAmount" style={{ display: "inline-block", fontSize: "1.15rem", marginLeft: "0.2rem", marginRight: "0.2rem", width: "7rem"}} />
                         <button onClick={ SendMoneyToIban } style={{ display: "inline-block", fontSize: "1.15rem", marginLeft: "0.2rem"}}>Confirm</button>
+                    </div>
+
+                    <div style={{ display: "block"}}>
+                        <p style={{ fontSize: "1.15rem", marginBottom: "0rem", display: "inline-block"}}>Take money from your savings account to your current: </p>
+                        <p style={{ fontSize: "1.15rem", marginBottom: "0rem", display: "inline-block"}}> amount: </p>
+                        <input id="takeMoneyAmountSavings" style={{ display: "inline-block", fontSize: "1.15rem", marginLeft: "0.2rem", marginRight: "0.2rem", width: "7rem"}} />
+                        <button onClick={ SendMoneyToCurrentFromSavings } style={{ display: "inline-block", fontSize: "1.15rem", marginLeft: "0.2rem"}}>Confirm</button>
                     </div>
 
                     <div>
