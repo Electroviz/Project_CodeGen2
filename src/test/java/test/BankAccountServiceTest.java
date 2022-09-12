@@ -14,6 +14,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class BankAccountServiceTest {
 
+
+
     @Test
     void deleteBankAccount() {
         BankAccount account = new BankAccount();
@@ -129,6 +131,11 @@ class BankAccountServiceTest {
         bankAccount.setBalance(0.0);
         bankAccount.setAbsoluteLimit(0.0);
         assertTrue(bankAccount.getBalance() >= bankAccount.getAbsoluteLimit());
+    }
+
+    @Test
+    public void TheBanksOwnAccountIsActive() {
+        List<BankAccount> allBankAccounts = getAllBankAccounts();
     }
 
 //    @Test
