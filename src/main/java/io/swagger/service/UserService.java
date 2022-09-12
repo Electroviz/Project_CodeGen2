@@ -155,7 +155,7 @@ public class UserService {
 
         return token;
     }
-    //Nick
+    //Melle
     public boolean checkUserInputAddUser(User user){
         if(user.getFullname().length() < 50 && user.getFullname().length() > 1 && checkIfUserInputIsWord(user.getFullname())){
             if(user.getUsername().length() < 20 && user.getUsername().length() > 3){
@@ -164,7 +164,9 @@ public class UserService {
                         if(user.getTransactionLimit().doubleValue() >= 0 && user.getTransactionLimit().doubleValue() <= 10000){
                             //if(user.getRole().equals(UserRoleEnum.ROLE_BANK) || user.getRole().equals(UserRoleEnum.ROLE_CUSTOMER) || user.getRole().equals(UserRoleEnum.ROLE_EMPLOYEE)){
                                 if(user.getPassword().length() >= 6 && user.getPassword().length() <= 32){
-                                    return true;
+                                    if(UsernameIsUnique(user.getUsername())) {
+                                        return true;
+                                    }
                                 }
                             }
                         }
@@ -174,6 +176,18 @@ public class UserService {
         //}
         return false;
     }
+
+    //Melle
+
+    private boolean UsernameIsUnique(String username) {
+        List<User> allUsers = userRepository.findAll();
+
+        for(User u : allUsers) if(u.getUsername() == username) return false;
+
+        return true;
+    }
+
+
     //Nick
     public boolean checkIfUserInputIsWord(String userInput){
         String noSpaceStr = userInput.replaceAll("\\s", "");
