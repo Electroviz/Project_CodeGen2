@@ -128,25 +128,6 @@ public class AccountsApiController implements AccountsApi {
     //melle
 
     @PreAuthorize("hasRole('EMPLOYEE') or hasRole('CUSTOMER')")
-    public ResponseEntity registerNewBankAccountController(@RequestBody BankAccount account){
-        ResponseEntity response = bankAccountService.CreateNewBankAccount();
-
-        User u = this.getLoggedInUser();
-
-        if(u.getRole() != UserRoleEnum.ROLE_EMPLOYEE) {
-            if(Objects.equals(u.getId(), account.getUserId()) == false) return ResponseEntity.status(401).body(null);
-        }
-
-        if (response.getStatusCode().isError()) {
-            return new ResponseEntity(response.getStatusCode(), HttpStatus.BAD_REQUEST);
-        } else {
-            return new ResponseEntity(response, HttpStatus.CREATED);
-        }
-    }
-
-    //melle
-
-    @PreAuthorize("hasRole('EMPLOYEE') or hasRole('CUSTOMER')")
     public ResponseEntity getBankAccountInfoByIbanController(@PathVariable("IBAN") String IBAN) {
         //protection for requesting bankaccount info
         User u = this.getLoggedInUser();

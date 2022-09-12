@@ -129,21 +129,6 @@ public interface AccountsApi {
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE,value = "/allBankAccounts")
     ResponseEntity getAllBankAccountsController();
 
-    @Operation(summary = "create a bank account", description = "create a bank account", security = {
-            @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts" })
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Bankaccount created succesfully"),
-
-            @ApiResponse(responseCode = "400", description = "Invalid input"),
-
-            @ApiResponse(responseCode = "401", description = "Unauthorised for this action"),
-
-            @ApiResponse(responseCode = "403", description = "Forbidden"),
-
-            @ApiResponse(responseCode = "404", description = "Requested object not found") })
-    @RequestMapping(value = "/createBankAccount", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity registerNewBankAccountController(@RequestBody BankAccount account);
-
     @Operation(summary = "Get bank account by iban", description = "Get bank account by iban", security = {
             @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts" })
     @ApiResponses(value = {
