@@ -78,7 +78,7 @@ public interface UserApi {
     @Operation(summary = "get user by userid", description = "", security = {
         @SecurityRequirement(name = "bearerAuth")    }, tags={ "Users" })
     @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "User Found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserDTO.class))),
+        @ApiResponse(responseCode = "200", description = "User Found"),
         
         @ApiResponse(responseCode = "400", description = "Invalid input"),
         
