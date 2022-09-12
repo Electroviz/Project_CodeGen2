@@ -642,7 +642,7 @@ const bankingPageComponent = () => {
                     </div>
 
                     <div style={{ display: "block"}}>
-                        <p style={{ fontSize: "1.15rem", marginBottom: "0rem", display: "inline-block"}}>Take money from your savings account to your current: </p>
+                        <p style={{ fontSize: "1.15rem", marginBottom: "0rem", display: "block"}}>Take money from your savings account to your current: </p>
                         <p style={{ fontSize: "1.15rem", marginBottom: "0rem", display: "inline-block"}}> amount: </p>
                         <input id="takeMoneyAmountSavings" style={{ display: "inline-block", fontSize: "1.15rem", marginLeft: "0.2rem", marginRight: "0.2rem", width: "7rem"}} />
                         <button onClick={ SendMoneyToCurrentFromSavings } style={{ display: "inline-block", fontSize: "1.15rem", marginLeft: "0.2rem"}}>Confirm</button>
