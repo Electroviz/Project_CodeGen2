@@ -108,7 +108,7 @@ public interface TransactionsApi {
     @RequestMapping(method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE, value="/transactions/deposit/{iban}/{amount}")
     ResponseEntity Deposit(@PathVariable("iban") String iban, @PathVariable("amount") Double amount);
 
-    @Operation(summary = "deposit money", description = "deposit money", security = {
+    @Operation(summary = "Get Transactions by date", description = "Get Transactions by date", security = {
             @SecurityRequirement(name = "bearerAuth")    }, tags={ "Transactions" })
     @ApiResponses(value = {
             @ApiResponse(responseCode = "202", description = "money despositted"),
@@ -123,7 +123,7 @@ public interface TransactionsApi {
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value="/transactions/byDate/{fromDate}/{toDate}")
     ResponseEntity GetTransactionsByDate(@PathVariable("fromDate") String fromDate, @PathVariable("toDate") String toDate) throws ParseException;
 
-    @Operation(summary = "deposit money", description = "deposit money", security = {
+    @Operation(summary = "Get transactions from a user by date", description = "Get transactions from a user by date", security = {
             @SecurityRequirement(name = "bearerAuth")    }, tags={ "Transactions" })
     @ApiResponses(value = {
             @ApiResponse(responseCode = "202", description = "money despositted"),
@@ -138,7 +138,7 @@ public interface TransactionsApi {
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value="/transactions/byDateAndUser/{fromDate}/{toDate}/{userId}")
     ResponseEntity GetTransactionsByDateAndUser(@PathVariable("fromDate") String fromDate, @PathVariable("toDate") String toDate, @PathVariable("userId") Integer userId) throws ParseException;
 
-    @Operation(summary = "deposit money", description = "deposit money", security = {
+    @Operation(summary = "Get transactions from an iban", description = "Get transactions from an iban", security = {
             @SecurityRequirement(name = "bearerAuth")    }, tags={ "Transactions" })
     @ApiResponses(value = {
             @ApiResponse(responseCode = "202", description = "money despositted"),
@@ -153,7 +153,7 @@ public interface TransactionsApi {
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value="/transactions/byIbans/{fromIban}/{toIban}")
     ResponseEntity GetTransactionByIbans(@PathVariable("fromIban") String fromIban, @PathVariable("toIban") String toIban);
 
-    @Operation(summary = "deposit money", description = "deposit money", security = {
+    @Operation(summary = "Get transactions that are equel to input", description = "Get transactions that are equel to input", security = {
             @SecurityRequirement(name = "bearerAuth")    }, tags={ "Transactions" })
     @ApiResponses(value = {
             @ApiResponse(responseCode = "202", description = "money despositted"),
@@ -168,7 +168,7 @@ public interface TransactionsApi {
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value="/transactions/byAmountIsEqual/{iban}/{amount}")
     ResponseEntity GetTransactionByAmountEqualToNum (@PathVariable("iban") String iban, @PathVariable("amount") Double amount);
 
-    @Operation(summary = "deposit money", description = "deposit money", security = {
+    @Operation(summary = "Get transactions that are smaller than input", description = "Get transactions that are smaller than input", security = {
             @SecurityRequirement(name = "bearerAuth")    }, tags={ "Transactions" })
     @ApiResponses(value = {
             @ApiResponse(responseCode = "202", description = "money despositted"),
@@ -184,6 +184,8 @@ public interface TransactionsApi {
     ResponseEntity GetTransactionByAmountSmallerToNum (@PathVariable("iban") String iban, @PathVariable("amount") Double amount);
 
 
+    @Operation(summary = "Get transactions that are bigger than input", description = "Get transactions that are bigger than input", security = {
+            @SecurityRequirement(name = "bearerAuth")    }, tags={ "Transactions" })
     @ApiResponses(value = {
             @ApiResponse(responseCode = "202", description = "money despositted"),
 
