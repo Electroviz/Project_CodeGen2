@@ -29,7 +29,7 @@ public interface UserApi {
     @Operation(summary = "Register", description = "Register User", security = {
         @SecurityRequirement(name = "bearerAuth")    }, tags={ "Users" })
     @ApiResponses(value = { 
-        @ApiResponse(responseCode = "201", description = "user account created", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserDTO.class))),
+        @ApiResponse(responseCode = "201", description = "user account created"),
         
         @ApiResponse(responseCode = "400", description = "Invalid input"),
         
@@ -45,7 +45,7 @@ public interface UserApi {
     @Operation(summary = "Get a list of all users", description = "", security = {
         @SecurityRequirement(name = "bearerAuth")    }, tags={ "Users" })
     @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "List of users", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = UserDTO.class)))),
+        @ApiResponse(responseCode = "200", description = "List of users"),
         
         @ApiResponse(responseCode = "400", description = "Invalid input"),
         
@@ -60,7 +60,7 @@ public interface UserApi {
 
     @Operation(summary = "Logs user into the system", description = "", tags={ "Users" })
     @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "User succesfully logged in", content = @Content(mediaType = "text/plain", schema = @Schema(implementation = String.class))),
+        @ApiResponse(responseCode = "200", description = "User succesfully logged in"),
         
         @ApiResponse(responseCode = "400", description = "Invalid input"),
         
@@ -95,7 +95,7 @@ public interface UserApi {
     @Operation(summary = "Get UserId by JWT", description = "", security = {
             @SecurityRequirement(name = "bearerAuth")    }, tags={ "Users" })
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "List of users", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserDTO.class))),
+            @ApiResponse(responseCode = "200", description = "List of users"),
 
             @ApiResponse(responseCode = "400", description = "Invalid input"),
 
@@ -110,7 +110,7 @@ public interface UserApi {
     @Operation(summary = "Get a list of all users without a bank account", description = "", security = {
             @SecurityRequirement(name = "bearerAuth")    }, tags={ "Users" })
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Succesfully recieved list of users without bank account", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = UserDTO.class)))),
+            @ApiResponse(responseCode = "200", description = "Succesfully recieved list of users without bank account"),
 
             @ApiResponse(responseCode = "400", description = "Invalid input"),
 
@@ -125,7 +125,7 @@ public interface UserApi {
     @Operation(summary = "Register as Employee", description = "Register User as Employee", security = {
             @SecurityRequirement(name = "bearerAuth")    }, tags={ "Users" })
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "user account created", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserDTO.class))),
+            @ApiResponse(responseCode = "201", description = "user account created"),
 
             @ApiResponse(responseCode = "400", description = "Invalid input"),
 
