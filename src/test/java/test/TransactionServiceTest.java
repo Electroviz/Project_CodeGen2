@@ -20,6 +20,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -44,7 +45,7 @@ public class TransactionServiceTest {
         BankAccount ba1 = new BankAccount();
         BankAccount ba2 = new BankAccount();
 
-        ba1.setAbsoluteLimit(1000.0);
+        ba1.setAbsoluteLimit(0.0);
         ba1.setBalance(300.0);
         ba1.setIban(bankAccountService.GenerateIban());
         ba1.setUserId(1);
@@ -69,6 +70,15 @@ public class TransactionServiceTest {
 
     //START TRANSFER MONEYS TESTS
     //MELLE:
+
+    @Test
+    public void TransferMoneyFromIbanToIbanTest() {
+        //should be possible
+        boolean result = transactionService.TransferMoneyFromToIban(bankAccountsList.get(0).getIban(),bankAccountsList.get(1).getIban(), 10.0,bankAccountsList.get(0).getUserId().intValue());
+
+        Assertions.assertTrue(result == true);
+        Assertions.assertFalse(result == false);
+    }
 
     @Test
     public void TransferMoneyNegativeAmountNotPossibleTest() {
@@ -149,7 +159,7 @@ public class TransactionServiceTest {
 
     //END TRANSFER MONEYS TESTS
 
-    //DEPOSIT AND WITHDRAW TESTS
+    //START DEPOSIT AND WITHDRAW TESTS
 
     @Test
     public void WithdrawToMuchMoneyTest() {
@@ -204,12 +214,14 @@ public class TransactionServiceTest {
         ba.setAccountType(BankAccount.AccountTypeEnum.CURRENT);
         ba.setAccountStatus(BankAccount.AccountStatusEnum.ACTIVE);
 
+        bankAccountService.SaveBankAccount(ba);
+
         boolean result = transactionService.WithdrawOrDepositMoney(ba.getIban(),200.0,false,ba.getUserId().intValue());
 
         Double endBalance = bankAccountService.GetBankAccountByIban(ba.getIban()).getBalance();
 
-        Assertions.assertTrue(endingAmount == endBalance);
-        Assertions.assertFalse(endingAmount != endBalance);
+        Assertions.assertTrue(Objects.equals(endingAmount,endBalance) == true);
+        Assertions.assertFalse(Objects.equals(endingAmount,endBalance) == false);
     }
 
     @Test
@@ -221,5 +233,13 @@ public class TransactionServiceTest {
         Assertions.assertFalse(result == true);
     }
 
+    //END DEPOSIT AND WITHDRAW TESTS
 
+    //START TRANSACTIONS BY DATE LOOKUP SHOULD FUNCTION PERFECTLY
+    @Test
+    public void TestTest() {
+        System.out.println("Total amount of transactions are: " + transactionService.GetAllTransactionsFromDatabase().size());
+
+        Assertions.assertFalse(true == true);
+    }
 }

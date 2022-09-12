@@ -206,7 +206,8 @@ public class BankAccountService {
         BankAccount BaReciever = GetBankAccountByIban(IbanReciever);
         BankAccount BaSender = GetBankAccountByIban(IbanSender);
 
-        if(BaReciever.getAccountStatus() == BankAccount.AccountStatusEnum.CLOSED || BaSender.getAccountStatus() == BankAccount.AccountStatusEnum.CLOSED) return false;
+        if(BaReciever == null || BaSender == null) return false;
+        else if(BaReciever.getAccountStatus() == BankAccount.AccountStatusEnum.CLOSED || BaSender.getAccountStatus() == BankAccount.AccountStatusEnum.CLOSED) return false;
 
         boolean transactionValid = false;
 

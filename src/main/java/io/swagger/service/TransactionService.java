@@ -141,8 +141,9 @@ public class TransactionService {
         if(bankAccountService.BankAccountsTransactionIsPossible(fromIban,toIban)) {
             BankAccount fromBankAccount = bankAccountService.GetBankAccountByIban(fromIban);
             BankAccount toBankAccount = bankAccountService.GetBankAccountByIban(toIban);
+
             if(fromBankAccount == null || toBankAccount == null) return false;
-            if(amount <= 0) return false;
+            else if(amount <= 0.0) return false;
 
             //this if statement exists because of Dummy data purpose
             if( userService.getUserById(fromBankAccount.getUserId().longValue()) != null) {
