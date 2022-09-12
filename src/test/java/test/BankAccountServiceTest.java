@@ -8,6 +8,7 @@ import io.swagger.model.entity.User;
 import io.swagger.service.BankAccountService;
 import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,17 +29,30 @@ class BankAccountServiceTest {
     @Autowired
     BankAccountService bankAccountService;
 
-    @Test
-    void testTest() {
+    @BeforeEach
+    public void setup(){
         BankAccount ba = new BankAccount();
         ba.setBalance(200.0);
-        ba.setIban("ANSGHBNAS");
-        ba.setUserId(1);
+        ba.setIban("NL82INHO01856227888");
+        ba.setUserId(1111);
         ba.setAccountStatus(BankAccount.AccountStatusEnum.ACTIVE);
         ba.setAccountType(BankAccount.AccountTypeEnum.CURRENT);
         ba.setAbsoluteLimit(100.0);
 
+        BankAccount ba2 = new BankAccount();
+        ba2.setBalance(200.0);
+        ba2.setIban("NL82INHO01856227889");
+        ba2.setUserId(1111);
+        ba2.setAccountStatus(BankAccount.AccountStatusEnum.ACTIVE);
+        ba2.setAccountType(BankAccount.AccountTypeEnum.SAVINGS);
+        ba2.setAbsoluteLimit(100.0);
+
+        bankAccountService.SaveBankAccount(ba2);
         bankAccountService.SaveBankAccount(ba);
+    }
+
+    @Test
+    public void testTest() {
 
         List<BankAccount> allBa = bankAccountService.GetAllBankAccountsList();
 
@@ -47,63 +61,46 @@ class BankAccountServiceTest {
     }
 
     @Test
-    void deleteBankAccount() {
-        BankAccount account = new BankAccount();
-        assertNotNull(account);
+    public void deleteBankAccount() {
+        bankAccountService.DeleteBankAccount("NL82INHO01856227888");
+
+        Assertions.assertNull(bankAccountService.GetBankAccountByIban("NL82INHO01856227888"));
     }
 
     @Test
-    void accountDeposit() {
-        TransactionInfo transactionInfo = new TransactionInfo();
-        assertNotNull(transactionInfo);
+    public void getAccountByName() {
+        List<String> accounts = bankAccountService.getAccountByName("Jantje Egberts");
+        assertNotNull(accounts);
     }
 
     @Test
-    void accountWithdraw() {
-        TransactionInfo transactionInfo = new TransactionInfo();
-        assertNotNull(transactionInfo);
+    public void getTotalBalanceByUserId() {
+        Double balance = (Double) bankAccountService.GetTotalBalanceByUserId(Long.valueOf(1111)).getBody();
+        assertNotNull(balance);
     }
 
     @Test
-    void getAccountByName() {
-        BankAccount account = new BankAccount();
-        assertNotNull(account);
+    public void getBankAccountsByUserId() {
+        List<BankAccount> accounts = bankAccountService.GetBankAccountsByUserId(Long.valueOf(1111));
+        assertNotNull(accounts);
     }
 
     @Test
-    void getTotalBalanceByUserId() {
-        BankAccount account = new BankAccount();
-        assertNotNull(account);
-    }
-
-    @Test
-    void getBankAccountsByUserId() {
-        BankAccount account = new BankAccount();
-        assertNotNull(account);
-    }
-
-    @Test
-    void getAllBankAccounts() {
-        List<BankAccount> allBankAccounts = new ArrayList<>();
+    public void getAllBankAccounts() {
+        List<BankAccount> allBankAccounts = (List<BankAccount>) bankAccountService.GetAllBankAccounts().getBody();
         assertNotNull(allBankAccounts);
     }
 
     @Test
-    void getBankAccountByIban() {
-        BankAccount account = new BankAccount();
-        assertNotNull(account);
-    }
-
-    @Test
-    void createNewBankAccount() {
-        BankAccount account = new BankAccount();
+    public void getBankAccountByIban() {
+        BankAccount account = bankAccountService.GetBankAccountByIban("NL82INHO01856227888");
         assertNotNull(account);
     }
 
     @Test
     public void IbanHasToBeValid(){
         BankAccount bankAccount = new BankAccount();
-        bankAccount.setIban("NL01INHO00000000100");
+        bankAccount.setIban(bankAccountService.GenerateIban());
         Assert.assertTrue(bankAccount.getIban().matches("NL\\d{2}INHO0\\d{10}"));
     }
 
@@ -120,9 +117,7 @@ class BankAccountServiceTest {
                 isValid = true;
             }
         }
-        if (!isValid) {
-            throw new IllegalArgumentException("Account type is not valid");
-        }
+        assertTrue(isValid);
     }
 
     @Test
@@ -133,15 +128,10 @@ class BankAccountServiceTest {
         bankAccount.setAccountStatus(BankAccount.AccountStatusEnum.ACTIVE);
         for(BankAccount.AccountStatusEnum status : BankAccount.AccountStatusEnum.values())
         {
-            System.out.println(status);
-            System.out.println(bankAccount.getAccountStatus());
             if(status.name().equals(bankAccount.getAccountStatus().name()))
             {
                 isValid = true;
             }
-        }
-        if (!isValid) {
-            throw new IllegalArgumentException("Account status is not valid");
         }
     }
 
@@ -163,24 +153,52 @@ class BankAccountServiceTest {
         assertTrue(bankAccount.getBalance() >= bankAccount.getAbsoluteLimit());
     }
 
-//    @Test
-//    public void TheBanksOwnAccountIsActive() {
-//        List<BankAccount> allBankAccounts = getAllBankAccounts();
-//    }
-
-//    @Test
-//    public void DoesListContainIban(String iban){
-//        BankAccount bankAccount = new BankAccount();
-//        bankAccount.setIban("NL01INHO00000000100");
-//        List<BankAccount> bankAccountList = new ArrayList<>();
-//        bankAccountList.add(bankAccount);
-//        assertTrue(bankAccountList.contains(bankAccount));
-//    }
+    @Test
+    public void ChangeAccountType(){
+        BankAccount account = bankAccountService.GetBankAccountByIban("NL82INHO01856227889");
+        bankAccountService.PutBankAccountType(BankAccount.AccountTypeEnum.CURRENT, account);
+        assertTrue(bankAccountService.GetBankAccountByIban("NL82INHO01856227889").getAccountType() == BankAccount.AccountTypeEnum.CURRENT);
+    }
 
     @Test
-    void generateIbanShouldBeValid() {
-        BankAccount account = new BankAccount();
-        account.setIban("NL01INHO0000000001");
-        assertTrue(account.getIban().matches("NL\\d{2}INHO0\\d{9}"));
+    public void ChangeAccountStatus(){
+        BankAccount account = bankAccountService.GetBankAccountByIban("NL82INHO01856227889");
+        bankAccountService.PutBankAccountStatus(BankAccount.AccountStatusEnum.INACTIVE, account);
+        assertTrue(bankAccountService.GetBankAccountByIban("NL82INHO01856227889").getAccountStatus() == BankAccount.AccountStatusEnum.INACTIVE);
+    }
+
+    @Test
+    public void ChangeAbsoluteLimit(){
+        BankAccount account = bankAccountService.GetBankAccountByIban("NL82INHO01856227889");
+        bankAccountService.PutBankAccountAbsoluteLimit(100.0, account);
+        assertTrue(bankAccountService.GetBankAccountByIban("NL82INHO01856227889").getAbsoluteLimit() == 100.0);
+    }
+
+    @Test
+    public void TestNegativeInputAbsoluteLimit(){
+        BankAccount account = bankAccountService.GetBankAccountByIban("NL82INHO01856227889");
+        double oldLimit = account.getAbsoluteLimit();
+        bankAccountService.PutBankAccountAbsoluteLimit(-100.0, account);
+        assertTrue(bankAccountService.GetBankAccountByIban("NL82INHO01856227889").getAbsoluteLimit() == oldLimit);
+    }
+
+    @Test
+    public void CheckIfUserHasBankAccounts(){
+        assertTrue(bankAccountService.UserAlreadyHasBankAccounts(1111L));
+    }
+
+    @Test
+    public void CheckIfIbanBelongsToUser(){
+        assertTrue(bankAccountService.CheckIbanBelongsToUser(1111, "NL82INHO01856227889"));
+    }
+
+    @Test
+    public void CheckIfAccountIsValidForTransaction(){
+        assertTrue(bankAccountService.BankAccountIsValidForTransactions("NL82INHO01856227888"));
+    }
+
+    @Test
+    public void CheckIfAccountIsNotValidForTransaction(){
+        assertFalse(bankAccountService.BankAccountIsValidForTransactions("NL82INHO01856227889"));
     }
 }

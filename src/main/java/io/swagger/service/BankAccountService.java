@@ -46,7 +46,7 @@ public class BankAccountService {
 
     //Melle
     public ResponseEntity PutBankAccountAbsoluteLimit(Double newLimit, BankAccount bankAccount) {
-        if(bankAccount != null) {
+        if(bankAccount != null && newLimit >= 0) {
             bankAccount.setAbsoluteLimit(newLimit);
             bankAccountRepository.save(bankAccount);
             return ResponseEntity.status(200).body(bankAccount);

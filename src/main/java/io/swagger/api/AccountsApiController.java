@@ -148,7 +148,6 @@ public class AccountsApiController implements AccountsApi {
     }
 
     //melle
-
     @PreAuthorize("hasRole('EMPLOYEE') or hasRole('CUSTOMER')")
     public ResponseEntity registerNewBankAccountController(@RequestBody BankAccount account){
         ResponseEntity response = bankAccountService.CreateNewBankAccount();
