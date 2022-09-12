@@ -196,7 +196,8 @@ public class TransactionService {
     public boolean WithdrawOrDepositMoney(String iban, Double amount, boolean isWithdraw, Integer userIdPerforming) {
         BankAccount ba = bankAccountService.GetBankAccountByIban(iban);
 
-        if(ba != null) {
+        if(amount <= 0) return false;
+        else if(ba != null) {
             if(ba.getAccountType() != BankAccount.AccountTypeEnum.SAVINGS && ba.getAccountStatus() != BankAccount.AccountStatusEnum.CLOSED) {
                 if(isWithdraw == false) {
                     //is depositing the amount

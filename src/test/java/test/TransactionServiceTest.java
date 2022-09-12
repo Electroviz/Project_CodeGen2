@@ -67,8 +67,12 @@ public class TransactionServiceTest {
 
     }
 
+    //START TRANSFER MONEYS TESTS
+    //MELLE:
+
     @Test
     public void TransferMoneyNegativeAmountNotPossibleTest() {
+        //should not be possible
         boolean result = transactionService.TransferMoneyFromToIban(bankAccountsList.get(0).getIban(),bankAccountsList.get(1).getIban(), -100.0,bankAccountsList.get(0).getUserId().intValue());
 
 
@@ -78,6 +82,7 @@ public class TransactionServiceTest {
 
     @Test
     public void TransferMoneySameIbanNotPossibleTest() {
+        //should not be possible
         boolean result = transactionService.TransferMoneyFromToIban(bankAccountsList.get(0).getIban(),bankAccountsList.get(0).getIban(), 100.0,bankAccountsList.get(0).getUserId().intValue());
 
         Assertions.assertTrue(result == false);
@@ -86,6 +91,7 @@ public class TransactionServiceTest {
 
     @Test
     public void TransferToMuchMoneyThenActiveBalanceTest() {
+        //should not be possible
         boolean result = transactionService.TransferMoneyFromToIban(bankAccountsList.get(0).getIban(),bankAccountsList.get(1).getIban(), (bankAccountsList.get(0).getBalance() + 50.0),bankAccountsList.get(0).getUserId().intValue());
 
         Assertions.assertTrue(result == false);
@@ -94,6 +100,7 @@ public class TransactionServiceTest {
 
     @Test
     public void TransferMoneyFromClosedBankAccountTest() {
+        //should not be possible
         BankAccount ba = new BankAccount();
 
         ba.setAbsoluteLimit(1000.0);
@@ -113,6 +120,7 @@ public class TransactionServiceTest {
 
     @Test
     public void TransferMoneyToClosedBankAccountTest() {
+        //should not be possible
         BankAccount ba = new BankAccount();
 
         ba.setAbsoluteLimit(1000.0);
@@ -129,5 +137,89 @@ public class TransactionServiceTest {
         Assertions.assertTrue(result == false);
         Assertions.assertFalse(result == true);
     }
+
+    @Test
+    public void TransferMoneyToNonExistingIbanTest() {
+        //should not be possible
+        boolean result = transactionService.TransferMoneyFromToIban(bankAccountsList.get(0).getIban(),bankAccountService.GenerateIban(), (bankAccountsList.get(0).getBalance() + 50.0),bankAccountsList.get(0).getUserId().intValue());
+
+        Assertions.assertTrue(result == false);
+        Assertions.assertFalse(result == true);
+    }
+
+    //END TRANSFER MONEYS TESTS
+
+    //DEPOSIT AND WITHDRAW TESTS
+
+    @Test
+    public void WithdrawToMuchMoneyTest() {
+        //should not be possible
+        BankAccount ba = new BankAccount();
+
+        ba.setAbsoluteLimit(1000.0);
+        ba.setBalance(300.0);
+        ba.setIban(bankAccountService.GenerateIban());
+        ba.setUserId(3);
+        ba.setAccountType(BankAccount.AccountTypeEnum.CURRENT);
+        ba.setAccountStatus(BankAccount.AccountStatusEnum.ACTIVE);
+
+        bankAccountService.SaveBankAccount(ba);
+
+        boolean result = transactionService.WithdrawOrDepositMoney(ba.getIban(),300.05,true,ba.getUserId().intValue());
+
+        Assertions.assertTrue(result == false);
+        Assertions.assertFalse(result == true);
+    }
+
+    @Test
+    public void WithdrawExactBalance() {
+        //should be possible
+        BankAccount ba = new BankAccount();
+
+        ba.setAbsoluteLimit(1000.0);
+        ba.setBalance(300.0);
+        ba.setIban(bankAccountService.GenerateIban());
+        ba.setUserId(3);
+        ba.setAccountType(BankAccount.AccountTypeEnum.CURRENT);
+        ba.setAccountStatus(BankAccount.AccountStatusEnum.ACTIVE);
+
+        bankAccountService.SaveBankAccount(ba);
+
+        boolean result = transactionService.WithdrawOrDepositMoney(ba.getIban(),300.0,true,ba.getUserId().intValue());
+
+        Assertions.assertTrue(result == true);
+        Assertions.assertFalse(result == false);
+    }
+
+    @Test
+    public void MoneyIsBeingDeposited() {
+        //should be predefined balance
+        Double endingAmount = 500.0;
+        BankAccount ba = new BankAccount();
+
+        ba.setAbsoluteLimit(1000.0);
+        ba.setBalance(300.0);
+        ba.setIban(bankAccountService.GenerateIban());
+        ba.setUserId(3);
+        ba.setAccountType(BankAccount.AccountTypeEnum.CURRENT);
+        ba.setAccountStatus(BankAccount.AccountStatusEnum.ACTIVE);
+
+        boolean result = transactionService.WithdrawOrDepositMoney(ba.getIban(),200.0,false,ba.getUserId().intValue());
+
+        Double endBalance = bankAccountService.GetBankAccountByIban(ba.getIban()).getBalance();
+
+        Assertions.assertTrue(endingAmount == endBalance);
+        Assertions.assertFalse(endingAmount != endBalance);
+    }
+
+    @Test
+    public void MoneyDepositNegativeValue() {
+        //should not be possible
+        boolean result = transactionService.WithdrawOrDepositMoney(bankAccountsList.get(0).getIban(),-200.0,false,bankAccountsList.get(0).getUserId().intValue());
+
+        Assertions.assertTrue(result == false);
+        Assertions.assertFalse(result == true);
+    }
+
 
 }
