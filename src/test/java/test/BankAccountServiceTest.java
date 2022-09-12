@@ -101,7 +101,7 @@ class BankAccountServiceTest {
     public void IbanHasToBeValid(){
         BankAccount bankAccount = new BankAccount();
         bankAccount.setIban(bankAccountService.GenerateIban());
-        Assert.assertTrue(bankAccount.getIban().matches("NL\\d{2}INHO0\\d{10}"));
+        Assert.assertTrue(bankAccount.getIban().matches("NL\\d{2}INHO0\\d{9}"));
     }
 
     @Test
