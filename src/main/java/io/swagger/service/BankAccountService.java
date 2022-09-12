@@ -206,14 +206,12 @@ public class BankAccountService {
         BankAccount BaReciever = GetBankAccountByIban(IbanReciever);
         BankAccount BaSender = GetBankAccountByIban(IbanSender);
 
-        if(BaReciever == null || BaSender == null) return false;
-        else if(BaReciever.getAccountStatus() == BankAccount.AccountStatusEnum.CLOSED || BaSender.getAccountStatus() == BankAccount.AccountStatusEnum.CLOSED) return false;
-        else if(IbanSender.equals(IbanReciever)) return false;
+        if(BaReciever.getAccountStatus() == BankAccount.AccountStatusEnum.CLOSED || BaSender.getAccountStatus() == BankAccount.AccountStatusEnum.CLOSED) return false;
 
         boolean transactionValid = false;
 
         if(BaReciever.getAccountType() == BankAccount.AccountTypeEnum.SAVINGS &&
-            BaSender.getAccountType() == BankAccount.AccountTypeEnum.CURRENT &&
+                BaSender.getAccountType() == BankAccount.AccountTypeEnum.CURRENT &&
                 BaReciever.getUserId() == BaSender.getUserId()) {
             //sender is sending money to its own savings account
             transactionValid = true;

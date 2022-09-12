@@ -138,25 +138,24 @@ public class TransactionService {
     //Melle
     public boolean TransferMoneyFromToIban(String toIban, String fromIban, Double amount, Integer userIdPerforming) {
         //check if the bankaccount is not a savings account or a closed account.
-        System.out.println("Trans is possible : " + bankAccountService.BankAccountsTransactionIsPossible(fromIban,toIban));
+        if(amount <= 0.0) return false;
+
         if(bankAccountService.BankAccountsTransactionIsPossible(fromIban,toIban)) {
             BankAccount fromBankAccount = bankAccountService.GetBankAccountByIban(fromIban);
             BankAccount toBankAccount = bankAccountService.GetBankAccountByIban(toIban);
-
             if(fromBankAccount == null || toBankAccount == null) return false;
-            else if(amount <= 0.0) return false;
 
             //this if statement exists because of Dummy data purpose
-            if( userService.getUserById(fromBankAccount.getUserId()) != null) {
+            if( userService.getUserById(fromBankAccount.getUserId().longValue()) != null) {
                 //CHECK IF THE TRANSACTION LIMIT IS BEING EXCEEDED
-                double transactionLimit = userService.getUserById(fromBankAccount.getUserId()).getTransactionLimit().doubleValue();
+                double transactionLimit = userService.getUserById(fromBankAccount.getUserId().longValue()).getTransactionLimit().doubleValue();
                 if (amount > transactionLimit && transactionLimit != 0) return false;
             }
 
             //CHECK IF THE BALANCE IS NOT BECOMMING LOWER THE THE PRE DEFINED ABSOLUTE LIMIT FOR THE USER
             if(fromBankAccount.getBalance() - amount < fromBankAccount.getAbsoluteLimit()) return false;
 
-            //DAY LIMIT CHECK NECESSARY - BUT NOT FUNCTIONAL :(
+            //DAY LIMIT CHECK NECESSARY
 
 
             fromBankAccount.setBalance(fromBankAccount.getBalance() - amount);
