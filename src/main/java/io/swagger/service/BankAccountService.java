@@ -206,6 +206,9 @@ public class BankAccountService {
         BankAccount BaReciever = GetBankAccountByIban(IbanReciever);
         BankAccount BaSender = GetBankAccountByIban(IbanSender);
 
+        if(Objects.isNull(BaReciever) || Objects.isNull(BaSender)) return false;
+
+
         if(BaReciever.getAccountStatus() == BankAccount.AccountStatusEnum.CLOSED || BaSender.getAccountStatus() == BankAccount.AccountStatusEnum.CLOSED) return false;
 
         boolean transactionValid = false;
