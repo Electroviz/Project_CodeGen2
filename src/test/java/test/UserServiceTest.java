@@ -32,7 +32,7 @@ class UserServiceTest {
 
     @Test
     void createNewRegularUserTest() {
-        User u = CreateFakeUser("janus321","Janus Kogelaar","januskogelaar@live.nl", "geheim123");
+        User u = CreateFakeUser("janus321343","Janus Kogelaar","januskogelaar@live.nl", "geheim123");
 
 
         ResponseEntity result = userService.addUser(u,false);
@@ -43,10 +43,10 @@ class UserServiceTest {
 
     @Test
     void passwordEncodingIsWorkingTest() {
-        User u = CreateFakeUser("janus321","Janus Kogelaar","januskogelaar@live.nl", "geheim123");
+        User u = CreateFakeUser("janus3212234","Janus Kogelaar","januskogelaar@live.nl", "geheim123");
         ResponseEntity result = userService.addUser(u,false);
         if(result.getStatusCodeValue() < 300) {
-            User findUserFromDatabase = userService.getUserById(userService.getUserIdByUsername("janus321"));
+            User findUserFromDatabase = userService.getUserById(userService.getUserIdByUsername("janus3212234"));
             if(findUserFromDatabase != null) {
                 Assertions.assertTrue(!Objects.equals(findUserFromDatabase.getPassword(), "geheim123"));
                 Assertions.assertFalse(Objects.equals(findUserFromDatabase.getPassword(), "geheim123"));
@@ -55,15 +55,14 @@ class UserServiceTest {
 
         }
         else Assertions.assertFalse(result.getStatusCodeValue() >= 300);
-
     }
 
     @Test
     void UsersWithoutBankAccountsFunctionsCorrectlyTest() {
         Integer originalUsersWithoutBankAcountSize = userService.getUsersWithoutBankAccount().size();
 
-        User u = CreateFakeUser("janus321","Janus Kogelaar","januskogelaar@live.nl", "geheim123");
-        User u2 = CreateFakeUser("janus3213","Jakkie Kogelares","januskogelaers@live.nl", "geheim123");
+        User u = CreateFakeUser("janus3213124","Janus Kogelaar","januskogelaar@live.nl", "geheim123");
+        User u2 = CreateFakeUser("janus321361232","Jakkie Kogelares","januskogelaers@live.nl", "geheim123");
 
         userService.addUser(u,false);
         userService.addUser(u2,false);
@@ -91,6 +90,33 @@ class UserServiceTest {
         assertTrue((result1.getStatusCodeValue() >= 300 && result2.getStatusCodeValue() >= 300) && result3.getStatusCodeValue() < 300);
         assertFalse(result1.getStatusCodeValue() < 300 || result2.getStatusCodeValue() < 300 || result3.getStatusCodeValue() >= 300);
     }
+    @Test
+    void checkIfStringIsEmailWorksCorrectlyTest() {
+        boolean resultShouldBeTrue1 = userService.checkIfStringIsEmail("helloWorld@test.com");
+        boolean resultShouldBeTrue2 = userService.checkIfStringIsEmail("helloWorld@jantje.live");
+
+        boolean resultShouldBeFalse1 = userService.checkIfStringIsEmail("@live.nl");
+        boolean resultShouldBeFalse2 = userService.checkIfStringIsEmail("@live");
+        boolean resultShouldBeFalse3 = userService.checkIfStringIsEmail("asd@");
+
+
+        Assertions.assertTrue((resultShouldBeTrue1 && resultShouldBeTrue2) && (!resultShouldBeFalse1 && !resultShouldBeFalse2 && !resultShouldBeFalse3));
+        Assertions.assertFalse(!resultShouldBeTrue1 || !resultShouldBeTrue2 || resultShouldBeFalse1 || resultShouldBeFalse2 || resultShouldBeFalse3);
+    }
+
+    @Test
+    void checkIfUserInputIsWordReturnsFalseIfNotWordTest() {
+        boolean resultShouldBeTrue1 = userService.checkIfUserInputIsWord("test");
+        boolean resultShouldBeTrue2 = userService.checkIfUserInputIsWord("janus akba kangkjn porjgaigf nadvhbahjdbgyabhbrgfauref");
+
+        boolean resultShouldBeFalse1 = userService.checkIfUserInputIsWord("test123123");
+        boolean resultShouldBeFalse2 = userService.checkIfUserInputIsWord("test@");
+
+        Assertions.assertTrue((resultShouldBeTrue1 && resultShouldBeTrue2) && (!resultShouldBeFalse1 && !resultShouldBeFalse2));
+        Assertions.assertFalse(!resultShouldBeTrue1 || !resultShouldBeTrue2 || resultShouldBeFalse1 || resultShouldBeFalse2);
+    }
+
+
 
     private User CreateFakeUser(String username,String fullName, String email, String plainPassword) {
         User newUser = new User();
@@ -104,23 +130,5 @@ class UserServiceTest {
         newUser.setDayLimit(BigDecimal.valueOf(3000.0));
 
         return newUser;
-    }
-
-    @Test
-    void checkIfStringIsEmailWorks() {
-        UserService userService = new UserService();
-
-        Assertions.assertFalse(userService.checkIfStringIsEmail("test.com"));
-    }
-
-    @Test
-    void checkIfUserInputIsWordReturnsFalseIfNotWord() {
-        UserService userService = new UserService();
-
-        Assertions.assertFalse(userService.checkIfUserInputIsWord("test123123"));
-    }
-
-    @Test
-    void login() {
     }
 }
