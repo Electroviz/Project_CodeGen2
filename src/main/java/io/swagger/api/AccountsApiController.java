@@ -212,16 +212,16 @@ public class AccountsApiController implements AccountsApi {
 
     //Nicky
 
-    public ResponseEntity accountDeposit(@PathVariable("IBAN") String IBAN, @RequestBody Transaction transaction) {
-        TransactionInfo transactionInfo = bankAccountService.AccountDeposit(IBAN, transaction.getAmount());
-
-        if(transactionInfo != null) {
-            return new ResponseEntity<TransactionInfo>(transactionInfo,HttpStatus.ACCEPTED);
-        }
-        else {
-            return ResponseEntity.status(400).body("Bad Request");
-        }
-    }
+//    public ResponseEntity accountDeposit(@PathVariable("IBAN") String IBAN, @RequestBody Transaction transaction) {
+//        TransactionInfo transactionInfo = bankAccountService.AccountDeposit(IBAN, transaction.getAmount());
+//
+//        if(transactionInfo != null) {
+//            return new ResponseEntity<TransactionInfo>(transactionInfo,HttpStatus.ACCEPTED);
+//        }
+//        else {
+//            return ResponseEntity.status(400).body("Bad Request");
+//        }
+//    }
 
     //Nicky
 
@@ -239,16 +239,16 @@ public class AccountsApiController implements AccountsApi {
 
     //Nicky
 
-    public ResponseEntity accountWithdraw(@PathVariable("IBAN") String IBAN, @RequestBody Transaction transaction) {
-        TransactionInfo transactionInfo = bankAccountService.AccountWithdraw(IBAN, transaction.getAmount());
-
-        if(transactionInfo != null) {
-            return new ResponseEntity<TransactionInfo>(transactionInfo,HttpStatus.ACCEPTED);
-        }
-        else {
-            return ResponseEntity.status(400).body("Bad Request");
-        }
-    }
+//    public ResponseEntity accountWithdraw(@PathVariable("IBAN") String IBAN, @RequestBody Transaction transaction) {
+//        TransactionInfo transactionInfo = bankAccountService.AccountWithdraw(IBAN, transaction.getAmount());
+//
+//        if(transactionInfo != null) {
+//            return new ResponseEntity<TransactionInfo>(transactionInfo,HttpStatus.ACCEPTED);
+//        }
+//        else {
+//            return ResponseEntity.status(400).body("Bad Request");
+//        }
+//    }
 
     private User getLoggedInUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
