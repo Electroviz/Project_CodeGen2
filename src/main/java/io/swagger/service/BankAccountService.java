@@ -173,7 +173,7 @@ public class BankAccountService {
         BankAccount newBankAccount = new BankAccount();
         newBankAccount.setIban(this.generateRandomIban());
         newBankAccount.setBalance(ThreadLocalRandom.current().nextDouble(300, 1800));
-        newBankAccount.setAbsoluteLimit(0.0);
+        newBankAccount.setAbsoluteLimit(-400.0);
         Random rand = new Random();
         Integer num = rand.nextInt(2);
         if(num == 0) newBankAccount.accountType(BankAccount.AccountTypeEnum.CURRENT);
@@ -208,7 +208,7 @@ public class BankAccountService {
 
         if(BaReciever == null || BaSender == null) return false;
         else if(BaReciever.getAccountStatus() == BankAccount.AccountStatusEnum.CLOSED || BaSender.getAccountStatus() == BankAccount.AccountStatusEnum.CLOSED) return false;
-        else if(IbanSender == IbanReciever) return false;
+        else if(IbanSender.equals(IbanReciever)) return false;
 
         boolean transactionValid = false;
 

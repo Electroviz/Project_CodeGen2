@@ -62,9 +62,18 @@ class BankAccountServiceTest {
 
     @Test
     public void deleteBankAccount() {
-        bankAccountService.DeleteBankAccount("NL82INHO01856227888");
+        BankAccount baTest = new BankAccount();
+        baTest.setBalance(200.0);
+        baTest.setIban(bankAccountService.GenerateIban());
+        baTest.setUserId(1112);
+        baTest.setAccountStatus(BankAccount.AccountStatusEnum.ACTIVE);
+        baTest.setAccountType(BankAccount.AccountTypeEnum.CURRENT);
+        baTest.setAbsoluteLimit(100.0);
+        bankAccountService.SaveBankAccount(baTest);
 
-        Assertions.assertNull(bankAccountService.GetBankAccountByIban("NL82INHO01856227888"));
+        bankAccountService.DeleteBankAccount(baTest.getIban());
+
+        Assertions.assertNull(bankAccountService.GetBankAccountByIban(baTest.getIban()));
     }
 
     @Test
