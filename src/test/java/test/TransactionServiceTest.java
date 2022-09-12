@@ -171,7 +171,7 @@ public class TransactionServiceTest {
     }
 
     @Test
-    public void WithdrawExactBalance() {
+    public void WithdrawExactBalanceTest() {
         //should be possible
         BankAccount ba = fakeBankAccount(3,300.0, BankAccount.AccountTypeEnum.CURRENT, BankAccount.AccountStatusEnum.ACTIVE);
 
@@ -183,7 +183,7 @@ public class TransactionServiceTest {
     }
 
     @Test
-    public void MoneyIsBeingDeposited() {
+    public void MoneyIsBeingDepositedTest() {
         //should be predefined balance
         Double endingAmount = 500.0;
 
@@ -199,7 +199,7 @@ public class TransactionServiceTest {
     }
 
     @Test
-    public void MoneyDepositNegativeValue() {
+    public void MoneyDepositNegativeValueTest() {
         //should not be possible
         boolean result = transactionService.WithdrawOrDepositMoney(bankAccountsList.get(0).getIban(),-200.0,false,bankAccountsList.get(0).getUserId().intValue());
 
@@ -212,7 +212,7 @@ public class TransactionServiceTest {
     //START GET TRANSACTIONS (COLLECT THE EXPECTED DATA)
 
     @Test
-    public void GetCorrectTransactionsByDate() throws ParseException {
+    public void GetCorrectTransactionsByDateTest() throws ParseException {
         //to iban , from iban
         BankAccount ba = fakeBankAccount(4,300.0, BankAccount.AccountTypeEnum.CURRENT, BankAccount.AccountStatusEnum.ACTIVE);
 
@@ -230,11 +230,12 @@ public class TransactionServiceTest {
     }
 
     @Test
-    public void GetTransactionWhereBalanceIsEqual() {
+    public void GetTransactionWhereBalanceIsEqualTest() {
         BankAccount ba1 = fakeBankAccount(1,300.0, BankAccount.AccountTypeEnum.CURRENT, BankAccount.AccountStatusEnum.ACTIVE);
         BankAccount ba2 = fakeBankAccount(2,500.0, BankAccount.AccountTypeEnum.CURRENT, BankAccount.AccountStatusEnum.ACTIVE);
 
-        boolean result = transactionService.TransferMoneyFromToIban(ba2.getIban(),ba1.getIban(),50.0,ba1.getUserId().intValue());
+        transactionService.TransferMoneyFromToIban(ba2.getIban(),ba1.getIban(),50.0,ba1.getUserId().intValue());
+        transactionService.TransferMoneyFromToIban(ba2.getIban(),ba1.getIban(),50.000001,ba1.getUserId().intValue());
 
         List<Transaction> transactionsEqual1 = transactionService.GetTransactionByRelationship(ba2.getIban(),50.0,"equal");
         List<Transaction> transactionsEqual2 = transactionService.GetTransactionByRelationship(ba2.getIban(),Double.valueOf("50"),"equal");
@@ -242,6 +243,58 @@ public class TransactionServiceTest {
         Assertions.assertTrue(transactionsEqual1.size() == 1 && transactionsEqual2.size() == 1);
         Assertions.assertFalse(transactionsEqual1.size() == 0 || transactionsEqual2.size() == 0);
     }
+
+    @Test
+    public void GetTransactionWhereBalanceIsSmallerTest() {
+        BankAccount ba1 = fakeBankAccount(1,300.0, BankAccount.AccountTypeEnum.CURRENT, BankAccount.AccountStatusEnum.ACTIVE);
+        BankAccount ba2 = fakeBankAccount(2,500.0, BankAccount.AccountTypeEnum.CURRENT, BankAccount.AccountStatusEnum.ACTIVE);
+
+        transactionService.TransferMoneyFromToIban(ba2.getIban(),ba1.getIban(),50.0,ba1.getUserId().intValue());
+        transactionService.TransferMoneyFromToIban(ba2.getIban(),ba1.getIban(),51.0,ba1.getUserId().intValue());
+
+        List<Transaction> transactionsSmaller1 = transactionService.GetTransactionByRelationship(ba2.getIban(),50.001,"smaller");
+        List<Transaction> transactionsSmaller2 = transactionService.GetTransactionByRelationship(ba2.getIban(),Double.valueOf("51"),"smaller");
+
+        Assertions.assertTrue(transactionsSmaller1.size() == 1 && transactionsSmaller2.size() == 1);
+        Assertions.assertFalse(transactionsSmaller1.size() == 0 || transactionsSmaller2.size() == 0);
+    }
+
+    @Test
+    public void GetTransactionWhereBalanceIsBiggerTest() {
+        BankAccount ba1 = fakeBankAccount(1,300.0, BankAccount.AccountTypeEnum.CURRENT, BankAccount.AccountStatusEnum.ACTIVE);
+        BankAccount ba2 = fakeBankAccount(2,500.0, BankAccount.AccountTypeEnum.CURRENT, BankAccount.AccountStatusEnum.ACTIVE);
+
+        transactionService.TransferMoneyFromToIban(ba2.getIban(),ba1.getIban(),50.0,ba1.getUserId().intValue());
+        transactionService.TransferMoneyFromToIban(ba2.getIban(),ba1.getIban(),49.0,ba1.getUserId().intValue());
+
+        List<Transaction> transactionsBigger1 = transactionService.GetTransactionByRelationship(ba2.getIban(),49.9999999,"bigger");
+        List<Transaction> transactionsBigger2 = transactionService.GetTransactionByRelationship(ba2.getIban(),Double.valueOf("49"),"bigger");
+
+        Assertions.assertTrue(transactionsBigger1.size() == 1 && transactionsBigger2.size() == 1);
+        Assertions.assertFalse(transactionsBigger1.size() == 0 || transactionsBigger2.size() == 0);
+    }
+
+    @Test
+    public void GetTransactionWhereBalanceIsBiggerMultipleOtherTransactionsTest() {
+        BankAccount ba1 = fakeBankAccount(1,300.0, BankAccount.AccountTypeEnum.CURRENT, BankAccount.AccountStatusEnum.ACTIVE);
+        BankAccount ba2 = fakeBankAccount(2,500.0, BankAccount.AccountTypeEnum.CURRENT, BankAccount.AccountStatusEnum.ACTIVE);
+        BankAccount ba3 = fakeBankAccount(3,800.0, BankAccount.AccountTypeEnum.CURRENT, BankAccount.AccountStatusEnum.ACTIVE);
+        BankAccount ba4 = fakeBankAccount(4,900.0, BankAccount.AccountTypeEnum.CURRENT, BankAccount.AccountStatusEnum.ACTIVE);
+
+        transactionService.TransferMoneyFromToIban(ba2.getIban(),ba1.getIban(),50.0,ba1.getUserId().intValue());
+        transactionService.TransferMoneyFromToIban(ba2.getIban(),ba1.getIban(),49.0,ba1.getUserId().intValue());
+
+        //fake transactions to check result
+        transactionService.TransferMoneyFromToIban(ba3.getIban(),ba4.getIban(),150.0,ba4.getUserId().intValue());
+        transactionService.TransferMoneyFromToIban(ba1.getIban(),ba3.getIban(),104.0,ba4.getUserId().intValue());
+
+        List<Transaction> transactionsBigger1 = transactionService.GetTransactionByRelationship(ba2.getIban(),49.9999999,"bigger");
+        List<Transaction> transactionsBigger2 = transactionService.GetTransactionByRelationship(ba2.getIban(),Double.valueOf("49"),"bigger");
+    }
+
+
+
+
 
     private BankAccount fakeBankAccount(int ownerId, Double balance, BankAccount.AccountTypeEnum type, BankAccount.AccountStatusEnum status) {
 
