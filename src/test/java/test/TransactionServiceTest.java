@@ -3,6 +3,7 @@ package test;
 import io.swagger.Swagger2SpringBoot;
 import io.swagger.enums.BankAccountType;
 import io.swagger.model.BankAccount;
+import io.swagger.model.Transaction;
 import io.swagger.model.TransactionInfo;
 import io.swagger.model.entity.User;
 import io.swagger.service.BankAccountService;
@@ -18,6 +19,8 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -111,16 +114,7 @@ public class TransactionServiceTest {
     @Test
     public void TransferMoneyFromClosedBankAccountTest() {
         //should not be possible
-        BankAccount ba = new BankAccount();
-
-        ba.setAbsoluteLimit(1000.0);
-        ba.setBalance(300.0);
-        ba.setIban(bankAccountService.GenerateIban());
-        ba.setUserId(3);
-        ba.setAccountType(BankAccount.AccountTypeEnum.CURRENT);
-        ba.setAccountStatus(BankAccount.AccountStatusEnum.CLOSED);
-
-        bankAccountService.SaveBankAccount(ba);
+        BankAccount ba = fakeBankAccount(3,300.0, BankAccount.AccountTypeEnum.CURRENT, BankAccount.AccountStatusEnum.CLOSED);
 
         boolean result = transactionService.TransferMoneyFromToIban(ba.getIban(),bankAccountsList.get(1).getIban(), 100.0,ba.getUserId().intValue());
 
@@ -129,18 +123,22 @@ public class TransactionServiceTest {
     }
 
     @Test
+    public void TransferMoneyFromOneUserIbanToSavingsAccountOtherUser() {
+        BankAccount baCurrent = fakeBankAccount(3,300.0, BankAccount.AccountTypeEnum.CURRENT, BankAccount.AccountStatusEnum.ACTIVE);
+        BankAccount baCurrentSavings = fakeBankAccount(3,300.0, BankAccount.AccountTypeEnum.SAVINGS, BankAccount.AccountStatusEnum.ACTIVE);
+        BankAccount baSavings = fakeBankAccount(4,300.0, BankAccount.AccountTypeEnum.SAVINGS, BankAccount.AccountStatusEnum.CLOSED);
+
+        boolean resultCurrentToSavingsDifferentUsers = transactionService.TransferMoneyFromToIban(baSavings.getIban(),baCurrent.getIban(),20.0,baCurrent.getUserId().intValue());
+        boolean resultCurrentToOwnSavings = transactionService.TransferMoneyFromToIban(baCurrentSavings.getIban(),baCurrent.getIban(),20.0,baCurrent.getUserId().intValue());
+
+        Assertions.assertTrue(resultCurrentToSavingsDifferentUsers == false && resultCurrentToOwnSavings);
+        Assertions.assertFalse(resultCurrentToSavingsDifferentUsers == true || resultCurrentToOwnSavings == false);
+    }
+
+    @Test
     public void TransferMoneyToClosedBankAccountTest() {
         //should not be possible
-        BankAccount ba = new BankAccount();
-
-        ba.setAbsoluteLimit(1000.0);
-        ba.setBalance(300.0);
-        ba.setIban(bankAccountService.GenerateIban());
-        ba.setUserId(3);
-        ba.setAccountType(BankAccount.AccountTypeEnum.CURRENT);
-        ba.setAccountStatus(BankAccount.AccountStatusEnum.CLOSED);
-
-        bankAccountService.SaveBankAccount(ba);
+        BankAccount ba = fakeBankAccount(3,300.0, BankAccount.AccountTypeEnum.CURRENT, BankAccount.AccountStatusEnum.CLOSED);
 
         boolean result = transactionService.TransferMoneyFromToIban(bankAccountsList.get(0).getIban(),ba.getIban(), 100.0,bankAccountsList.get(0).getUserId().intValue());
 
@@ -164,16 +162,7 @@ public class TransactionServiceTest {
     @Test
     public void WithdrawToMuchMoneyTest() {
         //should not be possible
-        BankAccount ba = new BankAccount();
-
-        ba.setAbsoluteLimit(1000.0);
-        ba.setBalance(300.0);
-        ba.setIban(bankAccountService.GenerateIban());
-        ba.setUserId(3);
-        ba.setAccountType(BankAccount.AccountTypeEnum.CURRENT);
-        ba.setAccountStatus(BankAccount.AccountStatusEnum.ACTIVE);
-
-        bankAccountService.SaveBankAccount(ba);
+        BankAccount ba = fakeBankAccount(3,300.0, BankAccount.AccountTypeEnum.CURRENT, BankAccount.AccountStatusEnum.ACTIVE);
 
         boolean result = transactionService.WithdrawOrDepositMoney(ba.getIban(),300.05,true,ba.getUserId().intValue());
 
@@ -184,16 +173,8 @@ public class TransactionServiceTest {
     @Test
     public void WithdrawExactBalance() {
         //should be possible
-        BankAccount ba = new BankAccount();
+        BankAccount ba = fakeBankAccount(3,300.0, BankAccount.AccountTypeEnum.CURRENT, BankAccount.AccountStatusEnum.ACTIVE);
 
-        ba.setAbsoluteLimit(1000.0);
-        ba.setBalance(300.0);
-        ba.setIban(bankAccountService.GenerateIban());
-        ba.setUserId(3);
-        ba.setAccountType(BankAccount.AccountTypeEnum.CURRENT);
-        ba.setAccountStatus(BankAccount.AccountStatusEnum.ACTIVE);
-
-        bankAccountService.SaveBankAccount(ba);
 
         boolean result = transactionService.WithdrawOrDepositMoney(ba.getIban(),300.0,true,ba.getUserId().intValue());
 
@@ -205,16 +186,9 @@ public class TransactionServiceTest {
     public void MoneyIsBeingDeposited() {
         //should be predefined balance
         Double endingAmount = 500.0;
-        BankAccount ba = new BankAccount();
 
-        ba.setAbsoluteLimit(1000.0);
-        ba.setBalance(300.0);
-        ba.setIban(bankAccountService.GenerateIban());
-        ba.setUserId(3);
-        ba.setAccountType(BankAccount.AccountTypeEnum.CURRENT);
-        ba.setAccountStatus(BankAccount.AccountStatusEnum.ACTIVE);
+        BankAccount ba = fakeBankAccount(3,300.0, BankAccount.AccountTypeEnum.CURRENT, BankAccount.AccountStatusEnum.ACTIVE);
 
-        bankAccountService.SaveBankAccount(ba);
 
         boolean result = transactionService.WithdrawOrDepositMoney(ba.getIban(),200.0,false,ba.getUserId().intValue());
 
@@ -235,11 +209,55 @@ public class TransactionServiceTest {
 
     //END DEPOSIT AND WITHDRAW TESTS
 
-    //START TRANSACTIONS BY DATE LOOKUP SHOULD FUNCTION PERFECTLY
-    @Test
-    public void TestTest() {
-        System.out.println("Total amount of transactions are: " + transactionService.GetAllTransactionsFromDatabase().size());
+    //START GET TRANSACTIONS (COLLECT THE EXPECTED DATA)
 
-        Assertions.assertFalse(true == true);
+    @Test
+    public void GetCorrectTransactionsByDate() throws ParseException {
+        //to iban , from iban
+        BankAccount ba = fakeBankAccount(4,300.0, BankAccount.AccountTypeEnum.CURRENT, BankAccount.AccountStatusEnum.ACTIVE);
+
+        boolean result1 = transactionService.TransferMoneyFromToIban(bankAccountsList.get(1).getIban(),ba.getIban(),50.0,ba.getUserId().intValue());
+        boolean result2 = transactionService.TransferMoneyFromToIban(bankAccountsList.get(1).getIban(),ba.getIban(),80.0,ba.getUserId().intValue());
+
+        if(result1 && result2) {
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+            List<Transaction> transactionsForBa = transactionService.GetTransactionsInBetweenDate(format.parse("1999-01-01"), format.parse("2050-09-12"),ba.getUserId().intValue());
+
+            Assertions.assertTrue(transactionsForBa.size() == 2);
+            Assertions.assertFalse(transactionsForBa.size() < 2);
+        }
+        else Assertions.assertFalse(result1 != result2);
     }
+
+    @Test
+    public void GetTransactionWhereBalanceIsEqual() {
+        BankAccount ba1 = fakeBankAccount(1,300.0, BankAccount.AccountTypeEnum.CURRENT, BankAccount.AccountStatusEnum.ACTIVE);
+        BankAccount ba2 = fakeBankAccount(2,500.0, BankAccount.AccountTypeEnum.CURRENT, BankAccount.AccountStatusEnum.ACTIVE);
+
+        boolean result = transactionService.TransferMoneyFromToIban(ba2.getIban(),ba1.getIban(),50.0,ba1.getUserId().intValue());
+
+        List<Transaction> transactionsEqual1 = transactionService.GetTransactionByRelationship(ba2.getIban(),50.0,"equal");
+        List<Transaction> transactionsEqual2 = transactionService.GetTransactionByRelationship(ba2.getIban(),Double.valueOf("50"),"equal");
+
+        Assertions.assertTrue(transactionsEqual1.size() == 1 && transactionsEqual2.size() == 1);
+        Assertions.assertFalse(transactionsEqual1.size() == 0 || transactionsEqual2.size() == 0);
+    }
+
+    private BankAccount fakeBankAccount(int ownerId, Double balance, BankAccount.AccountTypeEnum type, BankAccount.AccountStatusEnum status) {
+
+        BankAccount ba = new BankAccount();
+
+        ba.setAbsoluteLimit(-200.0);
+        ba.setBalance(balance);
+        ba.setIban(bankAccountService.GenerateIban());
+        ba.setUserId(ownerId);
+        ba.setAccountType(type);
+        ba.setAccountStatus(status);
+
+        bankAccountService.SaveBankAccount(ba);
+
+        return ba;
+    }
+
+
 }

@@ -155,7 +155,7 @@ public class TransactionService {
             //CHECK IF THE BALANCE IS NOT BECOMMING LOWER THE THE PRE DEFINED ABSOLUTE LIMIT FOR THE USER
             if(fromBankAccount.getBalance() - amount < fromBankAccount.getAbsoluteLimit()) return false;
 
-            //DAY LIMIT CHECK NECESSARY
+            //DAY LIMIT CHECK NECESSARY - BUT NOT FUNCTIONAL :(
 
 
             fromBankAccount.setBalance(fromBankAccount.getBalance() - amount);
