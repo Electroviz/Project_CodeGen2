@@ -94,9 +94,9 @@ public class AccountsApiController implements AccountsApi {
     }
 
     //melle
-    /*
+
     @PreAuthorize("hasRole('EMPLOYEE') or hasRole('CUSTOMER')")
-    public ResponseEntity testFunc(@PathVariable("userId") long userId) {
+    public ResponseEntity getBankAccountByUserId(@PathVariable("userId") long userId) {
         User u = this.getLoggedInUser();
 
         List<BankAccount> bankAccounts = bankAccountService.GetBankAccountsByUserId(userId);
@@ -115,7 +115,7 @@ public class AccountsApiController implements AccountsApi {
             else return ResponseEntity.status(200).body(bankAccounts); //succes
         } else return ResponseEntity.status(401).body(null); //forbidden
     }
-    */
+
 
     //melle
 

@@ -97,7 +97,7 @@ public interface AccountsApi {
     @RequestMapping(method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, value="/initBankAccounts/{userId}")
     ResponseEntity postBankAccountsForUserByUserId(@PathVariable("userId") Long userId);
 
-    /*
+
     @Operation(summary = "test function for userid", description = "test function for userid", security = {
             @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts" })
     @ApiResponses(value = {
@@ -111,8 +111,8 @@ public interface AccountsApi {
 
             @ApiResponse(responseCode = "404", description = "Requested object not found") })
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value="/bankAccounts/{userId}")
-    ResponseEntity testFunc(@PathVariable("userId") long userId);
-    */
+    ResponseEntity getBankAccountByUserId(@PathVariable("userId") long userId);
+
 
     @Operation(summary = "Get all bank accounts", description = "Get all bank accounts", security = {
             @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts" })
