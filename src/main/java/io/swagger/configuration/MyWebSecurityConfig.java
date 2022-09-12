@@ -27,13 +27,16 @@ public class MyWebSecurityConfig extends WebSecurityConfigurerAdapter {
     private static final String[] AUTH_WHITELIST = {
             "/login",
             "/h2-console/**/**",
-            "/swagger-ui.html",
             "/webjars/**",
             "/api-docs/**",
             "/swagger-ui/**",
+            "/swagger-ui",
             "/user/login",
             "/user/registeruser",
-            "/**"
+            "/user/login",
+            "/swagger-resources/**",
+            "/swagger-ui.html",
+            "/v2/api-docs"
     };
 
     @Override

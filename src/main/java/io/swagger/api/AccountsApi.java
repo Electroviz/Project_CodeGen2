@@ -6,43 +6,26 @@
 package io.swagger.api;
 
 import io.swagger.model.BankAccount;
-import io.swagger.model.Transaction;
-import io.swagger.model.TransactionInfo;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.bind.annotation.CookieValue;
-
-import javax.validation.Valid;
-import javax.validation.constraints.*;
-import java.util.List;
-import java.util.Map;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-05-12T15:22:53.754Z[GMT]")
 @Validated
 public interface AccountsApi {
 
-    @Operation(summary = "Change bank account type", description = "Change bank account type", security = {
+    @Operation(summary = "Change Bank account type", description = "Change bank account type", security = {
         @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts" })
     @ApiResponses(value = { 
-        @ApiResponse(responseCode = "202", description = "money deposited"),
+        @ApiResponse(responseCode = "201", description = "Bankaccount type changed"),
         
         @ApiResponse(responseCode = "400", description = "Invalid input"),
         
@@ -54,10 +37,10 @@ public interface AccountsApi {
     @RequestMapping(method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE, value= "/putBankAccountType/{type}/{IBAN}")
     ResponseEntity putBankAccountTypeByIBAN(@PathVariable("type") String type, @PathVariable("IBAN") String IBAN);
 
-    @Operation(summary = "Change bankaccount Absolute Limit", description = "Change bankaccount Absolute Limit", security = {
+    @Operation(summary = "Change Bank account Absolute Limit", description = "Change bankaccount Absolute Limit", security = {
             @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts" })
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "202", description = "money deposited"),
+            @ApiResponse(responseCode = "201", description = "Absolute limit changed"),
 
             @ApiResponse(responseCode = "400", description = "Invalid input"),
 
@@ -69,10 +52,10 @@ public interface AccountsApi {
     @RequestMapping(method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE, value= "/putAbsoluteLimit/{value}/{IBAN}")
     ResponseEntity putBankAccountAbsoluteLimit(@PathVariable("value") String value, @PathVariable("IBAN") String IBAN);
 
-    @Operation(summary = "Change Bank Account status", description = "Change Bank Account status", security = {
+    @Operation(summary = "Change Bank account status", description = "Change Bank Account status", security = {
             @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts" })
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "202", description = "money deposited"),
+            @ApiResponse(responseCode = "201", description = "Bankaccount status changed"),
 
             @ApiResponse(responseCode = "400", description = "Invalid input"),
 
@@ -87,7 +70,7 @@ public interface AccountsApi {
     @Operation(summary = "Get total balance by an userid", description = "Get total balance by an userid", security = {
             @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts" })
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "202", description = "money deposited"),
+            @ApiResponse(responseCode = "200", description = "succesfully recieved totalbalance by userid"),
 
             @ApiResponse(responseCode = "400", description = "Invalid input"),
 
@@ -99,10 +82,10 @@ public interface AccountsApi {
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value="/totalBalance/{userId}")
     ResponseEntity getTotalBalanceForUserId(@PathVariable("userId") Long userId);
 
-    @Operation(summary = "Create a Bank Account for a user by an user id", description = "Create a Bank Account for a user by an user id", security = {
+    @Operation(summary = "Create a Bank account for a user by an user id", description = "Create a Bank Account for a user by an user id", security = {
             @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts" })
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "202", description = "money deposited"),
+            @ApiResponse(responseCode = "201", description = "Bankaccount created"),
 
             @ApiResponse(responseCode = "400", description = "Invalid input"),
 
@@ -114,6 +97,7 @@ public interface AccountsApi {
     @RequestMapping(method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, value="/initBankAccounts/{userId}")
     ResponseEntity postBankAccountsForUserByUserId(@PathVariable("userId") Long userId);
 
+    /*
     @Operation(summary = "test function for userid", description = "test function for userid", security = {
             @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts" })
     @ApiResponses(value = {
@@ -128,11 +112,12 @@ public interface AccountsApi {
             @ApiResponse(responseCode = "404", description = "Requested object not found") })
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value="/bankAccounts/{userId}")
     ResponseEntity testFunc(@PathVariable("userId") long userId);
+    */
 
     @Operation(summary = "Get all bank accounts", description = "Get all bank accounts", security = {
             @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts" })
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "202", description = "money deposited"),
+            @ApiResponse(responseCode = "200", description = "successfully received all bank accounts"),
 
             @ApiResponse(responseCode = "400", description = "Invalid input"),
 
@@ -147,7 +132,7 @@ public interface AccountsApi {
     @Operation(summary = "create a bank account", description = "create a bank account", security = {
             @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts" })
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "202", description = "money deposited"),
+            @ApiResponse(responseCode = "201", description = "Bankaccount created succesfully"),
 
             @ApiResponse(responseCode = "400", description = "Invalid input"),
 
@@ -162,7 +147,7 @@ public interface AccountsApi {
     @Operation(summary = "Get bank account by iban", description = "Get bank account by iban", security = {
             @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts" })
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "202", description = "money deposited"),
+            @ApiResponse(responseCode = "200", description = "bank account successfully received"),
 
             @ApiResponse(responseCode = "400", description = "Invalid input"),
 
@@ -177,7 +162,7 @@ public interface AccountsApi {
     @Operation(summary = "Get bank account by name", description = "Get bank account by name", security = {
             @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts" })
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "202", description = "money deposited"),
+            @ApiResponse(responseCode = "200", description = "Succesfully recieved bank account by name"),
 
             @ApiResponse(responseCode = "400", description = "Invalid input"),
 
@@ -189,25 +174,10 @@ public interface AccountsApi {
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE,value="/getBankAccount/name/{FULLNAME}")
     ResponseEntity getBankAccountInfoByName(@PathVariable("FULLNAME") String fullName);
 
-    @Operation(summary = "Make a desposit with iban", description = "Make a desposit with iban", security = {
-            @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts" })
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "202", description = "money deposited"),
-
-            @ApiResponse(responseCode = "400", description = "Invalid input"),
-
-            @ApiResponse(responseCode = "401", description = "Unauthorised for this action"),
-
-            @ApiResponse(responseCode = "403", description = "Forbidden"),
-
-            @ApiResponse(responseCode = "404", description = "Requested object not found") })
-    @RequestMapping(method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE,value="/getBankAccount/{IBAN}/Deposit")
-    ResponseEntity accountDeposit(@PathVariable("IBAN") String IBAN, @RequestBody Transaction transaction);
-
     @Operation(summary = "Delete bank account by iban", description = "Delete bank account by iban", security = {
             @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts" })
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "202", description = "money deposited"),
+            @ApiResponse(responseCode = "200", description = "Succesfully deleted bank account by iban"),
 
             @ApiResponse(responseCode = "400", description = "Invalid input"),
 
@@ -218,21 +188,6 @@ public interface AccountsApi {
             @ApiResponse(responseCode = "404", description = "Requested object not found") })
     @RequestMapping(method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE,value="/deleteAccount/{IBAN}")
     ResponseEntity deleteAccount(@PathVariable("IBAN") String IBAN);
-
-    @Operation(summary = "Make a withdraw with iban", description = "Make a withdraw with iban", security = {
-            @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts" })
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "202", description = "money deposited"),
-
-            @ApiResponse(responseCode = "400", description = "Invalid input"),
-
-            @ApiResponse(responseCode = "401", description = "Unauthorised for this action"),
-
-            @ApiResponse(responseCode = "403", description = "Forbidden"),
-
-            @ApiResponse(responseCode = "404", description = "Requested object not found") })
-    @RequestMapping(method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE,value="/getBankAccount/{IBAN}/Withdraw")
-    ResponseEntity accountWithdraw(@PathVariable("IBAN") String IBAN, @RequestBody Transaction transaction);
 
 }
 

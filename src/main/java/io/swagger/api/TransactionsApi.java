@@ -5,14 +5,9 @@
  */
 package io.swagger.api;
 
-import java.math.BigDecimal;
-
 import org.springframework.http.MediaType;
-import org.threeten.bp.OffsetDateTime;
 import io.swagger.model.Transaction;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -22,21 +17,13 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.bind.annotation.CookieValue;
 
-import javax.validation.Valid;
-import javax.validation.constraints.*;
+
+
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.List;
-import java.util.Map;
+
 
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-05-12T15:22:53.754Z[GMT]")
 @Validated
@@ -45,7 +32,7 @@ public interface TransactionsApi {
     @Operation(summary = "gets all transactions", description = "gets all transactions", security = {
         @SecurityRequirement(name = "bearerAuth")    }, tags={ "Transactions" })
     @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "Transactions returned successfully", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = Transaction.class)))),
+        @ApiResponse(responseCode = "200", description = "Succesfully recieved transactions", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = Transaction.class)))),
         
         @ApiResponse(responseCode = "400", description = "Invalid input"),
         
@@ -63,7 +50,7 @@ public interface TransactionsApi {
     @Operation(summary = "transfer money from account to account", description = "transfer money form account to account", security = {
         @SecurityRequirement(name = "bearerAuth")    }, tags={ "Transactions" })
     @ApiResponses(value = { 
-        @ApiResponse(responseCode = "202", description = "money transfered"),
+        @ApiResponse(responseCode = "200", description = "money transfered succesfully"),
         
         @ApiResponse(responseCode = "400", description = "Invalid input"),
         
@@ -80,7 +67,7 @@ public interface TransactionsApi {
     @Operation(summary = "withdraw money", description = "withdraw money", security = {
             @SecurityRequirement(name = "bearerAuth")    }, tags={ "Transactions" })
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "202", description = "money withdrawn"),
+            @ApiResponse(responseCode = "200", description = "money withdrawn succesfully"),
 
             @ApiResponse(responseCode = "400", description = "Invalid input"),
 
@@ -96,7 +83,7 @@ public interface TransactionsApi {
     @Operation(summary = "deposit money", description = "deposit money", security = {
             @SecurityRequirement(name = "bearerAuth")    }, tags={ "Transactions" })
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "202", description = "money despositted"),
+            @ApiResponse(responseCode = "202", description = "money despositted succesfully"),
 
             @ApiResponse(responseCode = "400", description = "Invalid input"),
 
@@ -111,7 +98,7 @@ public interface TransactionsApi {
     @Operation(summary = "Get Transactions by date", description = "Get Transactions by date", security = {
             @SecurityRequirement(name = "bearerAuth")    }, tags={ "Transactions" })
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "202", description = "money despositted"),
+            @ApiResponse(responseCode = "200", description = "Succesfully recieved transactions by date"),
 
             @ApiResponse(responseCode = "400", description = "Invalid input"),
 
@@ -126,7 +113,7 @@ public interface TransactionsApi {
     @Operation(summary = "Get transactions from a user by date", description = "Get transactions from a user by date", security = {
             @SecurityRequirement(name = "bearerAuth")    }, tags={ "Transactions" })
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "202", description = "money despositted"),
+            @ApiResponse(responseCode = "200", description = "Succesfully recived transactions by date by user"),
 
             @ApiResponse(responseCode = "400", description = "Invalid input"),
 
@@ -141,7 +128,7 @@ public interface TransactionsApi {
     @Operation(summary = "Get transactions from an iban", description = "Get transactions from an iban", security = {
             @SecurityRequirement(name = "bearerAuth")    }, tags={ "Transactions" })
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "202", description = "money despositted"),
+            @ApiResponse(responseCode = "200", description = "Succesfully recieved transactions from iban"),
 
             @ApiResponse(responseCode = "400", description = "Invalid input"),
 
@@ -156,7 +143,7 @@ public interface TransactionsApi {
     @Operation(summary = "Get transactions that are equel to input", description = "Get transactions that are equel to input", security = {
             @SecurityRequirement(name = "bearerAuth")    }, tags={ "Transactions" })
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "202", description = "money despositted"),
+            @ApiResponse(responseCode = "200", description = "Succesfully got transactions equel to input"),
 
             @ApiResponse(responseCode = "400", description = "Invalid input"),
 
@@ -171,7 +158,7 @@ public interface TransactionsApi {
     @Operation(summary = "Get transactions that are smaller than input", description = "Get transactions that are smaller than input", security = {
             @SecurityRequirement(name = "bearerAuth")    }, tags={ "Transactions" })
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "202", description = "money despositted"),
+            @ApiResponse(responseCode = "202", description = "Succesfully got transactions smaller then input"),
 
             @ApiResponse(responseCode = "400", description = "Invalid input"),
 
@@ -187,7 +174,7 @@ public interface TransactionsApi {
     @Operation(summary = "Get transactions that are bigger than input", description = "Get transactions that are bigger than input", security = {
             @SecurityRequirement(name = "bearerAuth")    }, tags={ "Transactions" })
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "202", description = "money despositted"),
+            @ApiResponse(responseCode = "202", description = "Succesfully got transactions bigger then input"),
 
             @ApiResponse(responseCode = "400", description = "Invalid input"),
 

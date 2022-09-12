@@ -25,7 +25,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -64,6 +63,7 @@ public class UserApiController implements UserApi {
     }
 
 
+    //Nick
     @PreAuthorize("hasRole('EMPLOYEE')")
     public ResponseEntity getAll(){
 
@@ -79,22 +79,7 @@ public class UserApiController implements UserApi {
         return ResponseEntity.status(200).body(dtos);
     }
 
-
-
-    public ResponseEntity<UserDTO> userUseridGet(@Parameter(in = ParameterIn.PATH, description = "UserId to get user information", required=true, schema=@Schema()) @PathVariable("userid") String userid) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
-            try {
-                return new ResponseEntity<UserDTO>(objectMapper.readValue("{\n  \"password\" : \"fhdnd_Hdkf\",\n  \"phone\" : \"612345345\",\n  \"transaction limit\" : 500,\n  \"dateOfBirth\" : \"17-09-1990\",\n  \"day limit\" : 1000,\n  \"id\" : 0,\n  \"fullname\" : \"Kees Post\",\n  \"userRole\" : \"Employee\",\n  \"email\" : \"PieterBG@gmail.com\",\n  \"username\" : \"Kees1978\"\n}", UserDTO.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<UserDTO>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
-
-        return new ResponseEntity<UserDTO>(HttpStatus.NOT_IMPLEMENTED);
-    }
-
+    //Nick
     public ResponseEntity getUserIdByJwtTokenVerification() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         try {
@@ -142,6 +127,7 @@ public class UserApiController implements UserApi {
     }
 
 
+    //Nick
     @PreAuthorize("hasRole('EMPLOYEE')")
     public ResponseEntity getUserById(@PathVariable("id") Long id){
 
@@ -154,9 +140,9 @@ public class UserApiController implements UserApi {
         return ResponseEntity.status(201).body(response);
     }
 
+    //Nick
     public String login(@RequestBody Login login){
 
-        String test = "test";
         return userService.login(login.getUsername(), login.getPassword());
     }
 }

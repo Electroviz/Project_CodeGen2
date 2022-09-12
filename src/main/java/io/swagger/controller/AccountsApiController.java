@@ -4,8 +4,6 @@ import io.swagger.annotations.Api;
 import io.swagger.api.AccountsApi;
 import io.swagger.enums.UserRoleEnum;
 import io.swagger.model.BankAccount;
-import io.swagger.model.Transaction;
-import io.swagger.model.TransactionInfo;
 import io.swagger.model.entity.User;
 import io.swagger.service.BankAccountService;
 import io.swagger.service.UserService;
@@ -33,7 +31,6 @@ public class AccountsApiController implements AccountsApi {
     private UserService userService;
 
     //melle
-
     @PreAuthorize("hasRole('EMPLOYEE')")
     public ResponseEntity putBankAccountTypeByIBAN(@PathVariable("type") String type, @PathVariable("IBAN") String IBAN) {
         type = type.replaceAll("[{}]",""); //make sure that the {variable} quotes are not taking into consideration
@@ -97,7 +94,7 @@ public class AccountsApiController implements AccountsApi {
     }
 
     //melle
-
+    /*
     @PreAuthorize("hasRole('EMPLOYEE') or hasRole('CUSTOMER')")
     public ResponseEntity testFunc(@PathVariable("userId") long userId) {
         User u = this.getLoggedInUser();
@@ -118,6 +115,7 @@ public class AccountsApiController implements AccountsApi {
             else return ResponseEntity.status(200).body(bankAccounts); //succes
         } else return ResponseEntity.status(401).body(null); //forbidden
     }
+    */
 
     //melle
 
@@ -192,19 +190,6 @@ public class AccountsApiController implements AccountsApi {
 
     //Nicky
 
-    public ResponseEntity accountDeposit(@PathVariable("IBAN") String IBAN, @RequestBody Transaction transaction) {
-        TransactionInfo transactionInfo = bankAccountService.AccountDeposit(IBAN, transaction.getAmount());
-
-        if(transactionInfo != null) {
-            return new ResponseEntity<TransactionInfo>(transactionInfo,HttpStatus.ACCEPTED);
-        }
-        else {
-            return ResponseEntity.status(400).body("Bad Request");
-        }
-    }
-
-    //Nicky
-
     @PreAuthorize("hasRole('EMPLOYEE')")
     public ResponseEntity deleteAccount(@PathVariable("IBAN") String IBAN) {
         BankAccount bankAccount = bankAccountService.DeleteBankAccount(IBAN);
@@ -217,18 +202,6 @@ public class AccountsApiController implements AccountsApi {
         }
     }
 
-    //Nicky
-
-    public ResponseEntity accountWithdraw(@PathVariable("IBAN") String IBAN, @RequestBody Transaction transaction) {
-        TransactionInfo transactionInfo = bankAccountService.AccountWithdraw(IBAN, transaction.getAmount());
-
-        if(transactionInfo != null) {
-            return new ResponseEntity<TransactionInfo>(transactionInfo,HttpStatus.ACCEPTED);
-        }
-        else {
-            return ResponseEntity.status(400).body("Bad Request");
-        }
-    }
 
     private User getLoggedInUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
